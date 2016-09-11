@@ -2,11 +2,11 @@ import apa102
 import time
 import lightshows.spinthebottle
 import lightshows.utilities
+import lightshows.strandtest
 
 num_leds = 576
 strip = apa102.APA102(num_leds, max_spi_speed_hz=4000000)
-measurement = lightshows.utilities.MeasureFPS(strip)
+show = lightshows.spinthebottle.SpinTheBottle(strip)
 
-fps = measurement.run()
-
-print("Framerate: {}".format(fps))
+show.highlight_sections = 2
+show.run(fadeout=True)

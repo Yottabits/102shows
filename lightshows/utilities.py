@@ -13,8 +13,25 @@ def dim(undimmed: tuple, factor: float) -> tuple:
     return dimmed
 
 
-def fadeout(fadetime_sec: float):
+def linear_fadeout(strip: apa102.APA102, fadetime_sec: float):
+    now = time.perf_counter()
+    start_time = now
+    stop_time = now + fadetime_sec
+
+    initial_color = []
+    for led in range(strip.numLEDs):
+        initial_color.append(strip.getPixel(led))
+
+    while now < stop_time:
+        brightness = (stop_time - now) / fadetime_sec
+        for led in range(strip.numLEDs):
+            color = dim(initial_color[led], brightness)
+            strip.setPixel(led, *color)
+        strip.show()
+        now = time.perf_counter()
+
     pass  # @todo
+
 
 
 class MeasureFPS:

@@ -42,6 +42,10 @@ class SpinTheBottle:
             time.sleep(0.003 / relative_distance)  # slow down a little
         self.highlight(target_led)
 
+        if(fadeout):
+            time.sleep(10)
+            util.linear_fadeout(self.strip, fadetime_sec=2)
+
     def go_round(self):
         self.strip.clearStrip()
         for led in range(self.strip.numLEDs):
