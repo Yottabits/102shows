@@ -13,46 +13,40 @@ class SpinTheBottle:
         self.lower_border = 0
         self.upper_border = self.strip.numLEDs
 
-    def highlight(self, position: int, highlight_width=3):
+    def highlight(self, position: int, highlight_radius: int = 3):
         for led in range(0, self.strip.numLEDs):
             distance = abs(led - position)  # distance to highlight center
-            if distance <= highlight_width:
-                dim_factor = (1 - (distance / highlight_width)) ** 2
+            if distance <= highlight_radius:
+                dim_factor = (1 - (distance / highlight_radius)) ** 2
                 color = util.dim(self.highlight_color, dim_factor)
                 self.strip.setPixel(led, *color)
             else:
                 self.strip.setPixel(led, *self.background_color)
         self.strip.show()
 
-    def run(self, fadeout=False):
-        led_step = (self.upper_border - self.lower_border) // self.highlight_sections
-        target_led = random.randrange(self.lower_border, self.upper_border, led_step)
+    def run(self, time_sec: float = 5, fadeout: bool = False):
+        section_width = (self.upper_border - self.lower_border) // self.highlight_sections
+        target_led = random.randrange(self.lower_border, self.upper_border, section_width)
+        frame_time = time_sec / (3 * self.highlight_sections)  # 3 for the three roundtrips
 
         # go round the strip one time
-        for led in range(self.lower_border, self.upper_border + 1, led_step):
-            self.highlight(led)
-            time.sleep(0)
-        for led in range(self.upper_border + 1, self.lower_border, -led_step):
-            self.highlight(led)
+        for led in range(self.lower_border, self.upper_border + 1, section_width):
+            self.highlight(led, highlight_radius=section_width // 2)
+            time.sleep(frame_time)
+        for led in range(self.upper_border + 1, self.lower_border, -section_width):
+            self.highlight(led, highlight_radius=section_width // 2)
+            time.sleep(frame_time)
 
         # focus on target
-        for led in range(self.lower_border, target_led, led_step):
+        for led in range(self.lower_border, target_led, section_width):
             self.highlight(led)
             relative_distance = abs(led - target_led) / self.strip.numLEDs
-            time.sleep(0.003 / relative_distance)  # slow down a little
-        self.highlight(target_led)
+            time.sleep(0.0006 * time_sec / relative_distance)  # slow down a little
+        self.highlight(target_led, highlight_radius=section_width // 2)
 
-        if(fadeout):
+        if fadeout:
             time.sleep(10)
             util.linear_fadeout(self.strip, fadetime_sec=2)
-
-    def go_round(self):
-        self.strip.clearStrip()
-        for led in range(self.strip.numLEDs):
-            self.strip.setPixel(led, *self.highlight_color)
-        self.strip.show()
-        self.strip.show()
-        self.strip.show()
 
     def set_borders(self, lower: int, upper: int):
         self.lower_border = lower

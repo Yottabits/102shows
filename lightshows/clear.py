@@ -5,4 +5,4 @@ class clear:
         self.strip = strip
 
     def run(self):
-        strip.clear()
+        self.strip.clear()

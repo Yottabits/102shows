@@ -1,1 +1,2 @@
-__all__ = ['clear', 'spinthebottle', 'strandtest', 'twocolorblend']
+# __all__ = ['clear', 'dummy', 'spinthebottle', 'strandtest', 'twocolorblend']
+__all__ = ['dummy']
