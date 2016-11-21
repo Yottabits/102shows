@@ -1,6 +1,10 @@
-class Dummy:
-    def run(self):
-        print("Dummy show started")
+def run(strip, conf, parameters):
+    print("Dummy show started")
 
-    def stop(self):
-        print("Dummy show stopped")
+
+def parameters_valid(parameters: dict) -> bool:
+    return True
+
+
+def stop():
+    print("Dummy show stopped")

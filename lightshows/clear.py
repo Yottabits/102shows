@@ -1,8 +1,9 @@
-import apa102
+def run(strip, conf, parameters):
+    strip.clearStrip()
 
-class clear:
-    def __init__(self, strip: apa102.APA102):
-        self.strip = strip
 
-    def run(self):
-        self.strip.clear()
+def parameters_valid(parameters: dict) -> bool:
+    if "useless" in parameters:
+        return True
+    else:
+        return False
