@@ -1,0 +1,8 @@
+# thumbnails created by windows
+Thumbs.db
+
+# IDE files
+.idea/
+
+# any specific configuration
+config.py
