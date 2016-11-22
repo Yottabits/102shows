@@ -14,7 +14,7 @@ configuration = DefaultConfig.Configuration()
 
 
 # A list of available shows
-shows = {
+configuration.shows = {
     'clear': lightshows.clear,
     'dummy': lightshows.dummy,
     'spinthebottle': lightshows.spinthebottle,

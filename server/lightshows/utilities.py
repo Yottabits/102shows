@@ -1,5 +1,5 @@
 import time
-import DummyAPA102 as apa102
+import apa102
 
 
 def dim(undimmed: tuple, factor: float) -> tuple:

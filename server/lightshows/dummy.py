@@ -5,10 +5,12 @@ This show does nothing with the strip
 """
 
 import logging
+from apa102 import APA102
+from DefaultConfig import Configuration
 
 
 # end immediately after start
-def run(strip, conf, parameters):
+def run(strip: APA102, conf: Configuration, parameters: dict):
     logging.info("Dummy show started")
     stop()
 

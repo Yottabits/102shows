@@ -4,11 +4,12 @@ clear
 This lightshow just turns the whole strip off. It accepts no parameters
 """
 
-import DummyAPA102 as apa102
+from apa102 import APA102
+from DefaultConfig import Configuration
 
 
 # run this "show"
-def run(strip: apa102.APA102, conf, parameters: dict):
+def run(strip: APA102, conf: Configuration, parameters: dict):
     strip.clearStrip()
 
 

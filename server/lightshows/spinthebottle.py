@@ -6,7 +6,6 @@ A light beam runs back and forth the strip and stops at a random location
 
 import apa102
 import lightshows.utilities as util
-
 import random
 from time import sleep
 

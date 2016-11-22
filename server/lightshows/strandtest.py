@@ -1,9 +1,9 @@
-import apa102
+from apa102 import APA102
 import time
 
 
 class SolidColor:
-    def __init__(self, strip: apa102.APA102):
+    def __init__(self, strip: APA102):
         self.strip = strip
 
     def run(self, red, green, blue):
@@ -37,7 +37,7 @@ class RGBTest:
             time.sleep(5)
 
 class FPSTest:
-    def __init__(self, strip: apa102.APA102):
+    def __init__(self, strip: APA102):
         self.strip = strip
 
     def run(self):

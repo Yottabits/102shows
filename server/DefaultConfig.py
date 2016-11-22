@@ -4,6 +4,7 @@
 
 class Configuration:
     sys_name = None  # string
+    shows = None  # dict: string <=> show module
 
     class mqtt:
         prefix = "led"

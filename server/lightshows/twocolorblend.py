@@ -1,8 +1,8 @@
-import apa102
+from apa102 import APA102
 
 class TwoColorBlend:
 
-    def __init__(self, strip: apa102.APA102):
+    def __init__(self, strip: APA102):
         self.strip = strip
 
     def dim(self, color: tuple, dim: float):

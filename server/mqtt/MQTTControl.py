@@ -2,19 +2,12 @@ from apa102 import APA102
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 from multiprocessing import Process
-import lightshows
 import json
-import helpers
-from helpers import TopicAspect
-import config as user_config
-
-# load user settings from config.py
-conf = user_config.configuration
-
-# load available lightshows
-shows = user_config.shows
+import mqtt.helpers as helpers
+from mqtt.helpers import TopicAspect
 
 # global handles
+conf = None
 show_process = Process()  # for the process in which the lightshows run in
 strip = None  # for the APA102 LED strip
 
@@ -96,9 +89,11 @@ def stop_running_show(timeout_sec: int = 5):
 
 
 def start_show(show_name: str, parameters: dict):
+    global conf
+
     # search for show module
-    if show_name in user_config.shows:
-        show = user_config.shows[show_name]
+    if show_name in conf.shows:
+        show = conf.shows[show_name]
     else:
         debug_msg("Show {name} was not found!".format(name=show_name))
         return
@@ -114,8 +109,11 @@ def start_show(show_name: str, parameters: dict):
     show_process.start()
 
 
-def run() -> None:
-    global show_process, strip
+def run(config) -> None:
+    global conf, show_process, strip
+
+    # store config
+    conf = config
 
     debug_msg("Starting {name}".format(name=conf.sys_name))
 
@@ -132,6 +130,3 @@ def run() -> None:
 
     client.loop_forever()
     debug_msg("MQTTControl.py has exited")
-
-if __name__ == '__main__':
-    run()
