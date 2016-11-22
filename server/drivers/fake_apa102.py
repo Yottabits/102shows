@@ -1,3 +1,7 @@
+"""
+This driver can be called like the real apa102.py but and behaves like it with the exception that there is no LED strip
+"""
+
 class Empty:
     pass
 
