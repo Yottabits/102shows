@@ -5,9 +5,10 @@ from multiprocessing import Process
 import json
 import mqtt.helpers as helpers
 from mqtt.helpers import TopicAspect
+import logging as log
 
 # global handles
-conf = None
+conf = None # the user config
 show_process = Process()  # for the process in which the lightshows run in
 strip = None  # for the APA102 LED strip
 
@@ -24,16 +25,11 @@ def notify_user(message, qos=0):
     )
 
 
-def debug_msg(msg):
-    print(msg)
-
-
 # subscribe to all messages related to this LED installation
 def on_connect(client, userdata, flags, rc):
     subscription_path = helpers.assemble_path(show_name="+", command="+")
     client.subscribe(subscription_path)
-
-    debug_msg("subscription on broker {host} for {path}".format(host=conf.mqtt.broker.host, path=subscription_path))
+    log.info("subscription on broker {host} for {path}".format(host=conf.mqtt.broker.host, path=subscription_path))
 
 
 def on_message(client, userdata, msg):
@@ -47,27 +43,30 @@ def on_message(client, userdata, msg):
     # extract the essentials
     show_name = helpers.get_from_topic(TopicAspect.show_name.value, topic)
     command = helpers.get_from_topic(TopicAspect.command.value, topic)
+
     if payload:  # not empty
         try:
             parameters = json.loads(payload)
         except:
-            debug_msg("Could not parse payload!")
+            log.warning("The MQTT controller could not parse this payload")
             return
         else:
             if type(parameters) is not dict:
-                debug_msg("Please supply a JSON object as payload!")
+                log.warning("This payload is not a JSON object!")
                 return
     else:
-        debug_msg("payload is empty!")
+        log.debug("payload is empty!")
         parameters = {}
 
-#    debug_msg(
-#        """for show: \"{show}\":
-#            received command: \"{command}\"
-#         """.format(show=show_name,
-#                   command=command,
-#                   #parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
-#                    ))
+    log.debug(
+       """for show: \"{show}\":
+           received command: \"{command}\"
+           with:
+           {parameters}
+        """.format(show=show_name,
+                  command=command,
+                  parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
+                   ))
 
     if command == "stop":  # parameter: timeout (as integer in seconds)
         if "timeout" in parameters:
@@ -77,7 +76,7 @@ def on_message(client, userdata, msg):
 
     elif command == "start":  # parameter: show name
         stop_running_show()
-        debug_msg("Starting " + show_name)
+        log.info("Starting the show " + show_name)
         start_show(show_name, parameters)
 
 
@@ -97,12 +96,12 @@ def start_show(show_name: str, parameters: dict):
     if show_name in conf.shows:
         show = conf.shows[show_name]
     else:
-        debug_msg("Show {name} was not found!".format(name=show_name))
+        log.warning("Show {name} was not found!".format(name=show_name))
         return
 
     # check for valid parameters
     if not show.parameters_valid(parameters):
-        debug_msg("invalid parameters sent!")
+        log.warning("invalid parameters sent!")
         return
 
     global show_process, strip
@@ -117,18 +116,18 @@ def run(config) -> None:
     # store config
     conf = config
 
-    debug_msg("Starting {name}".format(name=conf.sys_name))
+    log.info("Starting {name}".format(name=conf.sys_name))
 
-    debug_msg("Initializing LED strip...")
+    log.info("Initializing LED strip...")
     strip = APA102(conf.strip.num_leds, conf.strip.global_brightness, 'rgb', conf.strip.max_spi_speed_hz)
     strip.verbose = False  # @nopi
 
-    debug_msg("Connecting to the MQTT broker")
+    log.info("Connecting to the MQTT broker")
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect(conf.mqtt.broker.host, conf.mqtt.broker.port, conf.mqtt.broker.keepalive)
-    debug_msg("{name} is ready".format(name=conf.sys_name))
+    log.info("{name} is ready".format(name=conf.sys_name))
 
     client.loop_forever()
-    debug_msg("MQTTControl.py has exited")
+    log.critical("MQTTControl.py has exited")
