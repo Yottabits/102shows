@@ -5,7 +5,7 @@ This show does nothing with the strip
 """
 
 import logging
-from apa102 import APA102
+from drivers.fake_apa102 import APA102
 from DefaultConfig import Configuration
 
 

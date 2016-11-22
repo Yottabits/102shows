@@ -4,7 +4,7 @@ clear
 This lightshow just turns the whole strip off. It accepts no parameters
 """
 
-from apa102 import APA102
+from drivers.fake_apa102 import APA102
 from DefaultConfig import Configuration
 
 

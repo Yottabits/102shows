@@ -1,4 +1,4 @@
-from apa102 import APA102
+from drivers.fake_apa102 import APA102
 import time
 
 
@@ -13,7 +13,7 @@ class SolidColor:
 
 
 class RGBTest:
-    def __init__(self, strip: apa102.APA102):
+    def __init__(self, strip: APA102):
         self.strip = strip
         self.show_color = SolidColor(strip)
 

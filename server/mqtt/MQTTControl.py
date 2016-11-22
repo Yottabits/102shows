@@ -1,4 +1,4 @@
-from apa102 import APA102
+from drivers.fake_apa102 import APA102
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 from multiprocessing import Process
@@ -61,13 +61,13 @@ def on_message(client, userdata, msg):
         debug_msg("payload is empty!")
         parameters = {}
 
-    debug_msg(
-        """for show: \"{show}\":
-            received command: \"{command}\"
-         """.format(show=show_name,
-                   command=command,
-                   #parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
-                    ))
+#    debug_msg(
+#        """for show: \"{show}\":
+#            received command: \"{command}\"
+#         """.format(show=show_name,
+#                   command=command,
+#                   #parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
+#                    ))
 
     if command == "stop":  # parameter: timeout (as integer in seconds)
         if "timeout" in parameters:
@@ -77,15 +77,17 @@ def on_message(client, userdata, msg):
 
     elif command == "start":  # parameter: show name
         stop_running_show()
+        debug_msg("Starting " + show_name)
         start_show(show_name, parameters)
 
 
 def stop_running_show(timeout_sec: int = 5):
     global show_process
-    if not show_process.is_alive():
-        debug_msg("no show running")
-    else:
+    if show_process.is_alive():
         show_process.join(timeout_sec)
+        debug_msg("{show_name} is running. Terminating...".format(show_name=show_process.name))
+    else:
+        debug_msg("no show running; all good")
 
 
 def start_show(show_name: str, parameters: dict):
@@ -119,7 +121,7 @@ def run(config) -> None:
 
     debug_msg("Initializing LED strip...")
     strip = APA102(conf.strip.num_leds, conf.strip.global_brightness, 'rgb', conf.strip.max_spi_speed_hz)
-    strip.verbose = True  # @nopi
+    strip.verbose = False  # @nopi
 
     debug_msg("Connecting to the MQTT broker")
     client = mqtt.Client()

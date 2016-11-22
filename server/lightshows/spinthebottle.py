@@ -4,13 +4,14 @@ SpinTheBottle
 A light beam runs back and forth the strip and stops at a random location
 """
 
-import apa102
+from drivers.fake_apa102 import APA102
+from DefaultConfig import Configuration
 import lightshows.utilities as util
 import random
 from time import sleep
 
 
-def run(strip: apa102.APA102, conf, parameters: dict):
+def run(strip: APA102, conf: Configuration, parameters: dict):
     show = SpinTheBottle(strip)
 
     show.highlight_color = parameters["highlight_color"]
@@ -46,7 +47,7 @@ def parameters_valid(parameters: dict) -> bool:
 
 
 class SpinTheBottle:
-    def __init__(self, strip: apa102.APA102):
+    def __init__(self, strip: APA102):
         self.strip = strip
         self.highlight_color = (200, 100, 0)
         self.highlight_sections = 72

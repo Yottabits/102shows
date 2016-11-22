@@ -1,5 +1,5 @@
 import time
-import apa102
+from drivers.fake_apa102 import APA102
 
 
 def dim(undimmed: tuple, factor: float) -> tuple:
@@ -13,7 +13,7 @@ def dim(undimmed: tuple, factor: float) -> tuple:
     return dimmed
 
 
-def linear_fadeout(strip: apa102.APA102, fadetime_sec: float):
+def linear_fadeout(strip: APA102, fadetime_sec: float):
     now = time.perf_counter()
     start_time = now
     stop_time = now + fadetime_sec
@@ -30,13 +30,13 @@ def linear_fadeout(strip: apa102.APA102, fadetime_sec: float):
         strip.show()
         now = time.perf_counter()
 
-    pass  # @todo
+    strip.clearStrip()
 
 
 class MeasureFPS:
     """ measures the refresh rate available to the strip"""
 
-    def __init__(self, strip: apa102.APA102):
+    def __init__(self, strip: APA102):
         self.strip = strip
         self.active_color = (255, 255, 255)
         self.passed_color = (0, 100, 100)
