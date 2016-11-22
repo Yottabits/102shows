@@ -1,10 +1,10 @@
 """
 SpinTheBottle
 
-FIXME! @todo
+A light beam runs back and forth the strip and stops at a random location
 """
 
-import DummyAPA102 as apa102  # @norpi
+import apa102
 import lightshows.utilities as util
 
 import random

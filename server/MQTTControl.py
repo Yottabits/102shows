@@ -1,5 +1,4 @@
-# from apa102 import APA102 @rpi
-from DummyAPA102 import APA102
+from apa102 import APA102
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 from multiprocessing import Process
