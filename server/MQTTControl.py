@@ -115,7 +115,9 @@ def start_show(show_name: str, parameters: dict):
     show_process.start()
 
 
-if __name__ == '__main__':
+def run() -> None:
+    global show_process, strip
+
     debug_msg("Starting {name}".format(name=conf.sys_name))
 
     debug_msg("Initializing LED strip...")
@@ -131,3 +133,6 @@ if __name__ == '__main__':
 
     client.loop_forever()
     debug_msg("MQTTControl.py has exited")
+
+if __name__ == '__main__':
+    run()

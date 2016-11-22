@@ -20,5 +20,4 @@ shows = {
     'spinthebottle': lightshows.spinthebottle,
     'strandtest': lightshows.strandtest,
     'twocolorblend': lightshows.twocolorblend,
-
 }

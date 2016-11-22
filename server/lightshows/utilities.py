@@ -1,5 +1,5 @@
 import time
-import apa102
+import DummyAPA102 as apa102
 
 
 def dim(undimmed: tuple, factor: float) -> tuple:
@@ -33,7 +33,6 @@ def linear_fadeout(strip: apa102.APA102, fadetime_sec: float):
     pass  # @todo
 
 
-
 class MeasureFPS:
     """ measures the refresh rate available to the strip"""
 
@@ -65,3 +64,21 @@ class MeasureFPS:
         self.strip.clearStrip()
 
         return (framerate, time_elapsed, number_of_frames)
+
+
+def is_color_tuple(to_check) -> bool:
+    """ check if :param to_check is a rgb color tuple"""
+    if type(to_check) is not tuple:
+        return False
+
+    if len(to_check) is not 3:
+        return False
+
+    for component in to_check:
+        if type(component) is not int:
+            return False
+        if not (0 <= component <= 255):
+            return False
+
+    # if no break condition is met:
+    return True
