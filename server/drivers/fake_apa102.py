@@ -43,6 +43,9 @@ class APA102:
             return  # again, invsible
 
         for component in (red, green, blue):
+            if type(component) is not int:
+                log.debug("RGB value for pixel {num} is not an integer!".format(num=ledNum))
+                component = int(component)
             if component < 0 or component > 255:
                 log.warning("RGB value for pixel {num} is out of bounds! (0-255)".format(num=ledNum))
                 return
