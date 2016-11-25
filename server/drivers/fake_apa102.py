@@ -2,6 +2,7 @@
 This driver can be called like the real apa102.py but and behaves like it with the exception that there is no LED strip
 """
 
+import logging as log
 
 class Empty:
     pass
@@ -21,8 +22,7 @@ class APA102:
         self.spi = Empty()  # Init the SPI device
         self.spi.max_speed_hz = max_spi_speed_hz  # Up the speed a bit, so that the LEDs are painted faster
 
-        self.debug_msg("initialized a strip with {num} LEDs".format(num=numLEDs))
-        self.verbose = False
+        log.info("initialized a strip with {num} LEDs".format(num=numLEDs))
 
     def getPixel(self, ledNum: int) -> tuple:
         if ledNum < 0:
@@ -41,20 +41,24 @@ class APA102:
             return  # Pixel is invisible, so ignore
         if ledNum >= self.numLEDs:
             return  # again, invsible
+
+        for component in (red, green, blue):
+            if component < 0 or component > 255:
+                log.warning("RGB value for pixel {num} is out of bounds! (0-255)".format(num=ledNum))
+                return
+
         startIndex = 4 * ledNum
         self.leds[startIndex] = self.ledstart
         self.leds[startIndex + self.rgb[0]] = red
         self.leds[startIndex + self.rgb[1]] = green
         self.leds[startIndex + self.rgb[2]] = blue
-        if self.verbose:
-            self.debug_msg("{ledNum} => ({r},{g},{b})".format(ledNum=ledNum, r=red, g=green, b=blue))
+        log.debug("{ledNum} => ({r},{g},{b})".format(ledNum=ledNum, r=red, g=green, b=blue))
 
     def setPixelRGB(self, ledNum, rgbColor):
         self.setPixel(ledNum, (rgbColor & 0xFF0000) >> 16, (rgbColor & 0x00FF00) >> 8, rgbColor & 0x0000FF)
 
     def show(self):
-        if self.verbose:
-            self.debug_msg("show!")
+        log.debug("show!")
 
     def clearStrip(self):
         # Clear the buffer
@@ -63,8 +67,4 @@ class APA102:
         self.show()
 
     def cleanup(self):
-        if self.verbose:
-            self.debug_msg("cleanup!")
-
-    def debug_msg(self, msg):
-        print("[DummyAPA102] " + msg)
+        log.debug("cleanup!")

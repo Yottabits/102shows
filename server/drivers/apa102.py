@@ -1,4 +1,5 @@
 import spidev
+import logging as log
 
 """
 Driver for APA102 LEDS (aka "DotStar").
@@ -137,6 +138,12 @@ class APA102:
             return  # Pixel is invisible, so ignore
         if ledNum >= self.numLEDs:
             return  # again, invsible
+
+        for component in (red, green, blue):
+            if component < 0 or component > 255:
+                log.warning("RGB value for pixel {num} is out of bounds! (0-255)".format(num=ledNum))
+                return
+
         startIndex = 4 * ledNum
         self.leds[startIndex] = self.ledstart
         self.leds[startIndex + self.rgb[0]] = red
