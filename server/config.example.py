@@ -17,6 +17,7 @@ configuration = DefaultConfig.Configuration()
 configuration.shows = {
     'clear': lightshows.clear,
     'dummy': lightshows.dummy,
+    'rgbtest': lightshows.rgbtest,
     'spinthebottle': lightshows.spinthebottle,
     'strandtest': lightshows.strandtest,
     'twocolorblend': lightshows.twocolorblend,
