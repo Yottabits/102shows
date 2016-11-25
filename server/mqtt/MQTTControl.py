@@ -1,3 +1,10 @@
+"""
+MQTT Control
+(c) 2016 Simon Leiner
+
+This script starts/stops the shows under lightshows/ according to the commands it receives via MQTT
+"""
+
 from drivers.fake_apa102 import APA102
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
@@ -25,14 +32,15 @@ def notify_user(message, qos=0):
     )
 
 
-# subscribe to all messages related to this LED installation
 def on_connect(client, userdata, flags, rc):
+    """ subscribe to all messages related to this LED installation """
     subscription_path = helpers.assemble_path(show_name="+", command="+")
     client.subscribe(subscription_path)
     log.info("subscription on broker {host} for {path}".format(host=conf.mqtt.broker.host, path=subscription_path))
 
 
 def on_message(client, userdata, msg):
+    """ react to a received message and eventually starts/stops a show """
     # store parameters as strings
     topic = str(msg.topic)
     if type(msg.payload) is bytes:  # might be a byte encoded string that must be stripped
@@ -50,22 +58,20 @@ def on_message(client, userdata, msg):
         log.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
         return
 
-    # parse parameters
-    parameters = helpers.parse_json_safely(payload)
-    log.debug(
-        """for show: \"{show}\":
-           received command: \"{command}\"
-           with:
-           {parameters}
-        """.format(show=show_name,
-                   command=command,
-                   parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
-                   ))
-
     # execute
     if command == "start":
-        # stop the running show
-        stop_running_show()
+        # parse parameters
+        parameters = helpers.parse_json_safely(payload)
+        log.debug(
+            """for show: \"{show}\":
+               received command: \"{command}\"
+               with:
+               {parameters}
+            """.format(show=show_name,
+                       command=command,
+                       parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
+                       ))
+        stop_running_show() # stop any running show
         start_show(show_name, parameters)
     elif command == "stop":
         stop_show(show_name)
