@@ -3,7 +3,7 @@ import logging as log
 
 """
 Driver for APA102 LEDS (aka "DotStar").
-Martin Erzberger 2016, modified by Simon Leiner 2016
+(c) Martin Erzberger 2016, modified by Simon Leiner 2016
 The original version by Martin Erzberger can be found at https://github.com/tinue/APA102_Pi
 
 

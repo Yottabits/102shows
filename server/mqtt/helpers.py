@@ -1,3 +1,10 @@
+"""
+Helpers for MQTT
+(c) 2016 Simon Leiner
+
+A couple of helper functions (big surprise!) for MQTTControl
+"""
+
 from enum import Enum
 import config as user_config
 import json

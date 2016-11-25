@@ -1,4 +1,7 @@
 """
+Fake APA102
+(c) 2016 Simon Leiner, Martin Erzberger (original interface)
+
 This driver can be called like the real apa102.py but and behaves like it with the exception that there is no LED strip
 """
 

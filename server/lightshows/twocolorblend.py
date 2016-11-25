@@ -1,5 +1,6 @@
 """
 Two Color Blend
+(c) 2016 Simon Leiner
 
 linear transition between two colors across the strip
 

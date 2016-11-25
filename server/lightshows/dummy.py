@@ -1,5 +1,6 @@
 """
 dummy
+(c) 2016 Simon Leiner
 
 This show does nothing with the strip
 """

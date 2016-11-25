@@ -1,5 +1,6 @@
 """
 SolidColor
+(c) 2016 Simon Leiner
 
 The whole strip shines in the same color.
 

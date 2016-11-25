@@ -1,5 +1,6 @@
 """
 SpinTheBottle
+(c) 2016 Simon Leiner
 
 A light beam runs back and forth the strip and stops at a random location
 
