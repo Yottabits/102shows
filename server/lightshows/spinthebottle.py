@@ -2,6 +2,15 @@
 SpinTheBottle
 
 A light beam runs back and forth the strip and stops at a random location
+
+Parameters:
+   =====================================================================
+   ||                     ||    python     ||   JSON representation   ||
+   || highlight_color:    ||   3x1 tuple   ||       3x1 array         ||
+   || background_color:   ||   3x1 tuple   ||       3x1 array         ||
+   || time_sec:           ||    numeric    ||        numeric          ||
+   || fadeout             ||     bool      ||          bool           ||
+   =====================================================================
 """
 
 from drivers.fake_apa102 import APA102
@@ -9,11 +18,16 @@ from DefaultConfig import Configuration
 import lightshows.utilities as util
 import random
 from time import sleep
+import logging as log
+
+color_parameters = ['highlight_color', 'background_color']
+necessary_parameters = color_parameters + ['time_sec', 'fadeout']
 
 
 def run(strip: APA102, conf: Configuration, parameters: dict):
     show = SpinTheBottle(strip)
 
+    parameters = prepare_parameters(parameters)
     show.highlight_color = parameters["highlight_color"]
     show.background_color = parameters["background_color"]
 
@@ -21,29 +35,38 @@ def run(strip: APA102, conf: Configuration, parameters: dict):
 
 
 def parameters_valid(parameters: dict) -> bool:
+    # prepare all types
+    parameters = prepare_parameters(parameters)
+
     # are all necessary parameters there?
-    color_parameters = ['highlight_color', 'background_color']
-    necessary_parameters = color_parameters + ['time_sec', 'fadeout']
     for p in necessary_parameters:
         if p not in parameters:
+            log.debug("Missing parameter {param_name}".format(param_name=p))
             return False
 
     # type checking
     for p in color_parameters:
-        if type(parameters[p]) is list: # correct arrays to lists
-            parameters[p] = tuple(parameters[p])
         if not util.is_color_tuple(parameters[p]):
+            log.debug("{param_name} is not valid!".format(param_name=p))
             return False
 
     time_type = type(parameters['time_sec'])
     if not (time_type is int or time_type is float):
+        log.debug("Parameter time_sec is not a numeric type!")
         return False
 
     if not type(parameters['fadeout']) is bool:
+        log.debug("Parameter fadeout is not a bool type!")
         return False
 
     # or else:
     return True
+
+
+def prepare_parameters(parameters: dict) -> dict:
+    for p in color_parameters:
+        if type(parameters[p]) is list:  # cast arrays to lists
+            parameters[p] = tuple(parameters[p])
 
 
 class SpinTheBottle:
