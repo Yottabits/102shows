@@ -69,6 +69,7 @@ def prepare_parameters(parameters: dict) -> dict:
     for p in color_parameters:
         if type(parameters[p]) is list:  # cast arrays to lists
             parameters[p] = tuple(parameters[p])
+    return parameters
 
 
 class SpinTheBottle:

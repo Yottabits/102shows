@@ -123,7 +123,7 @@ class SmoothBlend:
     def set_color_for_whole_strip(self, red: int, green: int, blue: int):
         """ set the same color for all LEDs in the strip """
         for ledNum in range(self.strip.numLEDs):
-            self.setPixel(ledNum, red, green, blue)
+            self.set_pixel(ledNum, red, green, blue)
 
     class BlendFunctions:
         """

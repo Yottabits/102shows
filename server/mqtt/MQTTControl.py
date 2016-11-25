@@ -94,7 +94,7 @@ def start_show(show_name: str, parameters: dict):
 
 
 def stop_show(show_name: str):
-    if show_name is show_process.name or show_name is "all":
+    if show_name == show_process.name or show_name == "all":
         stop_running_show()
         return
 
