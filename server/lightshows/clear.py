@@ -1,7 +1,10 @@
 """
 clear
 
-This lightshow just turns the whole strip off. It accepts no parameters
+This lightshow just turns the whole strip off.
+
+Parameters:
+    none
 """
 
 from drivers.fake_apa102 import APA102
