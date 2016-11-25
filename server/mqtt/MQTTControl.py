@@ -51,7 +51,7 @@ def on_message(client, userdata, msg):
         return
 
     # parse parameters
-    parameters = helpers.parse_JSON(payload)
+    parameters = helpers.parse_json_safely(payload)
     log.debug(
         """for show: \"{show}\":
            received command: \"{command}\"
@@ -97,17 +97,18 @@ def stop_show(show_name: str):
     if show_name is show_process.name or show_name is "all":
         stop_running_show()
         return
-    else:
-        return
 
 
 def stop_running_show(timeout_sec: int = 5):
-    global show_process
+    global show_process, strip
+
     if show_process.is_alive():
         show_process.join(timeout_sec)
         log.info("{show_name} is running. Terminating...".format(show_name=show_process.name))
     else:
         log.info("no show running; all good")
+
+    strip.clearBuffer()  # just in case
 
 
 def run(config) -> None:

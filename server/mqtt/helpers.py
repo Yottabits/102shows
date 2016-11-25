@@ -32,7 +32,7 @@ def assemble_path(show_name: str, command: str, prefix: str = conf.mqtt.prefix, 
     return path
 
 
-def parse_JSON(payload: str):
+def parse_json_safely(payload: str):
     if payload:  # not empty
         try:
             unpacked = json.loads(payload)

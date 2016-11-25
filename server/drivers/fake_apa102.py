@@ -63,10 +63,12 @@ class APA102:
     def show(self):
         log.debug("show!")
 
-    def clearStrip(self):
-        # Clear the buffer
+    def clearBuffer(self):
         for led in range(self.numLEDs):
             self.setPixel(led, 0, 0, 0)
+
+    def clearStrip(self):
+        self.clearBuffer()
         self.show()
 
     def cleanup(self):

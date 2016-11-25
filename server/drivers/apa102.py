@@ -12,6 +12,7 @@ Public methods are:
  - setPixelRGB
  - getPixel
  - show
+ - clearBuffer
  - clearStrip
  - cleanup
 
@@ -100,13 +101,19 @@ class APA102:
             self.spi.xfer2([0x00])
 
     """
+    void clearBuffer()
+    Clears the entire buffer without displaying the result
+    """
+    def clearBuffer(self):
+        for led in range(self.numLEDs):
+            self.setPixel(led, 0, 0, 0)
+
+    """
     void clearStrip()
     Sets the color for the entire strip to black, and immediately shows the result.
     """
     def clearStrip(self):
-        # Clear the buffer
-        for led in range(self.numLEDs):
-            self.setPixel(led, 0, 0, 0)
+        self.clearBuffer()
         self.show()
 
     """
@@ -126,7 +133,6 @@ class APA102:
         green = self.leds[startIndex + self.rgb[1]]
         blue = self.leds[startIndex + self.rgb[2]]
         return (red, green, blue)
-
 
     """
     void setPixel(ledNum, red, green, blue)
