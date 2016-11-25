@@ -1,10 +1,28 @@
+"""
+SolidColor
+
+The whole strip shines in the same color.
+
+Parameters:
+   =====================================================================
+   ||                     ||    python     ||   JSON representation   ||
+   ||       color:        ||   3x1 tuple   ||       3x1 array         ||
+   =====================================================================
+"""
+
 import drivers.fake_apa102 as APA102
 from DefaultConfig import Configuration
+import lightshows.utilities as util
 
 
 def run(strip: APA102, conf: Configuration, parameters: dict):
-    red, green, blue = parameters["color"]  # get color from parameters
-    SolidColor(strip).run(red, green, blue)  # set strip color
+    blend_to_color(strip, parameters["color"])
+
+
+def blend_to_color(strip: APA102, color: tuple, fadetime_sec: int = 2):
+    transition = util.SmoothBlend(strip)
+    transition.set_color_for_whole_strip(*color)
+    transition.blend(time_sec=fadetime_sec)
 
 
 def parameters_valid(parameters: dict) -> bool:
@@ -13,13 +31,3 @@ def parameters_valid(parameters: dict) -> bool:
             return True
 
     return False
-
-
-class SolidColor:
-    def __init__(self, strip: APA102):
-        self.strip = strip
-
-    def run(self, red, green, blue):
-        for led in range(self.strip.numLEDs):
-            self.strip.setPixel(led, red, green, blue)
-        self.strip.show()

@@ -9,12 +9,13 @@ Parameters:
    || highlight_color:    ||   3x1 tuple   ||       3x1 array         ||
    || background_color:   ||   3x1 tuple   ||       3x1 array         ||
    || time_sec:           ||    numeric    ||        numeric          ||
-   || fadeout             ||     bool      ||          bool           ||
+   || fadeout:            ||     bool      ||          bool           ||
    =====================================================================
 """
 
 from drivers.fake_apa102 import APA102
 from DefaultConfig import Configuration
+import lightshows.solidcolor
 import lightshows.utilities as util
 import random
 from time import sleep
@@ -31,7 +32,8 @@ def run(strip: APA102, conf: Configuration, parameters: dict):
     show.highlight_color = parameters["highlight_color"]
     show.background_color = parameters["background_color"]
 
-    show.run(parameters["time_sec"], parameters["fadeout"])
+    lightshows.solidcolor.blend_to_color(strip, show.background_color)  # fade to background_color
+    show.run(parameters["time_sec"], parameters["fadeout"])  # start the real show :-)
 
 
 def parameters_valid(parameters: dict) -> bool:
@@ -111,6 +113,4 @@ class SpinTheBottle:
 
         if fadeout:
             sleep(10)
-            transition = util.SmoothBlend(self.strip)
-            transition.set_color_for_whole_strip(0, 0, 0)
-            transition.blend(time_sec=2)
+            lightshows.solidcolor.blend_to_color(self.strip, self.background_color)  # fadeout the spot

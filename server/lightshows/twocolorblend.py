@@ -22,13 +22,15 @@ necessary_parameters = ['color1', 'color2']
 def run(strip: APA102, conf: Configuration, parameters: dict):
     parameters = prepare_parameters(parameters)
 
+    transition = util.SmoothBlend(strip)
+
     for led in range(strip.numLEDs):
         normal_distance = led / strip.numLEDs
         component1 = util.linear_dim(parameters["color1"], 1 - normal_distance)
         component2 = util.linear_dim(parameters["color2"], normal_distance)
         led_color = util.add_tuples(component1, component2)
-        strip.setPixel(led, *led_color)
-    strip.show()
+        transition.set_pixel(led, *led_color)
+    transition.blend()
 
 
 def parameters_valid(parameters: dict):
