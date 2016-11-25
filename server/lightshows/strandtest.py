@@ -1,15 +1,6 @@
 from drivers.fake_apa102 import APA102
+from lightshows.solidcolor import SolidColor
 import time
-
-
-class SolidColor:
-    def __init__(self, strip: APA102):
-        self.strip = strip
-
-    def run(self, red, green, blue):
-        for led in range(self.strip.numLEDs):
-            self.strip.setPixel(led, red, green, blue)
-        self.strip.show()
 
 
 class RGBTest:
@@ -36,9 +27,3 @@ class RGBTest:
             self.strip.clearStrip()
             time.sleep(5)
 
-class FPSTest:
-    def __init__(self, strip: APA102):
-        self.strip = strip
-
-    def run(self):
-        pass
