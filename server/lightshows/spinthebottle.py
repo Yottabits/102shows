@@ -46,7 +46,7 @@ def parameters_valid(parameters: dict) -> bool:
 
     # type checking
     for p in color_parameters:
-        if not util.is_color_tuple(parameters[p]):
+        if not util.is_rgb_color_tuple(parameters[p]):
             log.debug("{param_name} is not valid!".format(param_name=p))
             return False
 
@@ -83,7 +83,7 @@ class SpinTheBottle:
             distance = abs(led - position)  # distance to highlight center
             if distance <= highlight_radius:
                 dim_factor = (1 - (distance / highlight_radius)) ** 2
-                color = util.dim(self.highlight_color, dim_factor)
+                color = util.linear_dim(self.highlight_color, dim_factor)
                 self.strip.setPixel(led, *color)
             else:
                 self.strip.setPixel(led, *self.background_color)
@@ -111,4 +111,6 @@ class SpinTheBottle:
 
         if fadeout:
             sleep(10)
-            util.linear_fadeout(self.strip, fadetime_sec=2)
+            transition = util.SmoothBlend(self.strip)
+            transition.set_color_for_whole_strip(0, 0, 0)
+            transition.blend(time_sec=2)

@@ -24,8 +24,8 @@ def run(strip: APA102, conf: Configuration, parameters: dict):
 
     for led in range(strip.numLEDs):
         normal_distance = led / strip.numLEDs
-        component1 = util.dim(parameters["color1"], 1 - normal_distance)
-        component2 = util.dim(parameters["color2"], normal_distance)
+        component1 = util.linear_dim(parameters["color1"], 1 - normal_distance)
+        component2 = util.linear_dim(parameters["color2"], normal_distance)
         led_color = util.add_tuples(component1, component2)
         strip.setPixel(led, *led_color)
     strip.show()
@@ -39,7 +39,7 @@ def parameters_valid(parameters: dict):
             log.debug("Missing parameter {param_name}".format(param_name=p))
             return False
             # type checking
-        if not util.is_color_tuple(parameters[p]):
+        if not util.is_rgb_color_tuple(parameters[p]):
             log.debug("{param_name} is not valid!".format(param_name=p))
             return False
     # else
