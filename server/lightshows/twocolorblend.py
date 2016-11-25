@@ -1,29 +1,54 @@
+"""
+Two Color Blend
+
+linear transition between two colors across the strip
+
+Parameters:
+   =====================================================================
+   ||                     ||    python     ||   JSON representation   ||
+   || color1:             ||   3x1 tuple   ||       3x1 array         ||
+   || color2:             ||   3x1 tuple   ||       3x1 array         ||
+   =====================================================================
+"""
+
 from drivers.fake_apa102 import APA102
+from DefaultConfig import Configuration
+import lightshows.utilities as util
+import logging as log
 
-class TwoColorBlend:
+necessary_parameters = ['color1', 'color2']
 
-    def __init__(self, strip: APA102):
-        self.strip = strip
 
-    def dim(self, color: tuple, dim: float):
-        r, g, b = color
-        r = int(dim * r)
-        g = int(dim * g)
-        b = int(dim * b)
-        new_color = (r, g, b)
-        return new_color
+def run(strip: APA102, conf: Configuration, parameters: dict):
+    parameters = prepare_parameters(parameters)
 
-    def merge(self, tuple1: tuple, tuple2: tuple):
-        r1, g1, b1 = tuple1
-        r2, g2, b2 = tuple2
-        merged_tuple = (r1 + r2, g1 + g2, b1 + b2)
-        return merged_tuple
+    for led in range(strip.numLEDs):
+        normal_distance = led / strip.numLEDs
+        component1 = util.dim(parameters["color1"], 1 - normal_distance)
+        component2 = util.dim(parameters["color2"], normal_distance)
+        led_color = util.add_tuples(component1, component2)
+        strip.setPixel(led, *led_color)
+    strip.show()
 
-    def run(self, color1: tuple, color2: tuple):
-        for led in range(self.strip.numLEDs):
-            normal_distance = led / self.strip.numLEDs
-            component1 = self.dim(color1, 1 - normal_distance)
-            component2 = self.dim(color2, normal_distance)
-            led_color = self.merge(component1, component2)
-            self.strip.setPixel(led, *led_color)
-        self.strip.show()
+
+def parameters_valid(parameters: dict):
+    parameters = prepare_parameters(parameters)
+    # are all necessary parameters there?
+    for p in parameters:
+        if p not in necessary_parameters:
+            log.debug("Missing parameter {param_name}".format(param_name=p))
+            return False
+            # type checking
+        if not util.is_color_tuple(parameters[p]):
+            log.debug("{param_name} is not valid!".format(param_name=p))
+            return False
+    # else
+    return True
+
+
+def prepare_parameters(parameters: dict) -> dict:
+    for p in parameters:
+        if type(parameters[p]) is list:  # cast arrays to lists
+            parameters[p] = tuple(parameters[p])
+            log.debug("{}: {}".format(p, parameters[p]))
+    return parameters

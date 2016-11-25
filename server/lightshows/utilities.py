@@ -71,7 +71,7 @@ def is_color_tuple(to_check) -> bool:
     if type(to_check) is not tuple:
         return False
 
-    if len(to_check) is not 3:
+    if len(to_check) is not 3:  # an rgb tuple has three components
         return False
 
     for component in to_check:
@@ -82,3 +82,13 @@ def is_color_tuple(to_check) -> bool:
 
     # if no break condition is met:
     return True
+
+
+def add_tuples(tuple1: tuple, tuple2: tuple):
+    if len(tuple1) is not len(tuple2):
+        return None  # this type of addition is not defined for tuples with different lengths
+    # calculate sum
+    sum_of_two = []
+    for i in range(len(tuple1)):
+        sum_of_two.append(tuple1[i] + tuple2[i])
+    return tuple(sum_of_two)
