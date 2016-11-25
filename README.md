@@ -1,2 +1,2 @@
-# DotStar
-Couch lighting with APA102 (Adafruit DotStar) LED strips and a Raspberry Pi
+# 102shows
+_Raspberry Pi + APA102 + MQTT + 102shows = LED awesomness!_
