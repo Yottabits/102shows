@@ -12,13 +12,11 @@ import time
 
 
 class ColorCycleTemplate:
-    def __init__(self, strip: APA102, pauseValue=0, numStepsPerCycle=100, numCycles=-1, globalBrightness=4,
-                 order='rgb'):  # Init method
+    def __init__(self, strip: APA102, pauseValue=0, numStepsPerCycle=100, numCycles=-1, order='rgb'):  # Init method
         self.strip = strip  # store the strip handle
         self.pauseValue = pauseValue  # How long to pause between two runs
         self.numStepsPerCycle = numStepsPerCycle  # The number of steps in one cycle.
         self.numCycles = numCycles  # How many times will the program run
-        self.globalBrightness = globalBrightness  # Brightness of the strip
         self.order = order  # Strip colour ordering
 
     """

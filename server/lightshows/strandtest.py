@@ -14,7 +14,7 @@ from DefaultConfig import Configuration
 
 
 def run(strip: APA102, conf: Configuration, parameters: dict):
-    cycle = StrandTest(strip=strip, pauseValue=0, numStepsPerCycle=strip.numLEDs, numCycles=-1, globalBrightness=10)
+    cycle = StrandTest(strip=strip, pauseValue=0, numStepsPerCycle=strip.numLEDs, numCycles=-1)
     cycle.start()
 
 

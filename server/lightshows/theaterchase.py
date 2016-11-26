@@ -14,7 +14,7 @@ from DefaultConfig import Configuration
 
 
 def run(strip: APA102, conf: Configuration, parameters: dict):
-    cycle = TheaterChase(strip=strip, pauseValue=0.04, numStepsPerCycle=35, numCycles=-1, globalBrightness=10)
+    cycle = TheaterChase(strip=strip, pauseValue=0.04, numStepsPerCycle=35, numCycles=-1)
     cycle.start()  # run continuously
 
 

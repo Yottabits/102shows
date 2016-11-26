@@ -14,7 +14,7 @@ from DefaultConfig import Configuration
 
 
 def run(strip: APA102, conf: Configuration, parameters: dict):
-    cycle = Rainbow(strip=strip, pauseValue=0, numStepsPerCycle=255, numCycles=-1, globalBrightness=10)
+    cycle = Rainbow(strip=strip, pauseValue=0, numStepsPerCycle=255, numCycles=-1)
     cycle.start()  # run continuously
 
 
