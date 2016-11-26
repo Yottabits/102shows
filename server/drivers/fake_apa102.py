@@ -76,3 +76,17 @@ class APA102:
 
     def cleanup(self):
         log.debug("cleanup!")
+
+    def combineColor(self, red, green, blue):
+        return (red << 16) + (green << 8) + blue
+
+    def wheel(self, wheelPos):
+        if wheelPos > 254: wheelPos = 254  # Safeguard
+        if wheelPos < 85:  # Green -> Red
+            return self.combineColor(wheelPos * 3, 255 - wheelPos * 3, 0)
+        elif wheelPos < 170:  # Red -> Blue
+            wheelPos -= 85
+            return self.combineColor(255 - wheelPos * 3, 0, wheelPos * 3)
+        else:  # Blue -> Green
+            wheelPos -= 170
+            return self.combineColor(0, wheelPos * 3, 255 - wheelPos * 3);
