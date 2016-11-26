@@ -1,35 +1,42 @@
-# (C) 2015 Martin Erzberger
-import apa102
-import time
-
 """
+Color Cycle Template
+(c) 2015 Martin Erzberger, modified 2016 by Simon Leiner
+
 This class is the basis of all color cycles, such as rainbow or theater chase.
 A specific color cycle must subclass this template, and implement at least the
 'update' method.
 """
+
+from drivers.fake_apa102 import APA102
+import time
+
+
 class ColorCycleTemplate:
-    def __init__(self, numLEDs, pauseValue = 0, numStepsPerCycle = 100, numCycles = -1, globalBrightness = 4, order = 'rgb'): # Init method
-        self.numLEDs = numLEDs # The number of LEDs in the strip
-        self.pauseValue = pauseValue # How long to pause between two runs
-        self.numStepsPerCycle = numStepsPerCycle # The number of steps in one cycle.
-        self.numCycles = numCycles # How many times will the program run
-        self.globalBrightness = globalBrightness # Brightness of the strip
-        self.order = order # Strip colour ordering
+    def __init__(self, strip: APA102, pauseValue=0, numStepsPerCycle=100, numCycles=-1, globalBrightness=4,
+                 order='rgb'):  # Init method
+        self.strip = strip  # store the strip handle
+        self.pauseValue = pauseValue  # How long to pause between two runs
+        self.numStepsPerCycle = numStepsPerCycle  # The number of steps in one cycle.
+        self.numCycles = numCycles  # How many times will the program run
+        self.globalBrightness = globalBrightness  # Brightness of the strip
+        self.order = order  # Strip colour ordering
 
     """
     void init()
     This method is called to initialize a color program.
     """
-    def init(self, strip, numLEDs):
-    	  # The default does nothing. A particular subclass could setup variables, or
-    	  # even light the strip in an initial color.
-    	  print('Init not implemented')
+
+    def init(self, strip):
+        # The default does nothing. A particular subclass could setup variables, or
+        # even light the strip in an initial color.
+        print('Init not implemented')
 
     """
     void shutdown()
     This method is called at the end, when the light program should terminate
     """
-    def shutdown(self, strip, numLEDs):
+
+    def shutdown(self, strip):
         # The default does nothing
         print('Shutdown not implemented')
 
@@ -42,11 +49,12 @@ class ColorCycleTemplate:
                  equal to numLEDs).
     currentCycle: Starts with zero, and goes up by one whenever a full cycle has completed.
     """
-    def update(self, strip, numLEDs, numStepsPerCycle, currentStep, currentCycle):
-    	  raise NotImplementedError("Please implement the update() method")
+
+    def update(self, strip, numStepsPerCycle, currentStep, currentCycle):
+        raise NotImplementedError("Please implement the update() method")
 
     def cleanup(self, strip):
-        self.shutdown(strip, self.numLEDs)
+        self.shutdown(strip)
         strip.clearStrip()
         print('Strip cleared')
         strip.cleanup()
@@ -55,24 +63,25 @@ class ColorCycleTemplate:
     """
     Start the actual work
     """
+
     def start(self):
         try:
-            strip = apa102.APA102(numLEDs=self.numLEDs, globalBrightness=self.globalBrightness, order=self.order) # Initialize the strip
-            strip.clearStrip()
-            self.init(strip, self.numLEDs) # Call the subclasses init method
-            strip.show()
+            self.init(self.strip)  # Call the subclasses init method
+            self.strip.show()
             currentCycle = 0
             while True:  # Loop forever (no 'for' here due to the possibility of infinite loops)
-                for currentStep in range (self.numStepsPerCycle):
-                    needRepaint = self.update(strip, self.numLEDs, self.numStepsPerCycle, currentStep, currentCycle) # Call the subclasses update method
-                    if (needRepaint): strip.show() # Display, only if required
-                    time.sleep(self.pauseValue) # Pause until the next step
+                for currentStep in range(self.numStepsPerCycle):
+                    needRepaint = self.update(self.strip, self.numStepsPerCycle, currentStep,
+                                              currentCycle)  # Call the subclasses update method
+                    if needRepaint:
+                        self.strip.show()  # Display, only if required
+                    time.sleep(self.pauseValue)  # Pause until the next step
                 currentCycle += 1
-                if (self.numCycles != -1):
-                    if (currentCycle >= self.numCycles): break
+                if self.numCycles != -1 and currentCycle >= self.numCycles:
+                    break
             # Finished, cleanup everything
-            self.cleanup(strip)
+            self.cleanup(self.strip)
 
         except KeyboardInterrupt:  # Ctrl-C can halt the light program
             print('Interrupted...')
-            self.cleanup(strip)
+            self.cleanup(self.strip)
