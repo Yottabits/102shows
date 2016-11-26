@@ -1,5 +1,5 @@
 import DefaultConfig
-import lightshows
+from lightshows import *
 
 # load default configuration
 configuration = DefaultConfig.Configuration()
@@ -16,12 +16,12 @@ configuration = DefaultConfig.Configuration()
 
 # A list of available shows
 configuration.shows = {
-    'clear': lightshows.clear,
-    'dummy': lightshows.dummy,
-    'rainbow': lightshows.rainbow,
-    'rgbtest': lightshows.rgbtest,
-    'spinthebottle': lightshows.spinthebottle,
-    'strandtest': lightshows.strandtest,
-    'theaterchase': lightshows.theaterchase,
-    'twocolorblend': lightshows.twocolorblend,
+    'clear': clear,
+    'dummy': dummy,
+    'rainbow': rainbow,
+    'rgbtest': rgbtest,
+    'spinthebottle': spinthebottle,
+    'strandtest': strandtest,
+    'theaterchase': theaterchase,
+    'twocolorblend': twocolorblend,
 }

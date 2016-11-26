@@ -1,1 +1,1 @@
-__all__ = ['dummy', 'clear', 'rainbow', 'rgbtest', 'solidcolor', 'spinthebottle', 'strandtest', 'theaterchase', 'twocolorblend']
+__all__ = ['clear', 'dummy', 'rainbow', 'rgbtest', 'solidcolor', 'spinthebottle', 'strandtest', 'theaterchase', 'twocolorblend']
