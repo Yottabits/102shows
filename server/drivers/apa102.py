@@ -11,6 +11,7 @@ Public methods are:
  - setPixel
  - setPixelRGB
  - getPixel
+ - setGlobalBrightness
  - show
  - clearBuffer
  - clearStrip
@@ -63,7 +64,7 @@ class APA102:
         order = order.lower()
         self.rgb = rgb_map.get(order, rgb_map['rgb'])
         # LED startframe is three "1" bits, followed by 5 brightness bits
-        self.ledstart = (globalBrightness & 0b00011111) | 0b11100000  # Don't validate, just slash of extra bits
+        self.setGlobalBrightness(brightness=globalBrightness, update_buffer=False)
         self.leds = [self.ledstart, 0, 0, 0] * self.numLEDs  # Pixel buffer
         self.spi = spidev.SpiDev()  # Init the SPI device
         self.spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
@@ -73,6 +74,7 @@ class APA102:
     void clockStartFrame()
     This method clocks out a start frame, telling the receiving LED that it must update its own color now.
     """
+
     def clockStartFrame(self):
         self.spi.xfer2([0] * 4)  # Start frame, 32 zero bits
 
@@ -96,6 +98,7 @@ class APA102:
     to the strip. An optimized version of the driver could omit the "clockStartFrame" method if enough zeroes have
     been sent as part of "clockEndFrame".
     """
+
     def clockEndFrame(self):
         for _ in range((self.numLEDs + 15) // 16):  # Round up numLEDs/2 bits (or numLEDs/16 bytes)
             self.spi.xfer2([0x00])
@@ -104,6 +107,7 @@ class APA102:
     void clearBuffer()
     Clears the entire buffer without displaying the result
     """
+
     def clearBuffer(self):
         for led in range(self.numLEDs):
             self.setPixel(led, 0, 0, 0)
@@ -112,6 +116,7 @@ class APA102:
     void clearStrip()
     Sets the color for the entire strip to black, and immediately shows the result.
     """
+
     def clearStrip(self):
         self.clearBuffer()
         self.show()
@@ -122,23 +127,43 @@ class APA102:
     so it is possible that the output does not match the actual color of the LED if strip.show() was not
     called recently.
     """
+
     def getPixel(self, ledNum: int) -> tuple:
         if ledNum < 0:
             return None  # Pixel is invisible, so ignore
         if ledNum >= self.numLEDs:
             return None  # again, invsible
         startIndex = 4 * ledNum
-        self.leds[startIndex] = self.ledstart
         red = self.leds[startIndex + self.rgb[0]]
         green = self.leds[startIndex + self.rgb[1]]
         blue = self.leds[startIndex + self.rgb[2]]
         return (red, green, blue)
 
     """
+    void setGlobalBrightness(brightness)
+    Writes the global ledstart prefix that defines the brightness of all pixels.
+    If update_buffer is false, the new prefixes are not written to the buffer.
+    """
+
+    def setGlobalBrightness(self, brightness: int, update_buffer: bool = True):
+        # validate
+        if type(brightness) is not int or brightness < 0 or brightness > 31:
+            log.warning("set brightness value \"{brightness}\" is not an integer between 0 and 31")
+
+        # set bitmask ledstart
+        self.ledstart = (brightness & 0b00011111) | 0b11100000
+
+        # write to buffer
+        if update_buffer:
+            for ledNum in range(self.numLEDs):
+                self.leds[4 * ledNum] = self.ledstart
+
+    """
     void setPixel(ledNum, red, green, blue)
     Sets the color of one pixel in the LED stripe. The changed pixel is not shown yet on the Stripe, it is only
     written to the pixel buffer. Colors are passed individually.
     """
+
     def setPixel(self, ledNum, red, green, blue):
         if ledNum < 0:
             return  # Pixel is invisible, so ignore
@@ -164,6 +189,7 @@ class APA102:
     Sets the color of one pixel in the LED stripe. The changed pixel is not shown yet on the Stripe, it is only
     written to the pixel buffer. Colors are passed combined (3 bytes concatenated)
     """
+
     def setPixelRGB(self, ledNum, rgbColor):
         self.setPixel(ledNum, (rgbColor & 0xFF0000) >> 16, (rgbColor & 0x00FF00) >> 8, rgbColor & 0x0000FF)
 
@@ -172,6 +198,7 @@ class APA102:
     Treating the internal leds array as a circular buffer, rotate it by the specified number of positions.
     The number could be negative, which means rotating in the opposite direction.
     """
+
     def rotate(self, positions=1):
         cutoff = 4 * (positions % self.numLEDs)
         self.leds = self.leds[cutoff:] + self.leds[:cutoff]
@@ -181,6 +208,7 @@ class APA102:
     Sends the content of the pixel buffer to the strip.
     Todo: More than 1024 LEDs requires more than one xfer operation.
     """
+
     def show(self):
         self.clockStartFrame()
         self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
@@ -190,6 +218,7 @@ class APA102:
     void cleanup()
     This method should be called at the end of a program in order to release the SPI device
     """
+
     def cleanup(self):
         self.spi.close()  # ... SPI Port schliessen
 
@@ -197,6 +226,7 @@ class APA102:
     color combineColor(red,green,blue)
     Make one 3*8 byte color value
     """
+
     def combineColor(self, red, green, blue):
         return (red << 16) + (green << 8) + blue
 
@@ -205,6 +235,7 @@ class APA102:
     Get a color from a color wheel
     Green -> Red -> Blue -> Green
     """
+
     def wheel(self, wheelPos):
         if wheelPos > 254: wheelPos = 254  # Safeguard
         if wheelPos < 85:  # Green -> Red

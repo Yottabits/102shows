@@ -11,7 +11,8 @@ configuration = DefaultConfig.Configuration()
 # for example:
 # configuration.sys_name = "MyLED"
 # configuration.strip.num_leds = 144
-# configuration.strip.global_brightness = 14
+# configuration.strip.max_brightness = 20
+# configuration.strip.initial_brightness = 14
 
 
 # A list of available shows

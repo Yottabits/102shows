@@ -53,7 +53,7 @@ def on_message(client, userdata, msg):
     command = helpers.get_from_topic(TopicAspect.command.value, topic)
 
     # check if this is a relevant command for us
-    supported_commands = ["start", "stop"]
+    supported_commands = ["start", "stop", "brightness"]
     if command not in supported_commands:
         log.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
         return
@@ -75,6 +75,8 @@ def on_message(client, userdata, msg):
         start_show(show_name, parameters)
     elif command == "stop":
         stop_show(show_name)
+    elif command == "brightness":
+        set_strip_brightness(int(payload))
 
 
 def start_show(show_name: str, parameters: dict):
@@ -115,6 +117,17 @@ def stop_running_show(timeout_sec: int = 5):
         log.info("no show running; all good")
 
     strip.clearBuffer()  # just in case
+
+
+def set_strip_brightness(brightness: int):
+    global conf, strip
+    if type(brightness) is not int or brightness < 0 or brightness > conf.strip.max_brightness:
+        log.warning("set brightness value \"{brightness}\" is not an integer between 0 and {max_brightness}".format(
+            brightness=brightness, max_brightness=conf.strip.max_brightness))
+        return
+    else:
+        strip.setGlobalBrightness(brightness)
+        strip.show()
 
 
 def run(config) -> None:

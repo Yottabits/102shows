@@ -19,4 +19,5 @@ class Configuration:
     class strip:
         num_leds = None  # integer
         max_spi_speed_hz = 4000000  # maximum for "large" strips of more than 500 LEDs
-        global_brightness = 31  # integer from 0 to 31
+        initial_brightness = 16  # integer from 0 to 31
+        max_brightness = 20  # maximum value for global_brightness

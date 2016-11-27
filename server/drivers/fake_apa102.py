@@ -63,6 +63,16 @@ class APA102:
     def setPixelRGB(self, ledNum, rgbColor):
         self.setPixel(ledNum, (rgbColor & 0xFF0000) >> 16, (rgbColor & 0x00FF00) >> 8, rgbColor & 0x0000FF)
 
+    def setGlobalBrightness(self, brightness: int, update_buffer: bool = True):
+        # validate
+        if type(brightness) is not int or brightness < 0 or brightness > 31:
+            log.warning("set brightness value \"{brightness}\" is not an integer between 0 and 31")
+
+        log.debug("Global strip brightness set to {}".format(brightness))
+
+        if update_buffer:
+            log.debug("LED buffer updated with new brightness")
+
     def show(self):
         log.debug("show!")
 

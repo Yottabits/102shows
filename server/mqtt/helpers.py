@@ -16,6 +16,7 @@ conf = user_config.configuration
 
 # information you can get out of an MQTT topic (and on which path hierarchy they are)
 class TopicAspect(Enum):
+    prefix = 0
     sys_name = 1
     show_name = 3
     command = 4
