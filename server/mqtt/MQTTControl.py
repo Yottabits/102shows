@@ -141,7 +141,7 @@ def run(config) -> None:
     log.info("Starting {name}".format(name=conf.sys_name))
 
     log.info("Initializing LED strip...")
-    strip = APA102(conf.strip.num_leds, conf.strip.global_brightness, 'rgb', conf.strip.max_spi_speed_hz)
+    strip = APA102(conf.strip.num_leds, conf.strip.initial_brightness, 'rgb', conf.strip.max_spi_speed_hz)
     strip.verbose = False  # @nopi
 
     log.info("Connecting to the MQTT broker")
