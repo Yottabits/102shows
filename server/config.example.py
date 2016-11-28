@@ -22,6 +22,7 @@ configuration.shows = {
     'rainbow': rainbow,
     'rgbtest': rgbtest,
     'spinthebottle': spinthebottle,
+    'solidcolor': solidcolor,
     'strandtest': strandtest,
     'theaterchase': theaterchase,
     'twocolorblend': twocolorblend,
