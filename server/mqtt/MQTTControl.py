@@ -80,7 +80,7 @@ def on_message(client, userdata, msg):
 
 
 def start_show(show_name: str, parameters: dict):
-    global conf
+    global conf, strip, show_process
 
     # search for show module
     if show_name in conf.shows:
@@ -94,12 +94,11 @@ def start_show(show_name: str, parameters: dict):
         log.warning("invalid parameters sent!")
         return
 
-    if strip.num_leds < show.minimal_number_of_leds:
+    if strip.numLEDs < show.minimal_number_of_leds:
         log.critical("The show {show} needs a strip of at least {num} LEDs to run! Aborting.".format(
             show=show_name, num=show.minimal_number_of_leds))
 
     log.info("Starting the show " + show_name)
-    global show_process, strip
     arguments = {"strip": strip, "conf": conf, "parameters": parameters}
     show_process = Process(target=show.run, name=show_name, kwargs=arguments)
     show_process.start()
