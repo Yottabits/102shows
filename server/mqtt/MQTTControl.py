@@ -71,7 +71,7 @@ def on_message(client, userdata, msg):
                        command=command,
                        parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
                        ))
-        stop_running_show() # stop any running show
+        stop_running_show(timeout_sec=0)  # stop any running show
         start_show(show_name, parameters)
     elif command == "stop":
         stop_show(show_name)
@@ -107,12 +107,14 @@ def stop_show(show_name: str):
         return
 
 
-def stop_running_show(timeout_sec: int = 5):
+def stop_running_show(timeout_sec: int = 0.5):
     global show_process, strip
 
     if show_process.is_alive():
         show_process.join(timeout_sec)
-        log.info("{show_name} is running. Terminating...".format(show_name=show_process.name))
+        if show_process.is_alive():
+            log.info("{show_name} is running. Terminating...".format(show_name=show_process.name))
+            show_process.terminate()
     else:
         log.info("no show running; all good")
 
