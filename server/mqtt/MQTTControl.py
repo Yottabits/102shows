@@ -94,6 +94,10 @@ def start_show(show_name: str, parameters: dict):
         log.warning("invalid parameters sent!")
         return
 
+    if strip.num_leds < show.minimal_number_of_leds:
+        log.critical("The show {show} needs a strip of at least {num} LEDs to run! Aborting.".format(
+            show=show_name, num=show.minimal_number_of_leds))
+
     log.info("Starting the show " + show_name)
     global show_process, strip
     arguments = {"strip": strip, "conf": conf, "parameters": parameters}

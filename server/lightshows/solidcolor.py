@@ -14,9 +14,18 @@ Parameters:
 import drivers.fake_apa102 as APA102
 from DefaultConfig import Configuration
 import lightshows.utilities as util
+import logging as log
+
+
+minimal_number_of_leds = 1
 
 
 def run(strip: APA102, conf: Configuration, parameters: dict):
+    # check if we have enough LEDs
+    global minimal_number_of_leds
+    if strip.numLEDs < minimal_number_of_leds:
+        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
+        return
     blend_to_color(strip, parameters["color"])
 
 

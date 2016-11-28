@@ -12,9 +12,19 @@ from drivers.fake_apa102 import APA102
 import lightshows.solidcolor
 from DefaultConfig import Configuration
 import time
+import logging as log
+
+
+minimal_number_of_leds = 1
 
 
 def run(strip: APA102, conf: Configuration, parameters: dict):
+    # check if we have enough LEDs
+    global minimal_number_of_leds
+    if strip.numLEDs < minimal_number_of_leds:
+        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
+        return
+
     while True:
         # single leds
         lightshows.solidcolor.blend_to_color(strip, (255, 0, 0), fadetime_sec=0)

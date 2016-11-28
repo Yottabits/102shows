@@ -11,9 +11,17 @@ Parameters:
 from lightshows.colorcycletemplate import ColorCycleTemplate
 from drivers.fake_apa102 import APA102
 from DefaultConfig import Configuration
+import logging as log
 
+minimal_number_of_leds = 1
 
 def run(strip: APA102, conf: Configuration, parameters: dict):
+    # check if we have enough LEDs
+    global minimal_number_of_leds
+    if strip.numLEDs < minimal_number_of_leds:
+        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
+        return
+
     cycle = TheaterChase(strip=strip, pauseValue=0.04, numStepsPerCycle=35, numCycles=-1)
     cycle.start()  # run continuously
 

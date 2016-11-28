@@ -24,9 +24,15 @@ import logging as log
 
 color_parameters = ['highlight_color', 'background_color']
 necessary_parameters = color_parameters + ['time_sec', 'fadeout']
+minimal_number_of_leds = 144
 
 
 def run(strip: APA102, conf: Configuration, parameters: dict):
+    # check if we have enough LEDs
+    global minimal_number_of_leds
+    if strip.numLEDs < minimal_number_of_leds:
+        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
+        return
     show = SpinTheBottle(strip)
 
     parameters = prepare_parameters(parameters)
