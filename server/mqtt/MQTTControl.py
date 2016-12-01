@@ -147,12 +147,13 @@ def run(config) -> None:
 
     log.info("Initializing LED strip...")
     strip = APA102(conf.strip.num_leds, conf.strip.initial_brightness, 'rgb', conf.strip.max_spi_speed_hz)
-    strip.verbose = False  # @nopi
 
     log.info("Connecting to the MQTT broker")
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
+    if conf.mqtt.username is not None:
+        client.username_pw_set(conf.mqtt.username, conf.mqtt.password)
     client.connect(conf.mqtt.broker.host, conf.mqtt.broker.port, conf.mqtt.broker.keepalive)
     log.info("{name} is ready".format(name=conf.sys_name))
 

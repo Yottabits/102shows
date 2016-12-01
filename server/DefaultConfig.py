@@ -10,6 +10,8 @@ class Configuration:
         prefix = "led"
         general_path = "{prefix}/{sys_name}/show/{show_name}/{command}"
         notification_path = "{prefix}/{sys_name}/notification"
+        username = None
+        password = None
 
         class broker:
             host = "localhost"
