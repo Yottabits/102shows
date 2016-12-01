@@ -6,7 +6,7 @@ This show does nothing with the strip
 """
 
 import logging as log
-from drivers.fake_apa102 import APA102
+from drivers.apa102 import APA102
 from DefaultConfig import Configuration
 
 minimal_number_of_leds = 1

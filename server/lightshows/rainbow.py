@@ -9,7 +9,7 @@ Parameters:
 """
 
 from lightshows.colorcycletemplate import ColorCycleTemplate
-from drivers.fake_apa102 import APA102
+from drivers.apa102 import APA102
 from DefaultConfig import Configuration
 import logging as log
 

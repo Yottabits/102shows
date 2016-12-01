@@ -11,7 +11,7 @@ Parameters:
    =====================================================================
 """
 
-import drivers.fake_apa102 as APA102
+import drivers.apa102 as APA102
 from DefaultConfig import Configuration
 import lightshows.utilities as util
 import logging as log

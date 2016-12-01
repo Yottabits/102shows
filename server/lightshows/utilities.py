@@ -11,7 +11,7 @@ This class provides helper functions and classes for the lightshows:
     - MeasureFPS
 """
 import time
-from drivers.fake_apa102 import APA102
+from drivers.apa102 import APA102
 import types
 import logging as log
 

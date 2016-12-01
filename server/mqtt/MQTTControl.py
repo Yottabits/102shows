@@ -5,7 +5,7 @@ MQTT Control
 This script starts/stops the shows under lightshows/ according to the commands it receives via MQTT
 """
 
-from drivers.fake_apa102 import APA102
+from drivers.apa102 import APA102
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 from multiprocessing import Process

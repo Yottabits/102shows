@@ -10,7 +10,7 @@ Parameters:
    =====================================================================
 """
 
-from drivers.fake_apa102 import APA102
+from drivers.apa102 import APA102
 import lightshows.solidcolor
 from DefaultConfig import Configuration
 import logging as log

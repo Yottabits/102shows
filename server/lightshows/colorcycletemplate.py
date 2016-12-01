@@ -7,7 +7,7 @@ A specific color cycle must subclass this template, and implement at least the
 'update' method.
 """
 
-from drivers.fake_apa102 import APA102
+from drivers.apa102 import APA102
 import time
 
 
