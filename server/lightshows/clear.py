@@ -13,10 +13,20 @@ Parameters:
 from drivers.fake_apa102 import APA102
 import lightshows.solidcolor
 from DefaultConfig import Configuration
+import logging as log
+
+
+minimal_number_of_leds = 1
 
 
 # run this "show"
 def run(strip: APA102, conf: Configuration, parameters: dict):
+    # check if we have enough LEDs
+    global minimal_number_of_leds
+    if strip.numLEDs < minimal_number_of_leds:
+        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
+        return
+
     fadetime_sec = parameters["fadetime_sec"]
 
     if fadetime_sec > 0:
