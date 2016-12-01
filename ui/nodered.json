@@ -323,16 +323,16 @@
         "type": "ui_text_input",
         "z": "b0c966b5.2cbe3",
         "name": "",
-        "label": "background",
+        "label": "background color",
         "group": "a6d85b60.22b1b8",
         "order": 2,
         "width": "2",
         "height": "1",
-        "passthru": true,
+        "passthru": false,
         "mode": "color",
         "delay": 300,
         "topic": "background_color",
-        "x": 3268.8576049804688,
+        "x": 3288.8576049804688,
         "y": 570.6190490722656,
         "wires": [
             [
@@ -419,19 +419,19 @@
         "id": "a0a354af.83d568",
         "type": "ui_slider",
         "z": "b0c966b5.2cbe3",
-        "name": "duration",
+        "name": "time_sec",
         "label": "",
         "group": "a6d85b60.22b1b8",
         "order": 5,
         "width": "3",
         "height": "1",
-        "passthru": true,
+        "passthru": false,
         "topic": "time_sec",
         "min": 0,
         "max": "20",
         "step": "0.2",
-        "x": 3265.6195678710938,
-        "y": 453.7620544433594,
+        "x": 3259.61962890625,
+        "y": 449.7620544433594,
         "wires": [
             [
                 "77af22fd.fbf46c",
@@ -447,12 +447,12 @@
         "order": 6,
         "width": "2",
         "height": "1",
-        "name": "preview duration",
+        "name": "preview time_sec",
         "label": "",
         "format": "{{msg.payload + \" s\"}}",
         "layout": "row-left",
-        "x": 3493.7147216796875,
-        "y": 455.8094482421875,
+        "x": 3279.7149047851562,
+        "y": 483.8094177246094,
         "wires": []
     },
     {
@@ -794,7 +794,8 @@
             ],
             [
                 "a0a354af.83d568",
-                "5eab3742.5d519"
+                "5eab3742.5d519",
+                "77af22fd.fbf46c"
             ],
             [
                 "8123b58b.59559",
@@ -1153,7 +1154,7 @@
         "order": 2,
         "width": "3",
         "height": "1",
-        "passthru": true,
+        "passthru": false,
         "mode": "color",
         "delay": 300,
         "topic": "color2",
@@ -1508,57 +1509,11 @@
         ]
     },
     {
-        "id": "5d74723b.0a1c7c",
-        "type": "ui_button",
-        "z": "b0c966b5.2cbe3",
-        "name": "max",
-        "group": "a2286af3.9d1f9",
-        "order": 3,
-        "width": "1",
-        "height": "1",
-        "label": "",
-        "color": "#a0a0a0",
-        "icon": "brightness_high",
-        "payload": "20",
-        "payloadType": "num",
-        "topic": "brightness",
-        "x": 3271,
-        "y": 58.22220993041992,
-        "wires": [
-            [
-                "14aa04d6.195683"
-            ]
-        ]
-    },
-    {
-        "id": "c46e8e50.de9368",
-        "type": "ui_button",
-        "z": "b0c966b5.2cbe3",
-        "name": "min",
-        "group": "a2286af3.9d1f9",
-        "order": 1,
-        "width": "1",
-        "height": "1",
-        "label": "",
-        "color": "#a0a0a0",
-        "icon": "brightness_low",
-        "payload": "0",
-        "payloadType": "num",
-        "topic": "brightness",
-        "x": 3275.4442749023438,
-        "y": 138.2222137451172,
-        "wires": [
-            [
-                "14aa04d6.195683"
-            ]
-        ]
-    },
-    {
         "id": "d4f66126.ff4e",
         "type": "ui_switch",
         "z": "b0c966b5.2cbe3",
         "name": "",
-        "label": "reset duration",
+        "label": "reset time_sec",
         "group": "a6d85b60.22b1b8",
         "order": 4,
         "width": "1",
@@ -1579,6 +1534,64 @@
         "wires": [
             [
                 "2825489f.ead048"
+            ]
+        ]
+    },
+    {
+        "id": "ba349348.d092a8",
+        "type": "ui_switch",
+        "z": "b0c966b5.2cbe3",
+        "name": "",
+        "label": "brightness min",
+        "group": "a2286af3.9d1f9",
+        "order": 1,
+        "width": "1",
+        "height": "1",
+        "passthru": false,
+        "topic": "brightness",
+        "style": "",
+        "onvalue": "1",
+        "onvalueType": "num",
+        "onicon": "brightness_low",
+        "oncolor": "#a0a0a0",
+        "offvalue": "1",
+        "offvalueType": "num",
+        "officon": "brightness_low",
+        "offcolor": "#a0a0a0",
+        "x": 3271,
+        "y": 138.1999969482422,
+        "wires": [
+            [
+                "14aa04d6.195683"
+            ]
+        ]
+    },
+    {
+        "id": "3364f9de.30e216",
+        "type": "ui_switch",
+        "z": "b0c966b5.2cbe3",
+        "name": "",
+        "label": "brightness max",
+        "group": "a2286af3.9d1f9",
+        "order": 3,
+        "width": "1",
+        "height": "1",
+        "passthru": false,
+        "topic": "brightness",
+        "style": "",
+        "onvalue": "20",
+        "onvalueType": "num",
+        "onicon": "brightness_high",
+        "oncolor": "#aaaa33",
+        "offvalue": "20",
+        "offvalueType": "num",
+        "officon": "brightness_high",
+        "offcolor": "#aaaa33",
+        "x": 3260,
+        "y": 59.19999694824219,
+        "wires": [
+            [
+                "14aa04d6.195683"
             ]
         ]
     }
