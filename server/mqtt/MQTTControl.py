@@ -136,8 +136,6 @@ def set_strip_brightness(brightness: int):
 def run(config) -> None:
     global conf, show_process, strip
 
-    log.getLogger().setLevel(log.DEBUG)
-
     # store config
     conf = config
 
