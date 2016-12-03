@@ -1,5 +1,6 @@
 import spidev
 import logging as log
+from multiprocessing import Array as multiprocessing_array
 
 """
 Driver for APA102 LEDS (aka "DotStar").
@@ -20,6 +21,10 @@ Public methods are:
 Helper methods for color manipulation are:
  - combineColor
  - wheel
+
+
+If the parameter multiprocessing is enabled in the constructor, the LED buffer is stored in a static array which is
+available to all processes of apa102.py
 
 The rest of the methods are used internally and should not be used by the user of the library.
 
@@ -59,13 +64,16 @@ rgb_map = {'rgb': [3, 2, 1], 'rbg': [3, 1, 2], 'grb': [2, 3, 1], 'gbr': [2, 1, 3
 
 
 class APA102:
-    def __init__(self, numLEDs, globalBrightness=31, order='rgb', max_spi_speed_hz=8000000):
+    def __init__(self, numLEDs, globalBrightness=31, order='rgb', max_spi_speed_hz=8000000, multiprocessing=False):
         self.numLEDs = numLEDs
         order = order.lower()
         self.rgb = rgb_map.get(order, rgb_map['rgb'])
         # LED startframe is three "1" bits, followed by 5 brightness bits
         self.setGlobalBrightness(brightness=globalBrightness, update_buffer=False)
         self.leds = [self.ledstart, 0, 0, 0] * self.numLEDs  # Pixel buffer
+        self.multiprocessing = multiprocessing  # if multiprocessing enabled: convert array to a shared state
+        if self.multiprocessing:
+            self.leds = multiprocessing_array('i', self.leds)
         self.spi = spidev.SpiDev()  # Init the SPI device
         self.spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
         self.spi.max_speed_hz = max_spi_speed_hz  # should not be higher than 8000000
@@ -202,6 +210,8 @@ class APA102:
     def rotate(self, positions=1):
         cutoff = 4 * (positions % self.numLEDs)
         self.leds = self.leds[cutoff:] + self.leds[:cutoff]
+        if self.multiprocessing:
+            self.leds = multiprocessing_array('i', self.leds)
 
     """
     void show()
@@ -211,7 +221,7 @@ class APA102:
 
     def show(self):
         self.clockStartFrame()
-        self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
+        self.spi.xfer2(list(self.leds))  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
         self.clockEndFrame()
 
     """

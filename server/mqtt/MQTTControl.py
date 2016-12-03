@@ -121,8 +121,6 @@ def stop_running_show(timeout_sec: int = 0.5):
     else:
         log.info("no show running; all good")
 
-    strip.clearBuffer()  # just in case
-
 
 def set_strip_brightness(brightness: int):
     global conf, strip
@@ -146,7 +144,11 @@ def run(config) -> None:
     log.info("Starting {name}".format(name=conf.sys_name))
 
     log.info("Initializing LED strip...")
-    strip = APA102(conf.strip.num_leds, conf.strip.initial_brightness, 'rgb', conf.strip.max_spi_speed_hz)
+    strip = APA102(numLEDs=conf.strip.num_leds,
+                   globalBrightness=conf.strip.initial_brightness,
+                   order='rgb',
+                   max_spi_speed_hz=conf.strip.max_spi_speed_hz,
+                   multiprocessing=True)
 
     log.info("Connecting to the MQTT broker")
     client = mqtt.Client()
