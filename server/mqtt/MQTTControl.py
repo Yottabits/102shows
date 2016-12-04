@@ -84,7 +84,7 @@ def start_show(show_name: str, parameters: dict):
 
     # search for show module
     if show_name in conf.shows:
-        show = conf.shows[show_name]
+        show = conf.shows[show_name](strip, conf, parameters)
     else:
         log.warning("Show {name} was not found!".format(name=show_name))
         return
@@ -99,8 +99,7 @@ def start_show(show_name: str, parameters: dict):
             show=show_name, num=show.minimal_number_of_leds))
 
     log.info("Starting the show " + show_name)
-    arguments = {"strip": strip, "conf": conf, "parameters": parameters}
-    show_process = Process(target=show.run, name=show_name, kwargs=arguments)
+    show_process = Process(target=show.run, name=show_name)
     show_process.start()
 
 

@@ -15,8 +15,23 @@ import lightshows.solidcolor
 from DefaultConfig import Configuration
 import logging as log
 
-
 minimal_number_of_leds = 1
+
+
+class Clear():
+    minimal_number_of_leds = 1
+
+    def __init__(self, strip: APA102, conf: Configuration, parameters: dict):
+        self.strip = strip
+        self.conf = Configuration
+        self.parameters = parameters
+
+    def run(self):
+        run(self.strip, self.conf, self.parameters)
+
+    @classmethod
+    def parameters_valid(cls, parameters: dict) -> bool:
+        return parameters_valid(parameters)
 
 
 # run this "show"
