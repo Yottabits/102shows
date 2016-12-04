@@ -49,8 +49,8 @@ def on_message(client, userdata, msg):
         payload = str(msg.payload)
 
     # extract the essentials
-    show_name = helpers.get_from_topic(TopicAspect.show_name.value, topic)
-    command = helpers.get_from_topic(TopicAspect.command.value, topic)
+    show_name = helpers.get_from_topic(TopicAspect.show_name, topic)
+    command = helpers.get_from_topic(TopicAspect.command, topic)
 
     # check if this is a relevant command for us
     supported_commands = ["start", "stop", "brightness"]
@@ -90,13 +90,9 @@ def start_show(show_name: str, parameters: dict):
         return
 
     # check for valid parameters
-    if not show.parameters_valid(parameters):
+    if not show.runnable():
         log.warning("invalid parameters sent!")
         return
-
-    if strip.numLEDs < show.minimal_number_of_leds:
-        log.critical("The show {show} needs a strip of at least {num} LEDs to run! Aborting.".format(
-            show=show_name, num=show.minimal_number_of_leds))
 
     log.info("Starting the show " + show_name)
     show_process = Process(target=show.run, name=show_name)

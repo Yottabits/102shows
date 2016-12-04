@@ -5,7 +5,6 @@ Helpers for MQTT
 A couple of helper functions (big surprise!) for MQTTControl
 """
 
-from enum import Enum
 import config as user_config
 import json
 import logging as log
@@ -15,7 +14,7 @@ conf = user_config.configuration
 
 
 # information you can get out of an MQTT topic (and on which path hierarchy they are)
-class TopicAspect(Enum):
+class TopicAspect:
     prefix = 0
     sys_name = 1
     show_name = 3
