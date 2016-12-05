@@ -8,10 +8,10 @@ Parameters:
     None
 """
 
-from lightshows.templates.colorcycletemplate import *
+from lightshows.templates.colorcycle import *
 
 
-class Rainbow(ColorCycleTemplate):
+class Rainbow(ColorCycle):
     def init(self, strip):
         pass
 

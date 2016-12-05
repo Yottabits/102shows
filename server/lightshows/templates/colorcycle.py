@@ -11,7 +11,7 @@ import time
 from lightshows.templates.base import *
 
 
-class ColorCycleTemplate(Lightshow):
+class ColorCycle(Lightshow):
     # Parameters
     @property
     def pause_sec(self):

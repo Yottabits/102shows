@@ -8,10 +8,10 @@ Parameters:
     None
 """
 
-from lightshows.templates.colorcycletemplate import *
+from lightshows.templates.colorcycle import *
 
 
-class StrandTest(ColorCycleTemplate):
+class StrandTest(ColorCycle):
     def init(self, strip: LEDStrip):
         self.color = 0x000000  # Initialize with black
 

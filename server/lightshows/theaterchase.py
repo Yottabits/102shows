@@ -10,10 +10,10 @@ Parameters:
 
 import logging as log
 
-from lightshows.templates.colorcycletemplate import *
+from lightshows.templates.colorcycle import *
 
 
-class TheaterChase(ColorCycleTemplate):
+class TheaterChase(ColorCycle):
     def init(self, strip):
         pass
 
