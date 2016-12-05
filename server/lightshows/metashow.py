@@ -7,6 +7,8 @@ import paho.mqtt.client
 
 class Lightshow(metaclass=ABCMeta):
     def __init__(self, strip: LEDStrip, conf: Configuration, parameters: dict, check_runnable: bool = True):
+        self.__parameter_map = {}
+
         self.strip = strip
         self.conf = conf
         self.parameters = parameters
@@ -29,8 +31,11 @@ class Lightshow(metaclass=ABCMeta):
         """Start the show with the parameters given in the constructor"""
         raise NotImplementedError
 
-    def set_parameter(self, parameter: str, value):
-        pass
+    def set_parameter(self, param_name: str, value):
+        try:
+            self.__parameter_map[param_name] = value
+        except KeyError as unknown_key:
+            raise InvalidParameters("Parameter key  \"{name}\" is unkown!".format(name=unknown_key))
 
     class MQTTListener:
         def __init__(self, lightshow):

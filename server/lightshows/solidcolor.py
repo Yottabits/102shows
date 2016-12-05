@@ -11,33 +11,17 @@ Parameters:
    =====================================================================
 """
 
-import drivers.apa102 as APA102
-from DefaultConfig import Configuration
-import lightshows.utilities as util
-import logging as log
+from lightshows.metashow import Lightshow
+from lightshows.utilities import blend_whole_strip_to_color
 
 
-minimal_number_of_leds = 1
+class SolidColor(Lightshow):
+    def check_runnable(self) -> bool:
+        if "color" in self.parameters:
+            if len(self.parameters["color"]) is 3:
+                return True
 
+        return False
 
-def run(strip: APA102, conf: Configuration, parameters: dict):
-    # check if we have enough LEDs
-    global minimal_number_of_leds
-    if strip.numLEDs < minimal_number_of_leds:
-        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
-        return
-    blend_to_color(strip, parameters["color"])
-
-
-def blend_to_color(strip: APA102, color: tuple, fadetime_sec: int = 2):
-    transition = util.SmoothBlend(strip)
-    transition.set_color_for_whole_strip(*color)
-    transition.blend(time_sec=fadetime_sec)
-
-
-def parameters_valid(parameters: dict) -> bool:
-    if "color" in parameters:
-        if len(parameters["color"]) is 3:
-            return True
-
-    return False
+    def run(self):
+        blend_whole_strip_to_color(self.strip, self.parameters["color"])

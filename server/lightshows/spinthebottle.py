@@ -13,7 +13,7 @@ Parameters:
    || fadeout:            ||     bool      ||          bool           ||
    =====================================================================
 """
-
+import lightshows.utilities
 from drivers.apa102 import APA102
 from DefaultConfig import Configuration
 import lightshows.solidcolor
@@ -39,7 +39,7 @@ def run(strip: APA102, conf: Configuration, parameters: dict):
     show.highlight_color = parameters["highlight_color"]
     show.background_color = parameters["background_color"]
 
-    lightshows.solidcolor.blend_to_color(strip, show.background_color)  # fade to background_color
+    lightshows.utilities.blend_whole_strip_to_color(strip, show.background_color)  # fade to background_color
     show.run(parameters["time_sec"], parameters["fadeout"])  # start the real show :-)
 
 
@@ -121,4 +121,4 @@ class SpinTheBottle:
 
         if fadeout:
             sleep(10)
-            lightshows.solidcolor.blend_to_color(self.strip, self.background_color)  # fadeout the spot
+            lightshows.utilities.blend_whole_strip_to_color(self.strip, self.background_color)  # fadeout the spot
