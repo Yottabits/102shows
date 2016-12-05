@@ -6,28 +6,20 @@ This show does nothing with the strip
 """
 
 import logging as log
-from drivers.apa102 import APA102
+from drivers.apa102 import APA102 as LEDStrip
 from DefaultConfig import Configuration
-
-minimal_number_of_leds = 1
-
-
-# end immediately after start
-def run(strip: APA102, conf: Configuration, parameters: dict):
-    # check if we have enough LEDs
-    global minimal_number_of_leds
-    if strip.numLEDs < minimal_number_of_leds:
-        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
-        return
-
-    log.info("Dummy show started")
-    stop()
+from lightshows.metashow import Lightshow
+import time
 
 
-# what could go wrong?
-def parameters_valid(parameters: dict) -> bool:
-    return True
+class Dummy(Lightshow):
+    def check_runnable(self):
+        return True
 
+    def run(self):
+        log.info("Dummy show started")
+        time.sleep(4)
+        self.stop()
 
-def stop():
-    log.info("Dummy show stopped")
+    def stop(self):
+        log.info("Dummy show stopped")

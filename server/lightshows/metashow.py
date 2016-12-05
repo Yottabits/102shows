@@ -2,23 +2,26 @@ from abc import ABCMeta, abstractmethod
 from DefaultConfig import Configuration
 from drivers.apa102 import APA102 as LEDStrip
 import mqtt.helpers
-import paho.mqtt.client as paho
+import paho.mqtt.client
 
 
 class Lightshow(metaclass=ABCMeta):
-    def __init__(self, strip: LEDStrip, conf: Configuration, parameters: dict):
+    def __init__(self, strip: LEDStrip, conf: Configuration, parameters: dict, check_runnable: bool = True):
         self.strip = strip
-        self.conf = Configuration
+        self.conf = conf
         self.parameters = parameters
 
+        if check_runnable:
+            self.check_runnable()
+
     @property
-    @abstractmethod
     def name(self) -> str:
-        raise NotImplementedError
+        subclass_name = type(self).__name__
+        return subclass_name.lower()
 
     @abstractmethod
-    def runnable(self) -> bool:
-        """ Check if there are enough LEDs in the strip, if the parameters and configuration are valid... """
+    def check_runnable(self):
+        """ Raise an exception (InvalidStrip, InvalidConf or InvalidParameters) if the show is not runnable"""
         raise NotImplementedError
 
     @abstractmethod
@@ -32,12 +35,16 @@ class Lightshow(metaclass=ABCMeta):
     class MQTTListener:
         def __init__(self, lightshow):
             self.lightshow = lightshow
-            self.client = paho.Client()
+            self.client = paho.mqtt.client.Client()
             self.client.on_connect = self.subscribe_to_show
             self.client.on_message = self.store_to_parameters
 
         def subscribe_to_show(self, client, userdata, flags, rc):
-            subscription_path = mqtt.helpers.assemble_path(show_name=self.lightshow.name, command="+")
+            subscription_path = self.lightshow.conf.mqtt.general_path.format(
+                prefix=self.lightshow.conf.mqtt.prefix,
+                sys_name=self.lightshow.conf.sys_name,
+                show_name=self.lightshow.namelightshow.conf,
+                command="+")
             client.subscribe(subscription_path)
 
         def store_to_parameters(self, client, userdata, msg):
@@ -54,3 +61,15 @@ class Lightshow(metaclass=ABCMeta):
             self.client.connect(self.lightshow.conf.mqtt.broker.host,
                                 self.lightshow.conf.mqtt.broker.port,
                                 self.lightshow.conf.mqtt.broker.keepalive)
+
+
+class InvalidStrip(Exception):
+    pass
+
+
+class InvalidConf(Exception):
+    pass
+
+
+class InvalidParameters(Exception):
+    pass

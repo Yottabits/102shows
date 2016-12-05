@@ -6,4 +6,5 @@ import logging as log
 log.getLogger().setLevel(log.DEBUG)
 
 user_config = config.configuration
-mqtt.MQTTControl.run(user_config)
+server = mqtt.MQTTControl.MQTTControl(user_config)
+server.run()
