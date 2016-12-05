@@ -15,7 +15,7 @@ rgb_map = {'rgb': [3, 2, 1], 'rbg': [3, 1, 2], 'grb': [2, 3, 1], 'gbr': [2, 1, 3
 
 
 class APA102:
-    def __init__(self, numLEDs, globalBrightness=31, order='rgb', max_spi_speed_hz=8000000):
+    def __init__(self, numLEDs, globalBrightness=31, order='rgb', max_spi_speed_hz=8000000, multiprocessing=False):
         self.numLEDs = numLEDs
         order = order.lower()
         self.rgb = rgb_map.get(order, rgb_map['rgb'])
@@ -24,6 +24,7 @@ class APA102:
         self.leds = [self.ledstart, 0, 0, 0] * self.numLEDs  # Pixel buffer
         self.spi = Empty()  # Init the SPI device
         self.spi.max_speed_hz = max_spi_speed_hz  # Up the speed a bit, so that the LEDs are painted faster
+        self.multiprocessing = multiprocessing
 
         log.info("initialized a strip with {num} LEDs".format(num=numLEDs))
 
