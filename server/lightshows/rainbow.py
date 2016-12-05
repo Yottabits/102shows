@@ -8,33 +8,14 @@ Parameters:
     None
 """
 
-from lightshows.colorcycletemplate import ColorCycleTemplate
-from drivers.apa102 import APA102
-from DefaultConfig import Configuration
-import logging as log
-
-minimal_number_of_leds = 1
-
-
-def run(strip: APA102, conf: Configuration, parameters: dict):
-    # check if we have enough LEDs
-    global minimal_number_of_leds
-    if strip.numLEDs < minimal_number_of_leds:
-        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
-        return
-    cycle = Rainbow(strip=strip, pauseValue=0, numStepsPerCycle=255, numCycles=-1)
-    cycle.start()  # run continuously
-
-
-def parameters_valid(parameters: dict) -> bool:
-    if parameters:
-        return False
-    else:
-        return True
+from lightshows.templates.colorcycletemplate import *
 
 
 class Rainbow(ColorCycleTemplate):
-    def update(self, strip: APA102, numStepsPerCycle, currentStep, currentCycle):
+    def init(self, strip):
+        pass
+
+    def update(self, strip: LEDStrip, numStepsPerCycle, currentStep, currentCycle):
         # One cycle = One thrip through the color wheel, 0..254
         # Few cycles = quick transition, lots of cycles = slow transition
         # -> LED 0 goes from index 0 to 254 in numStepsPerCycle cycles. So it might have to step up

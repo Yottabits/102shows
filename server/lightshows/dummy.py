@@ -6,10 +6,9 @@ This show does nothing with the strip
 """
 
 import logging as log
-from drivers.apa102 import APA102 as LEDStrip
-from DefaultConfig import Configuration
-from lightshows.metashow import Lightshow
 import time
+
+from lightshows.templates.base import *
 
 
 class Dummy(Lightshow):

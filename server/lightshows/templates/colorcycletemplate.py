@@ -7,12 +7,8 @@ A specific color cycle must subclass this template, and implement at least the
 'update' method.
 """
 
-from drivers.apa102 import APA102 as LEDStrip
-from DefaultConfig import Configuration
-from lightshows.metashow import Lightshow, InvalidParameters
-import logging as log
 import time
-from abc import abstractmethod
+from lightshows.templates.base import *
 
 
 class ColorCycleTemplate(Lightshow):
@@ -49,12 +45,12 @@ class ColorCycleTemplate(Lightshow):
     @num_cycles.setter
     def num_cycles(self, num_cycles):
         try:
-            num_steps_per_cycle = int(num_steps_per_cycle)
+            num_steps_per_cycle = int(num_cycles)
         except ValueError as e:
-            raise InvalidParameters("Parameter \"num_steps_per_cycle\" must be numeric! (given: {given})".
-                                    format(given=num_steps_per_cycle))
+            raise InvalidParameters("Parameter \"num_cycles\" must be numeric! (given: {given})".
+                                    format(given=num_cycles))
         else:
-            self.__num_steps_per_cycle = num_steps_per_cycle
+            self.__num_cycles = num_cycles
 
     def __init__(self, strip: LEDStrip, conf: Configuration, parameters: dict):
         super().__init__(strip, conf, parameters, check_runnable=False)

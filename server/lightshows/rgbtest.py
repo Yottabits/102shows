@@ -7,13 +7,11 @@ turns on all red, then all green, then all blue leds and then all together
 Parameters:
     None
 """
-import lightshows.utilities
-from drivers.apa102 import APA102
-import lightshows.solidcolor
-from DefaultConfig import Configuration
-from lightshows.metashow import Lightshow
 import time
-import logging as log
+
+import lightshows.solidcolor
+import lightshows.utilities
+from lightshows.templates.base import *
 
 
 class RGBTest(Lightshow):

@@ -8,15 +8,14 @@ Parameters:
     None
 """
 
-from lightshows.colorcycletemplate import ColorCycleTemplate
-from drivers.apa102 import APA102
+from lightshows.templates.colorcycletemplate import *
 
 
 class StrandTest(ColorCycleTemplate):
-    def init(self, strip: APA102):
+    def init(self, strip: LEDStrip):
         self.color = 0x000000  # Initialize with black
 
-    def update(self, strip: APA102, numStepsPerCycle, currentStep, currentCycle):
+    def update(self, strip: LEDStrip, numStepsPerCycle, currentStep, currentCycle):
         # One cycle = The 9 Test-LEDs wander through numStepsPerCycle LEDs.
         if currentStep == 0:
             self.color >>= 8  # Red->green->blue->black

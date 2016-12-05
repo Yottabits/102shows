@@ -11,7 +11,7 @@ Parameters:
    =====================================================================
 """
 
-from lightshows.metashow import Lightshow
+from lightshows.templates.base import *
 from lightshows.utilities import blend_whole_strip_to_color
 
 

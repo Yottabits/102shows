@@ -14,7 +14,7 @@ import paho.mqtt.publish
 
 import mqtt.helpers as helpers
 from drivers.apa102 import APA102
-from lightshows.metashow import *
+from lightshows.templates.base import *
 from mqtt.helpers import TopicAspect
 
 

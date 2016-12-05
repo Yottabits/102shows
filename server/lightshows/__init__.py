@@ -1,6 +1,5 @@
 __all__ = ['clear',
            'dummy',
-           'metashow',
            'rainbow',
            'rgbtest',
            'solidcolor',

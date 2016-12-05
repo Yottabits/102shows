@@ -10,9 +10,10 @@ Parameters:
    =====================================================================
 """
 
-import lightshows.utilities
-from lightshows.metashow import Lightshow, InvalidStrip, InvalidConf, InvalidParameters
 import logging as log
+
+import lightshows.utilities
+from lightshows.templates.base import *
 
 
 class Clear(Lightshow):
