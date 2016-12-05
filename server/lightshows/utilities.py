@@ -6,14 +6,16 @@ This class provides helper functions and classes for the lightshows:
     - linear_dim(undimmed, factor)
     - is_rgb_color_tuple(to_check)
     - add_tuples(tuple1, tuple2)
+    - blend_whole_strip_to_color(strip, color, fadetime_sec):
 
     - SmoothBlend
     - MeasureFPS
 """
-import time
+from drivers import apa102 as APA102
 from drivers.apa102 import APA102
 import types
 import logging as log
+import time
 
 
 def linear_dim(undimmed: tuple, factor: float) -> tuple:
@@ -64,7 +66,7 @@ class MeasureFPS:
         self.active_color = (255, 255, 255)
         self.passed_color = (0, 100, 100)
 
-    def run(self) -> float:
+    def run(self):
         """runs a test on the LED strip framerate
         :return: a tuple with (framerate, time_elapsed, number_of_frames)
         """
@@ -86,7 +88,7 @@ class MeasureFPS:
         self.strip.clearStrip()
         self.strip.clearStrip()
 
-        return (framerate, time_elapsed, number_of_frames)
+        return framerate, time_elapsed, number_of_frames
 
 
 class SmoothBlend:
@@ -177,3 +179,9 @@ class SmoothBlend:
         # set to final target state
         for ledNum in range(self.strip.numLEDs):
             self.strip.setPixel(ledNum, *(self.target_colors[ledNum]))
+
+
+def blend_whole_strip_to_color(strip: APA102, color: tuple, fadetime_sec: int = 2):
+    transition = SmoothBlend(strip)
+    transition.set_color_for_whole_strip(*color)
+    transition.blend(time_sec=fadetime_sec)
