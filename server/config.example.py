@@ -4,7 +4,6 @@ from lightshows import *
 # load default configuration
 configuration = DefaultConfig.Configuration()
 
-
 ################################# CUSTOM SETTINGS #################################
 # set your own parameters here, look at DefaultConfig.py for all possible options #
 ###################################################################################
@@ -25,6 +24,6 @@ configuration.shows = {
     'rgbtest': rgbtest.RGBTest,
     'spinthebottle': spinthebottle.SpinTheBottle,
     'solidcolor': solidcolor.SolidColor,
-     'theaterchase': theaterchase.TheaterChase,
+    'theaterchase': theaterchase.TheaterChase,
     'twocolorblend': twocolorblend.TwoColorBlend,
 }

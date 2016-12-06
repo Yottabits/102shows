@@ -8,6 +8,7 @@ A couple of helper functions (big surprise!) for MQTTControl
 import json
 import logging as log
 
+
 # information you can get out of an MQTT topic (and on which path hierarchy they are)
 class TopicAspect:
     prefix = 0
@@ -33,8 +34,8 @@ def parse_json_safely(payload: str):
     if payload:  # not empty
         try:
             unpacked = json.loads(payload)
-        except:
-            log.warning("Could not parse this payload")
+        except Exception as error:
+            log.warning("Could not parse this payload: {}".format(error))
             return
         else:
             if type(unpacked) is not dict:

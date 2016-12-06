@@ -45,7 +45,8 @@ class MQTTControl:
             show_name="+",
             command="+")
         client.subscribe(subscription_path)
-        log.info("subscription on broker {host} for {path}".format(host=self.conf.mqtt.broker.host, path=subscription_path))
+        log.info("subscription on broker {host} for {path}".format(
+            host=self.conf.mqtt.broker.host, path=subscription_path))
 
     def on_message(self, client, userdata, msg):
         """ react to a received message and eventually starts/stops a show """
@@ -127,10 +128,10 @@ class MQTTControl:
 
         log.info("Initializing LED strip...")
         self.strip = APA102(numLEDs=self.conf.strip.num_leds,
-                       globalBrightness=self.conf.strip.initial_brightness,
-                       order='rgb',
-                       max_spi_speed_hz=self.conf.strip.max_spi_speed_hz,
-                       multiprocessing=True)
+                            globalBrightness=self.conf.strip.initial_brightness,
+                            order='rgb',
+                            max_spi_speed_hz=self.conf.strip.max_spi_speed_hz,
+                            multiprocessing=True)
 
         log.info("Connecting to the MQTT broker")
         client = paho.mqtt.client.Client()

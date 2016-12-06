@@ -70,6 +70,7 @@ class APA102:
         order = order.lower()
         self.rgb = rgb_map.get(order, rgb_map['rgb'])
         # LED startframe is three "1" bits, followed by 5 brightness bits
+        self.ledstart = None  # this is set by self.setGlobalBrightness()
         self.setGlobalBrightness(brightness=globalBrightness, update_buffer=False)
         self.leds = [self.ledstart, 0, 0, 0] * self.numLEDs  # Pixel buffer
         self.multiprocessing = multiprocessing  # if multiprocessing enabled: convert array to a shared state
@@ -103,9 +104,9 @@ class APA102:
     the input of LED one so that the data can reach the last LED.
 
     Ultimately, we need to send additional numLEDs/2 arbitrary data bits, in order to trigger numLEDs/2 additional clock
-    changes. This driver sends zeroes, which has the benefit of getting LED one partially or fully ready for the next update
-    to the strip. An optimized version of the driver could omit the "clockStartFrame" method if enough zeroes have
-    been sent as part of "clockEndFrame".
+    changes. This driver sends zeroes, which has the benefit of getting LED one partially or fully ready for the next
+    update to the strip. An optimized version of the driver could omit the "clockStartFrame" method if enough zeroes
+    have been sent as part of "clockEndFrame".
     """
 
     def clockEndFrame(self):
@@ -139,14 +140,14 @@ class APA102:
 
     def getPixel(self, ledNum: int) -> tuple:
         if ledNum < 0:
-            return None  # Pixel is invisible, so ignore
+            raise IndexError("led_num cannot be < 0!")
         if ledNum >= self.numLEDs:
-            return None  # again, invsible
+            raise IndexError("led_num is out of bounds!")
         startIndex = 4 * ledNum
         red = self.leds[startIndex + self.rgb[0]]
         green = self.leds[startIndex + self.rgb[1]]
         blue = self.leds[startIndex + self.rgb[2]]
-        return (red, green, blue)
+        return red, green, blue
 
     """
     void setGlobalBrightness(brightness)
@@ -240,7 +241,8 @@ class APA102:
     Make one 3*8 byte color value
     """
 
-    def combineColor(self, red, green, blue):
+    @staticmethod
+    def combineColor(red, green, blue):
         return (red << 16) + (green << 8) + blue
 
     """
@@ -250,7 +252,8 @@ class APA102:
     """
 
     def wheel(self, wheelPos):
-        if wheelPos > 254: wheelPos = 254  # Safeguard
+        if wheelPos > 254:
+            wheelPos = 254  # Safeguard
         if wheelPos < 85:  # Green -> Red
             return self.combineColor(wheelPos * 3, 255 - wheelPos * 3, 0)
         elif wheelPos < 170:  # Red -> Blue
@@ -258,4 +261,4 @@ class APA102:
             return self.combineColor(255 - wheelPos * 3, 0, wheelPos * 3)
         else:  # Blue -> Green
             wheelPos -= 170
-            return self.combineColor(0, wheelPos * 3, 255 - wheelPos * 3);
+            return self.combineColor(0, wheelPos * 3, 255 - wheelPos * 3)

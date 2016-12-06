@@ -78,7 +78,7 @@ class ColorCycle(Lightshow):
         raise NotImplementedError("Please implement the update() method")
 
     def cleanup(self):
-        self.shutdown(self.strip)
+        self.shutdown()
         self.strip.clearStrip()
         log.debug('Strip cleared')
         self.strip.cleanup()

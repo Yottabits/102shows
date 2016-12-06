@@ -35,15 +35,14 @@ class APA102:
 
     def getPixel(self, ledNum: int) -> tuple:
         if ledNum < 0:
-            return None  # Pixel is invisible, so ignore
+            raise IndexError("led_num cannot be < 0!")
         if ledNum >= self.numLEDs:
-            return None  # again, invsible
+            raise IndexError("led_num is out of bounds!")
         startIndex = 4 * ledNum
-        self.leds[startIndex] = self.ledstart
         red = self.leds[startIndex + self.rgb[0]]
         green = self.leds[startIndex + self.rgb[1]]
         blue = self.leds[startIndex + self.rgb[2]]
-        return (red, green, blue)
+        return red, green, blue
 
     def setPixel(self, ledNum, red, green, blue):
         if ledNum < 0:
@@ -99,7 +98,8 @@ class APA102:
         return (red << 16) + (green << 8) + blue
 
     def wheel(self, wheelPos):
-        if wheelPos > 254: wheelPos = 254  # Safeguard
+        if wheelPos > 254:
+            wheelPos = 254  # Safeguard
         if wheelPos < 85:  # Green -> Red
             return self.combineColor(wheelPos * 3, 255 - wheelPos * 3, 0)
         elif wheelPos < 170:  # Red -> Blue

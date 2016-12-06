@@ -11,7 +11,6 @@ This class provides helper functions and classes for the lightshows:
     - SmoothBlend
     - MeasureFPS
 """
-from drivers import apa102 as APA102
 from drivers.apa102 import APA102
 import types
 import logging as log
@@ -91,19 +90,19 @@ class SmoothBlend:
         self.strip = strip
         self.target_colors = [(0, 0, 0)] * self.strip.numLEDs  # an array of tuples
 
-    def set_pixel(self, ledNum: int, red: int, green: int, blue: int):
+    def set_pixel(self, led_num: int, red: int, green: int, blue: int):
         """ set the desired state of a given pixel after the blending is finished """
         # check if the given color values are valid
         for component in (red, green, blue):
             if type(component) is not int:
-                log.warning("RGB value for pixel {num} is not an integer!".format(num=ledNum))
+                log.warning("RGB value for pixel {num} is not an integer!".format(num=led_num))
                 return
             if component < 0 or component > 255:
-                log.warning("RGB value for pixel {num} is out of bounds! (0-255)".format(num=ledNum))
+                log.warning("RGB value for pixel {num} is out of bounds! (0-255)".format(num=led_num))
                 return
 
         # store in buffer
-        self.target_colors[ledNum] = (red, green, blue)
+        self.target_colors[led_num] = (red, green, blue)
 
     def set_color_for_whole_strip(self, red: int, green: int, blue: int):
         """ set the same color for all LEDs in the strip """
