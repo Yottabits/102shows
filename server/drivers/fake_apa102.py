@@ -6,9 +6,7 @@ This driver can be called like the real apa102.py but and behaves like it with t
 """
 
 import logging as log
-
-class Empty:
-    pass
+from lightshows.utilities import verifyparameters as verify
 
 
 rgb_map = {'rgb': [3, 2, 1], 'rbg': [3, 1, 2], 'grb': [2, 3, 1], 'gbr': [2, 1, 3], 'brg': [1, 3, 2], 'bgr': [1, 2, 3]}
@@ -66,8 +64,10 @@ class APA102:
 
     def setGlobalBrightness(self, brightness: int, update_buffer: bool = True):
         # validate
-        if type(brightness) is not int or brightness < 0 or brightness > 31:
-            log.warning("set brightness value \"{brightness}\" is not an integer between 0 and 31")
+        try:
+            verify.integer(brightness, "brightness", minimum=0, maximum=31)
+        except verify.InvalidParameters as error:
+            log.warning(str(error))
 
         log.debug("Global strip brightness set to {}".format(brightness))
 

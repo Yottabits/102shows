@@ -1,6 +1,7 @@
 import spidev
 import logging as log
 from multiprocessing import Array as multiprocessing_array
+from lightshows.utilities import verifyparameters as verify
 
 """
 Driver for APA102 LEDS (aka "DotStar").
@@ -155,8 +156,10 @@ class APA102:
 
     def setGlobalBrightness(self, brightness: int, update_buffer: bool = True):
         # validate
-        if type(brightness) is not int or brightness < 0 or brightness > 31:
-            log.warning("set brightness value \"{brightness}\" is not an integer between 0 and 31")
+        try:
+            verify.integer(brightness, "brightness", minimum=0, maximum=31)
+        except verify.InvalidParameters as error:
+            log.warning(str(error))
 
         # set bitmask ledstart
         self.ledstart = (brightness & 0b00011111) | 0b11100000

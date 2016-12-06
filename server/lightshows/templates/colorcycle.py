@@ -7,10 +7,12 @@ A specific color cycle must subclass this template, and implement at least the
 'update' method.
 """
 
-import time
 import logging as log
+import time
+
 from lightshows.templates.base import *
 from lightshows.utilities import verifyparameters as verify
+from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class ColorCycle(Lightshow):

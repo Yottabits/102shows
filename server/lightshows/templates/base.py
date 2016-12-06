@@ -1,8 +1,10 @@
 from abc import ABCMeta, abstractmethod
+
+import paho.mqtt.client
+
+import mqtt.helpers
 from DefaultConfig import Configuration
 from drivers.apa102 import APA102 as LEDStrip
-import mqtt.helpers
-import paho.mqtt.client
 
 
 class Lightshow(metaclass=ABCMeta):
@@ -69,27 +71,3 @@ class Lightshow(metaclass=ABCMeta):
                                 self.lightshow.conf.mqtt.broker.keepalive)
 
 
-class InvalidStrip(Exception):
-    pass
-
-
-class InvalidConf(Exception):
-    pass
-
-
-class InvalidParameters(Exception):
-    @staticmethod
-    def unknown(param_name: str = None):
-        if param_name:
-            debug_str = "Parameter \"{name}\" is unknown!".format(name=param_name)
-        else:
-            debug_str = "Parameter is unknown!"
-        return InvalidParameters(debug_str)
-
-    @staticmethod
-    def missing(param_name: str = None):
-        if param_name:
-            debug_str = "Parameter \"{name}\" is missing!".format(name=param_name)
-        else:
-            debug_str = "Parameter is missing!"
-        return InvalidParameters(debug_str)

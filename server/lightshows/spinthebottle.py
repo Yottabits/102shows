@@ -19,6 +19,7 @@ from time import sleep
 from lightshows.templates.base import *
 from lightshows.utilities import verifyparameters as verify
 from lightshows.utilities.general import blend_whole_strip_to_color, linear_dim
+from lightshows.utilities.verifyparameters import InvalidStrip, InvalidParameters
 
 
 class SpinTheBottle(Lightshow):

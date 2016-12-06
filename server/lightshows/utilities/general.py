@@ -29,24 +29,6 @@ def linear_dim(undimmed: tuple, factor: float) -> tuple:
     return dimmed
 
 
-def is_rgb_color_tuple(to_check) -> bool:
-    """ check if :param to_check is a rgb color tuple"""
-    if type(to_check) is not tuple:
-        return False
-
-    if len(to_check) is not 3:  # an rgb tuple has three components
-        return False
-
-    for component in to_check:
-        if type(component) is not int:
-            return False
-        if not (0 <= component <= 255):
-            return False
-
-    # if no break condition is met:
-    return True
-
-
 def add_tuples(tuple1: tuple, tuple2: tuple):
     """add :param tuple1 component-wise to :param tuple2"""
     if len(tuple1) is not len(tuple2):

@@ -12,8 +12,9 @@ Parameters:
 """
 
 from lightshows.templates.base import *
-from lightshows.utilities.general import blend_whole_strip_to_color, is_rgb_color_tuple
 from lightshows.utilities import verifyparameters as verify
+from lightshows.utilities.general import blend_whole_strip_to_color
+from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class SolidColor(Lightshow):
