@@ -69,14 +69,13 @@ class SpinTheBottle(Lightshow):
             InvalidStrip("This show needs a strip of at last {} LEDs to run correctly!".format(
                 self.minimal_number_of_leds))
         # do we have all necessary parameters?
-        if self.highlight_color is None:
-            raise InvalidParameters.missing("highlight_color")
-        if self.background_color is None:
-            raise InvalidParameters.missing("background_color")
-        if self.time_sec is None:
-            raise InvalidParameters.missing("time_sec")
-        if self.fadeout is None:
-            raise InvalidParameters.missing("fadeout")
+        necessary_parameters = [(self.highlight_color, "highlight_color"),
+                                (self.background_color, "background_color"),
+                                (self.time_sec, "time_sec"),
+                                (self.fadeout, "fadeout")]
+        for parameter, parameter_name in necessary_parameters:
+            if parameter is None:
+                raise InvalidParameters.missing(parameter_name)
 
         # is our area (limited by lower_border and upper_border) wide enough?
         led_width = self.upper_border - self.lower_border + 1
