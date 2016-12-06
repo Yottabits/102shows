@@ -17,9 +17,9 @@ from lightshows.utilities.verifyparameters import InvalidParameters
 
 class ColorCycle(Lightshow):
     def init_parameters(self):
-        self.pause_sec = None
+        self.pause_sec = 0
         self.num_steps_per_cycle = None
-        self.num_cycles = None
+        self.num_cycles = float("inf")
         self.order = 'rgb'  # this should not be changed!
 
     def set_parameter(self, param_name: str, value):
@@ -89,22 +89,17 @@ class ColorCycle(Lightshow):
     """
 
     def run(self):
-        try:
-            self.init(self.strip)  # Call the subclasses init method
-            self.strip.show()
-            currentCycle = 0
-            while True:  # Loop forever (no 'for' here due to the possibility of infinite loops)
-                for currentStep in range(self.num_steps_per_cycle):
-                    needRepaint = self.update(currentStep, currentCycle)  # Call the subclasses update method
-                    if needRepaint:
-                        self.strip.show()  # Display, only if required
-                    time.sleep(self.pause_sec)  # Pause until the next step
-                currentCycle += 1
-                if self.num_cycles != -1 and currentCycle >= self.num_cycles:
-                    break
-            # Finished, cleanup everything
-            self.cleanup()
-
-        except KeyboardInterrupt:  # Ctrl-C can halt the light program
-            log.debug('Interrupted...')
-            self.cleanup()
+        self.init(self.strip)  # Call the subclasses init method
+        self.strip.show()
+        currentCycle = 0
+        while True:  # Loop forever (no 'for' here due to the possibility of infinite loops)
+            for currentStep in range(self.num_steps_per_cycle):
+                needRepaint = self.update(currentStep, currentCycle)  # Call the subclasses update method
+                if needRepaint:
+                    self.strip.show()  # Display, only if required
+                time.sleep(self.pause_sec)  # Pause until the next step
+            currentCycle += 1
+            if currentCycle >= self.num_cycles:
+                break
+        # Finished, cleanup everything
+        self.cleanup()
