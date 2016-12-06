@@ -8,25 +8,23 @@ Parameters:
     None
 """
 
-import logging as log
-
 from lightshows.templates.colorcycle import *
 
 
 class TheaterChase(ColorCycle):
-    def init(self, strip):
+    def init(self):
         pass
 
-    def update(self, strip: LEDStrip, numStepsPerCycle, currentStep, currentCycle):
-        # One cycle = One thrip through the color wheel, 0..254
+    def update(self, current_step: int, current_cycle):
+        # One cycle = One trip through the color wheel, 0..254
         # Few cycles = quick transition, lots of cycles = slow transition
         # Note: For a smooth transition between cycles, numStepsPerCycle must be a multiple of 7
-        startIndex = currentStep % 7  # Each segment is 7 dots long: 2 blank, and 5 filled
-        colorIndex = strip.wheel(int(round(255 / numStepsPerCycle * currentStep, 0)))
-        for pixel in range(strip.numLEDs):
+        start_index = current_step % 7  # Each segment is 7 dots long: 2 blank, and 5 filled
+        color_index = self.strip.wheel(int(round(255 / self.num_steps_per_cycle * current_step, 0)))
+        for pixel in range(self.strip.numLEDs):
             # Two LEDs out of 7 are blank. At each step, the blank ones move one pixel ahead.
-            if ((pixel + startIndex) % 7 == 0) or ((pixel + startIndex) % 7 == 1):
-                strip.setPixelRGB(pixel, 0)
+            if ((pixel + start_index) % 7 == 0) or ((pixel + start_index) % 7 == 1):
+                self.strip.setPixelRGB(pixel, 0)
             else:
-                strip.setPixelRGB(pixel, colorIndex)
+                self.strip.setPixelRGB(pixel, color_index)
         return 1

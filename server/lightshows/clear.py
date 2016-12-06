@@ -10,44 +10,28 @@ Parameters:
    =====================================================================
 """
 
-import logging as log
-
-import lightshows.utilities
+from lightshows.utilities.general import blend_whole_strip_to_color
+from lightshows.utilities import verifyparameters as verify
 from lightshows.templates.base import *
 
 
 class Clear(Lightshow):
-    minimal_number_of_leds = 1
+    def init_parameters(self):
+        self.fadetime_sec = None
+
+    def set_parameter(self, param_name: str, value):
+        if param_name == "fadetime_sec":
+            verify.numeric(value, param_name)
+            self.fadetime_sec = value
+        else:
+            raise InvalidParameters.unknown(param_name)
 
     def run(self):
-        # check if we have enough LEDs
-        if self.strip.numLEDs < self.minimal_number_of_leds:
-            log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
-            return
-
-        fadetime_sec = self.parameters["fadetime_sec"]
-
-        if fadetime_sec > 0:
-            lightshows.utilities.blend_whole_strip_to_color(self.strip, (0, 0, 0), fadetime_sec)  # fadeout
+        blend_whole_strip_to_color(self.strip, (0, 0, 0), self.fadetime_sec)  # fadeout
         self.strip.clearStrip()
+        self.strip.clearStrip()  # just to be sure
 
     def check_runnable(self):
-        # is "fadetime_sec" set?
-        if "fadetime_sec" not in self.parameters:
-            raise InvalidParameters("fadetime_sec missing!")
-
-        # it is set, so we can import it now
-        fadetime_sec = self.parameters["fadetime_sec"]
-
-        # is "fadetime_sec" numeric?
-        param_type = type(fadetime_sec)
-        if not (param_type is int or param_type is float):
-            raise InvalidParameters("fadetime_sec is not a numeric type (instead {}!".format(param_type))
-
-        # is "fadetime_sec" positive?
-        if fadetime_sec < 0:
-            raise InvalidParameters("fadetime_sec must be a _positive_ number! (instead {})!".format(fadetime_sec))
-
-        # do we have at least one LED
-        if self.strip.numLEDs < self.minimal_number_of_leds:
+        # do we have at least one LED?
+        if self.strip.numLEDs < 1:
             raise InvalidStrip("This show needs a strip of at least {} LEDs to run!".format(self.strip.numLEDs))

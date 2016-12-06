@@ -12,54 +12,43 @@ Parameters:
    =====================================================================
 """
 
-from drivers.apa102 import APA102
-from DefaultConfig import Configuration
-import lightshows.utilities as util
-import logging as log
-
-necessary_parameters = ['color1', 'color2']
-
-minimal_number_of_leds = 2  # you need at least 10 leds for this show
+from lightshows.templates.base import *
+from lightshows.utilities import verifyparameters as verify
+from lightshows.utilities.general import SmoothBlend, linear_dim, add_tuples
 
 
-def run(strip: APA102, conf: Configuration, parameters: dict):
-    # check if we have enough LEDs
-    global minimal_number_of_leds
-    if strip.numLEDs < minimal_number_of_leds:
-        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
-        return
+class TwoColorBlend(Lightshow):
+    def run(self):
+        transition = SmoothBlend(self.strip)
 
-    parameters = prepare_parameters(parameters)
+        for led in range(self.strip.numLEDs):
+            normal_distance = led / (self.strip.numLEDs - 1)
+            component1 = linear_dim(self.color1, 1 - normal_distance)
+            component2 = linear_dim(self.color2, normal_distance)
+            led_color = add_tuples(component1, component2)
+            transition.set_pixel(led, *led_color)
+        transition.blend()
 
-    transition = util.SmoothBlend(strip)
+    def init_parameters(self):
+        self.color1 = None
+        self.color2 = None
 
-    for led in range(strip.numLEDs):
-        normal_distance = led / (strip.numLEDs - 1)
-        component1 = util.linear_dim(parameters["color1"], 1 - normal_distance)
-        component2 = util.linear_dim(parameters["color2"], normal_distance)
-        led_color = util.add_tuples(component1, component2)
-        transition.set_pixel(led, *led_color)
-    transition.blend()
+    def set_parameter(self, param_name: str, value):
+        if type(value) is list:
+            value = tuple(value)
 
+        if param_name == "color1":
+            verify.rgb_color_tuple(value, param_name)
+            self.color1 = value
+        elif param_name == "color2":
+            verify.rgb_color_tuple(value, param_name)
+            self.color2 = value
+        else:
+            raise InvalidParameters.unknown(param_name)
 
-def parameters_valid(parameters: dict):
-    parameters = prepare_parameters(parameters)
-    # are all necessary parameters there?
-    for p in parameters:
-        if p not in necessary_parameters:
-            log.debug("Missing parameter {param_name}".format(param_name=p))
-            return False
-            # type checking
-        if not util.is_rgb_color_tuple(parameters[p]):
-            log.debug("{param_name} is not valid!".format(param_name=p))
-            return False
-    # else
-    return True
-
-
-def prepare_parameters(parameters: dict) -> dict:
-    for p in parameters:
-        if type(parameters[p]) is list:  # cast arrays to lists
-            parameters[p] = tuple(parameters[p])
-            log.debug("{}: {}".format(p, parameters[p]))
-    return parameters
+    def check_runnable(self):
+        # do we have all parameters
+        if self.color1 is None:
+            raise InvalidParameters.missing("color1")
+        if self.color2 is None:
+            raise InvalidParameters.missing("color2")

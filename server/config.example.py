@@ -19,13 +19,12 @@ configuration = DefaultConfig.Configuration()
 
 # A list of available shows
 configuration.shows = {
-    'clear': clear,
-    'dummy': dummy,
-    'rainbow': rainbow,
-    'rgbtest': rgbtest,
-    'spinthebottle': spinthebottle,
-    'solidcolor': solidcolor,
-    'strandtest': strandtest,
-    'theaterchase': theaterchase,
-    'twocolorblend': twocolorblend,
+    'clear': clear.Clear,
+    'dummy': dummy.Dummy,
+    'rainbow': rainbow.Rainbow,
+    'rgbtest': rgbtest.RGBTest,
+    'spinthebottle': spinthebottle.SpinTheBottle,
+    'solidcolor': solidcolor.SolidColor,
+     'theaterchase': theaterchase.TheaterChase,
+    'twocolorblend': twocolorblend.TwoColorBlend,
 }

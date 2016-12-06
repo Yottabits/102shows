@@ -13,96 +13,95 @@ Parameters:
    || fadeout:            ||     bool      ||          bool           ||
    =====================================================================
 """
-import lightshows.utilities
-from drivers.apa102 import APA102
-from DefaultConfig import Configuration
-import lightshows.solidcolor
-import lightshows.utilities as util
 import random
 from time import sleep
-import logging as log
 
-color_parameters = ['highlight_color', 'background_color']
-necessary_parameters = color_parameters + ['time_sec', 'fadeout']
-minimal_number_of_leds = 144
-
-
-def run(strip: APA102, conf: Configuration, parameters: dict):
-    # check if we have enough LEDs
-    global minimal_number_of_leds
-    if strip.numLEDs < minimal_number_of_leds:
-        log.critical("This show needs a strip of at least {} LEDs to run correctly".format(minimal_number_of_leds))
-        return
-    show = SpinTheBottle(strip)
-
-    parameters = prepare_parameters(parameters)
-    show.highlight_color = parameters["highlight_color"]
-    show.background_color = parameters["background_color"]
-
-    lightshows.utilities.blend_whole_strip_to_color(strip, show.background_color)  # fade to background_color
-    show.run(parameters["time_sec"], parameters["fadeout"])  # start the real show :-)
+from lightshows.templates.base import *
+from lightshows.utilities import verifyparameters as verify
+from lightshows.utilities.general import blend_whole_strip_to_color, linear_dim
 
 
-def parameters_valid(parameters: dict) -> bool:
-    # prepare all types
-    parameters = prepare_parameters(parameters)
+class SpinTheBottle(Lightshow):
+    minimal_number_of_leds = 144
 
-    # are all necessary parameters there?
-    for p in necessary_parameters:
-        if p not in parameters:
-            log.debug("Missing parameter {param_name}".format(param_name=p))
-            return False
+    def set_parameter(self, param_name: str, value):
+        if param_name == "highlight_color":
+            if type(value) is list:
+                value = tuple(value)
+            verify.rgb_color_tuple(value, param_name)
+            self.highlight_color = value
+        elif param_name == "background_color":
+            if type(value) is list:
+                value = tuple(value)
+            verify.rgb_color_tuple(value, param_name)
+            self.background_color = value
+        elif param_name == "time_sec":
+            verify.positive_numeric(value, param_name)
+            self.time_sec = value
+        elif param_name == "fadeout":
+            verify.boolean(value, param_name)
+            self.fadeout = value
+        elif param_name == "lower_border":
+            verify.integer(value, param_name, minimum=0, maximum=self.strip.numLEDs - 2)
+            self.lower_border = value
+        elif param_name == "upper_border":
+            verify.integer(value, param_name, minimum=1, maximum=self.strip.numLEDs - 1)
+            self.upper_border = value
+        elif param_name == "highlight_sections":
+            verify.integer(value, param_name, minimum=1, maximum=self.strip.numLEDs)
+            self.highlight_sections = value
+        else:
+            raise InvalidParameters.unknown(param_name)
 
-    # type checking
-    for p in color_parameters:
-        if not util.is_rgb_color_tuple(parameters[p]):
-            log.debug("{param_name} is not valid!".format(param_name=p))
-            return False
+    def init_parameters(self):
+        self.highlight_color = None
+        self.background_color = None
+        self.time_sec = None
+        self.fadeout = None
 
-    time_type = type(parameters['time_sec'])
-    if not (time_type is int or time_type is float):
-        log.debug("Parameter time_sec is not a numeric type!")
-        return False
-
-    if not type(parameters['fadeout']) is bool:
-        log.debug("Parameter fadeout is not a bool type!")
-        return False
-
-    # or else:
-    return True
-
-
-def prepare_parameters(parameters: dict) -> dict:
-    for p in color_parameters:
-        if type(parameters[p]) is list:  # cast arrays to lists
-            parameters[p] = tuple(parameters[p])
-    return parameters
-
-
-class SpinTheBottle:
-    def __init__(self, strip: APA102):
-        self.strip = strip
-        self.highlight_color = (200, 100, 0)
-        self.highlight_sections = 72
-        self.background_color = (0, 0, 0)
         self.lower_border = 0
-        self.upper_border = self.strip.numLEDs
+        self.upper_border = self.strip.numLEDs - 1
+        self.highlight_sections = 72
+
+    def check_runnable(self):
+        # do we have enough LEDs
+        if self.strip.numLEDs < self.minimal_number_of_leds:
+            InvalidStrip("This show needs a strip of at last {} LEDs to run correctly!".format(
+                self.minimal_number_of_leds))
+        # do we have all necessary parameters?
+        if self.highlight_color is None:
+            raise InvalidParameters.missing("highlight_color")
+        if self.background_color is None:
+            raise InvalidParameters.missing("background_color")
+        if self.time_sec is None:
+            raise InvalidParameters.missing("time_sec")
+        if self.fadeout is None:
+            raise InvalidParameters.missing("fadeout")
+
+        # is our area (limited by lower_border and upper_border) wide enough?
+        led_width = self.upper_border - self.lower_border + 1
+        if led_width < 2:   # with less than two LEDs there is no random choice possible
+            raise InvalidParameters("\"upper_border\" (now: {}) must be greater than \"lower_border\" (now: {})".format(
+                self.lower_border, self.upper_border))
+        if led_width < self.highlight_sections:
+            raise InvalidParameters("This show needs at least {} LEDs to run. Please modify the strip borders.".format(
+                self.highlight_sections))
 
     def highlight(self, position: int, highlight_radius: int = 3):
         for led in range(0, self.strip.numLEDs):
             distance = abs(led - position)  # distance to highlight center
             if distance <= highlight_radius:
                 dim_factor = (1 - (distance / highlight_radius)) ** 2
-                color = util.linear_dim(self.highlight_color, dim_factor)
+                color = linear_dim(self.highlight_color, dim_factor)
                 self.strip.setPixel(led, *color)
             else:
                 self.strip.setPixel(led, *self.background_color)
         self.strip.show()
 
-    def run(self, time_sec: float = 5, fadeout: bool = False):
+    def run(self):
         section_width = (self.upper_border - self.lower_border) // self.highlight_sections
         target_led = random.randrange(self.lower_border, self.upper_border, section_width)
-        frame_time = time_sec / (3 * self.highlight_sections)  # 3 for the three roundtrips
+        frame_time = self.time_sec / (3 * self.highlight_sections)  # 3 for the three roundtrips
 
         # go round the strip one time
         for led in range(self.lower_border, self.upper_border + 1, section_width):
@@ -116,9 +115,9 @@ class SpinTheBottle:
         for led in range(self.lower_border, target_led, section_width):
             self.highlight(led)
             relative_distance = abs(led - target_led) / self.strip.numLEDs
-            sleep(0.0006 * time_sec / relative_distance)  # slow down a little
+            sleep(0.0006 * self.time_sec / relative_distance)  # slow down a little
         self.highlight(target_led, highlight_radius=section_width // 2)
 
-        if fadeout:
+        if self.fadeout:
             sleep(10)
-            lightshows.utilities.blend_whole_strip_to_color(self.strip, self.background_color)  # fadeout the spot
+            blend_whole_strip_to_color(self.strip, self.background_color)  # fadeout the spot

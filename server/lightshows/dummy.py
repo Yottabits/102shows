@@ -12,6 +12,9 @@ from lightshows.templates.base import *
 
 
 class Dummy(Lightshow):
+    def set_parameter(self, param_name: str, value):
+        pass
+
     def check_runnable(self):
         return True
 

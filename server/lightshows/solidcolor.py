@@ -12,16 +12,24 @@ Parameters:
 """
 
 from lightshows.templates.base import *
-from lightshows.utilities import blend_whole_strip_to_color
+from lightshows.utilities.general import blend_whole_strip_to_color, is_rgb_color_tuple
+from lightshows.utilities import verifyparameters as verify
 
 
 class SolidColor(Lightshow):
-    def check_runnable(self) -> bool:
-        if "color" in self.parameters:
-            if len(self.parameters["color"]) is 3:
-                return True
-
-        return False
-
     def run(self):
-        blend_whole_strip_to_color(self.strip, self.parameters["color"])
+        blend_whole_strip_to_color(self.strip, self.color)
+
+    def init_parameters(self):
+        self.color = None
+
+    def set_parameter(self, param_name: str, value):
+        if param_name == "color":
+            verify.numeric(value, param_name)
+            self.color = value
+        else:
+            InvalidParameters.unknown(param_name)
+
+    def check_runnable(self):
+        if not self.color:
+            raise InvalidParameters.missing("color")

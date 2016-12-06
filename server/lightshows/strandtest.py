@@ -12,19 +12,19 @@ from lightshows.templates.colorcycle import *
 
 
 class StrandTest(ColorCycle):
-    def init(self, strip: LEDStrip):
+    def init(self):
         self.color = 0x000000  # Initialize with black
 
-    def update(self, strip: LEDStrip, numStepsPerCycle, currentStep, currentCycle):
+    def update(self, current_step: int, current_cycle: int):
         # One cycle = The 9 Test-LEDs wander through numStepsPerCycle LEDs.
-        if currentStep == 0:
+        if current_step == 0:
             self.color >>= 8  # Red->green->blue->black
         if self.color == 0:
             self.color = 0xFF0000  # If black, reset to red
 
-        head = (currentStep + 9) % numStepsPerCycle  # The head pixel that will be turned on in this cycle
-        tail = currentStep  # The tail pixel that will be turned off
-        strip.setPixelRGB(head, self.color)  # Paint head
-        strip.setPixelRGB(tail, 0)  # Clear tail
+        head = (current_step + 9) % self.num_steps_per_cycle  # The head pixel that will be turned on in this cycle
+        tail = current_step  # The tail pixel that will be turned off
+        self.strip.setPixelRGB(head, self.color)  # Paint head
+        self.strip.setPixelRGB(tail, 0)  # Clear tail
 
         return 1  # Repaint is necessary

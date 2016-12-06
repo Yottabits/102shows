@@ -8,70 +8,38 @@ A specific color cycle must subclass this template, and implement at least the
 """
 
 import time
+import logging as log
 from lightshows.templates.base import *
+from lightshows.utilities import verifyparameters as verify
 
 
 class ColorCycle(Lightshow):
-    # Parameters
-    @property
-    def pause_sec(self):
-        return self.__pause_sec
-
-    @pause_sec.setter
-    def pause_sec(self, pause_sec):
-        if type(pause_sec) in (int, float):
-            self.__pause_sec = pause_sec
-        else:
-            raise InvalidParameters("Parameter \"pause_sec\" must be numeric!")
-
-    @property
-    def num_steps_per_cycle(self):
-        return self.__num_steps_per_cycle
-
-    @num_steps_per_cycle.setter
-    def num_steps_per_cycle(self, num_steps_per_cycle):
-        try:
-            num_steps_per_cycle = int(num_steps_per_cycle)
-        except ValueError as e:
-            raise InvalidParameters("Parameter \"num_steps_per_cycle\" must be numeric! (given: {given})".
-                                    format(given=num_steps_per_cycle))
-        else:
-            self.__num_steps_per_cycle = num_steps_per_cycle
-
-    @property
-    def num_cycles(self):
-        return self.__num_cycles
-
-    @num_cycles.setter
-    def num_cycles(self, num_cycles):
-        try:
-            num_steps_per_cycle = int(num_cycles)
-        except ValueError as e:
-            raise InvalidParameters("Parameter \"num_cycles\" must be numeric! (given: {given})".
-                                    format(given=num_cycles))
-        else:
-            self.__num_cycles = num_cycles
-
-    def __init__(self, strip: LEDStrip, conf: Configuration, parameters: dict):
-        super().__init__(strip, conf, parameters, check_runnable=False)
-        self.__parameter_map = {"pause_sec": self.pause_sec,
-                                "num_steps_per_cycle": self.num_steps_per_cycle,
-                                "num_cycles": self.num_cycles}
-        for parameter in self.__parameter_map:
-            self.__parameter_map[parameter] = None
-
+    def init_parameters(self):
+        self.pause_sec = None
+        self.num_steps_per_cycle = None
+        self.num_cycles = None
         self.order = 'rgb'  # this should not be changed!
 
-        try:
-            self.pause_sec = parameters["pause_sec"]
-            self.num_steps_per_cycle = parameters["num_steps_per_cycle"]
-            self.num_cycles = parameters["num_cycles"]
-        except KeyError as missing_key:
-            raise InvalidParameters("Key \"{name}\" is missing!".format(name=missing_key))
+    def set_parameter(self, param_name: str, value):
+        if param_name == "pause_sec":
+            verify.not_negative_numeric(value, param_name)
+            self.pause_sec = value
+        elif param_name == "num_steps_per_cycle":
+            verify.positive_integer(value, param_name)
+            self.num_steps_per_cycle = value
+        elif param_name == "num_cycles":
+            verify.positive_integer(value, param_name)
+            self.num_cycles = value
+        else:
+            raise InvalidParameters.unknown(param_name)
 
-    def check_runnable(self) -> bool:
-        return True
-
+    def check_runnable(self):
+        if not self.pause_sec:
+            raise InvalidParameters("Missing parameter \"pause_sec\"!")
+        if not self.num_steps_per_cycle:
+            raise InvalidParameters("Missing parameter \"num_steps_per_cycle\"!")
+        if not self.num_cycles:
+            raise InvalidParameters("Missing parameter \"num_cycles\"!")
 
     """
     void init()
@@ -79,10 +47,10 @@ class ColorCycle(Lightshow):
     """
 
     @abstractmethod
-    def init(self, strip):
+    def init(self):
         # The default does nothing. A particular subclass could setup variables, or
         # even light the strip in an initial color.
-        print('Init not implemented')
+        pass
 
     """
     void shutdown()
@@ -91,7 +59,7 @@ class ColorCycle(Lightshow):
 
     def shutdown(self, strip):
         # The default does nothing
-        print('Shutdown not implemented')
+        log.debug('Shutdown not implemented')
 
     """
     void update()
@@ -104,15 +72,15 @@ class ColorCycle(Lightshow):
     """
 
     @abstractmethod
-    def update(self, strip, numStepsPerCycle, currentStep, currentCycle):
+    def update(self, current_step: int, current_cycle: int):
         raise NotImplementedError("Please implement the update() method")
 
-    def cleanup(self, strip):
-        self.shutdown(strip)
-        strip.clearStrip()
-        print('Strip cleared')
-        strip.cleanup()
-        print('SPI closed')
+    def cleanup(self):
+        self.shutdown(self.strip)
+        self.strip.clearStrip()
+        log.debug('Strip cleared')
+        self.strip.cleanup()
+        log.debug('SPI closed')
 
     """
     Start the actual work
@@ -125,8 +93,7 @@ class ColorCycle(Lightshow):
             currentCycle = 0
             while True:  # Loop forever (no 'for' here due to the possibility of infinite loops)
                 for currentStep in range(self.num_steps_per_cycle):
-                    needRepaint = self.update(self.strip, self.num_steps_per_cycle, currentStep,
-                                              currentCycle)  # Call the subclasses update method
+                    needRepaint = self.update(currentStep, currentCycle)  # Call the subclasses update method
                     if needRepaint:
                         self.strip.show()  # Display, only if required
                     time.sleep(self.pause_sec)  # Pause until the next step
@@ -134,8 +101,8 @@ class ColorCycle(Lightshow):
                 if self.num_cycles != -1 and currentCycle >= self.num_cycles:
                     break
             # Finished, cleanup everything
-            self.cleanup(self.strip)
+            self.cleanup()
 
         except KeyboardInterrupt:  # Ctrl-C can halt the light program
-            print('Interrupted...')
-            self.cleanup(self.strip)
+            log.debug('Interrupted...')
+            self.cleanup()

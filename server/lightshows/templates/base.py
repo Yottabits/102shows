@@ -6,15 +6,15 @@ import paho.mqtt.client
 
 
 class Lightshow(metaclass=ABCMeta):
-    def __init__(self, strip: LEDStrip, conf: Configuration, parameters: dict, check_runnable: bool = True):
-        self.__parameter_map = {}
-
+    def __init__(self, strip: LEDStrip, conf: Configuration, parameters: dict):
         self.strip = strip
         self.conf = conf
-        self.parameters = parameters
 
-        if check_runnable:
-            self.check_runnable()
+        self.init_parameters()
+
+        # store given parameters
+        for param_name in parameters:
+            self.set_parameter(param_name, parameters[param_name])
 
     @property
     def name(self) -> str:
@@ -31,11 +31,12 @@ class Lightshow(metaclass=ABCMeta):
         """Start the show with the parameters given in the constructor"""
         raise NotImplementedError
 
+    @abstractmethod
     def set_parameter(self, param_name: str, value):
-        try:
-            self.__parameter_map[param_name] = value
-        except KeyError as unknown_key:
-            raise InvalidParameters("Parameter key  \"{name}\" is unkown!".format(name=unknown_key))
+        pass
+
+    def init_parameters(self):
+        pass
 
     class MQTTListener:
         def __init__(self, lightshow):
@@ -77,4 +78,18 @@ class InvalidConf(Exception):
 
 
 class InvalidParameters(Exception):
-    pass
+    @staticmethod
+    def unknown(param_name: str = None):
+        if param_name:
+            debug_str = "Parameter \"{name}\" is unknown!".format(name=param_name)
+        else:
+            debug_str = "Parameter is unknown!"
+        return InvalidParameters(debug_str)
+
+    @staticmethod
+    def missing(param_name: str = None):
+        if param_name:
+            debug_str = "Parameter \"{name}\" is missing!".format(name=param_name)
+        else:
+            debug_str = "Parameter is missing!"
+        return InvalidParameters(debug_str)

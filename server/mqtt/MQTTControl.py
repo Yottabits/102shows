@@ -93,6 +93,7 @@ class MQTTControl:
 
         try:
             show = self.conf.shows[show_name](self.strip, self.conf, parameters)
+            show.check_runnable()
         except (InvalidStrip, InvalidConf, InvalidParameters) as error_message:
             log.error(error_message)
 
