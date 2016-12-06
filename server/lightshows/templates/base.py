@@ -14,9 +14,12 @@ class Lightshow(metaclass=ABCMeta):
 
         self.init_parameters()
 
+        parameters_valid = type(parameters) is dict
+
         # store given parameters
-        for param_name in parameters:
-            self.set_parameter(param_name, parameters[param_name])
+        if parameters_valid:
+            for param_name in parameters:
+                self.set_parameter(param_name, parameters[param_name])
 
     @property
     def name(self) -> str:

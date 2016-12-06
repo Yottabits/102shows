@@ -26,7 +26,9 @@ class SolidColor(Lightshow):
 
     def set_parameter(self, param_name: str, value):
         if param_name == "color":
-            verify.numeric(value, param_name)
+            if type(value) is list:
+                value = tuple(value)
+            verify.rgb_color_tuple(value, param_name)
             self.color = value
         else:
             InvalidParameters.unknown(param_name)

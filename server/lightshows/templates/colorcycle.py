@@ -36,20 +36,20 @@ class ColorCycle(Lightshow):
             raise InvalidParameters.unknown(param_name)
 
     def check_runnable(self):
-        if not self.pause_sec:
+        if self.pause_sec is None:
             raise InvalidParameters("Missing parameter \"pause_sec\"!")
-        if not self.num_steps_per_cycle:
+        if self.num_steps_per_cycle is None:
             raise InvalidParameters("Missing parameter \"num_steps_per_cycle\"!")
-        if not self.num_cycles:
+        if self.num_cycles is None:
             raise InvalidParameters("Missing parameter \"num_cycles\"!")
 
     """
-    void init()
+    void before_start()
     This method is called to initialize a color program.
     """
 
     @abstractmethod
-    def init(self):
+    def before_start(self):
         # The default does nothing. A particular subclass could setup variables, or
         # even light the strip in an initial color.
         pass
@@ -89,7 +89,7 @@ class ColorCycle(Lightshow):
     """
 
     def run(self):
-        self.init(self.strip)  # Call the subclasses init method
+        self.before_start()  # Call the subclasses before_start method
         self.strip.show()
         currentCycle = 0
         while True:  # Loop forever (no 'for' here due to the possibility of infinite loops)

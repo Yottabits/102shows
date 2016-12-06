@@ -12,7 +12,11 @@ from lightshows.templates.colorcycle import *
 
 
 class TheaterChase(ColorCycle):
-    def init(self):
+    def init_parameters(self):
+        super().init_parameters()
+        self.num_steps_per_cycle = 35
+
+    def before_start(self):
         pass
 
     def update(self, current_step: int, current_cycle):

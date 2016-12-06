@@ -7,6 +7,11 @@ This driver can be called like the real apa102.py but and behaves like it with t
 
 import logging as log
 from lightshows.utilities import verifyparameters as verify
+from multiprocessing import Array as multiprocessing_array
+
+
+class Empty:
+    pass
 
 
 rgb_map = {'rgb': [3, 2, 1], 'rbg': [3, 1, 2], 'grb': [2, 3, 1], 'gbr': [2, 1, 3], 'brg': [1, 3, 2], 'bgr': [1, 2, 3]}
@@ -23,6 +28,8 @@ class APA102:
         self.spi = Empty()  # Init the SPI device
         self.spi.max_speed_hz = max_spi_speed_hz  # Up the speed a bit, so that the LEDs are painted faster
         self.multiprocessing = multiprocessing
+        if self.multiprocessing:
+            self.leds = multiprocessing_array('i', self.leds)
 
         log.info("initialized a strip with {num} LEDs".format(num=numLEDs))
 
@@ -100,4 +107,10 @@ class APA102:
             return self.combineColor(255 - wheelPos * 3, 0, wheelPos * 3)
         else:  # Blue -> Green
             wheelPos -= 170
-            return self.combineColor(0, wheelPos * 3, 255 - wheelPos * 3);
+            return self.combineColor(0, wheelPos * 3, 255 - wheelPos * 3)
+
+    def rotate(self, positions=1):
+        cutoff = 4 * (positions % self.numLEDs)
+        self.leds = self.leds[cutoff:] + self.leds[:cutoff]
+        if self.multiprocessing:
+            self.leds = multiprocessing_array('i', self.leds)

@@ -93,6 +93,7 @@ class MQTTControl:
             show.check_runnable()
         except (InvalidStrip, InvalidConf, InvalidParameters) as error_message:
             log.error(error_message)
+            return
 
         log.info("Starting the show " + show_name)
         self.show_process = Process(target=show.run, name=show_name)
