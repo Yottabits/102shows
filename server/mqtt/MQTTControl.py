@@ -59,12 +59,6 @@ class MQTTControl:
         show_name = helpers.get_from_topic(TopicAspect.show_name, topic)
         command = helpers.get_from_topic(TopicAspect.command, topic)
 
-        # check if this is a relevant command for us
-        supported_commands = ["start", "stop", "brightness"]
-        if command not in supported_commands:
-            log.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
-            return
-
         # execute
         if command == "start":
             # parse parameters
@@ -84,6 +78,8 @@ class MQTTControl:
             self.stop_show(show_name)
         elif command == "brightness":
             self.set_strip_brightness(int(payload))
+        else:
+            log.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
 
     def start_show(self, show_name: str, parameters: dict):
         # search for show module
