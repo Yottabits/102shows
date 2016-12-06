@@ -36,5 +36,5 @@ class RGBTest(Lightshow):
             time.sleep(10)
 
             # clear strip
-            self.strip.clearStrip()
+            self.strip.clear_strip()
             time.sleep(5)

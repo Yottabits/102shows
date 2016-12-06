@@ -28,7 +28,7 @@ class StrandTest(ColorCycle):
 
         head = (current_step + 9) % self.num_steps_per_cycle  # The head pixel that will be turned on in this cycle
         tail = current_step  # The tail pixel that will be turned off
-        self.strip.setPixelRGB(head, self.color)  # Paint head
-        self.strip.setPixelRGB(tail, 0)  # Clear tail
+        self.strip.set_pixel_bytes(head, self.color)  # Paint head
+        self.strip.set_pixel_bytes(tail, 0)  # Clear tail
 
         return 1  # Repaint is necessary

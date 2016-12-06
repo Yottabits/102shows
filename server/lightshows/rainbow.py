@@ -32,5 +32,5 @@ class Rainbow(ColorCycle):
             led_index = start_index + i * scale_factor  # Index of LED i, not rounded and not wrapped at 255
             led_index_rounded_and_wrapped_around = int(round(led_index, 0)) % 255  # Now rounded and wrapped
             pixel_color = self.strip.wheel(led_index_rounded_and_wrapped_around)  # Get the actual color out of wheel
-            self.strip.setPixelRGB(i, pixel_color)
+            self.strip.set_pixel_bytes(i, pixel_color)
         return 1  # All pixels are set in the buffer, so repaint the strip now

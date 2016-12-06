@@ -51,14 +51,14 @@ class MeasureFPS:
         """runs a test on the LED strip framerate
         :return: a tuple with (framerate, time_elapsed, number_of_frames)
         """
-        self.strip.clearStrip()
-        self.strip.clearStrip()  # just to be sure ;)
+        self.strip.clear_strip()
+        self.strip.clear_strip()  # just to be sure ;)
 
         start_time = time.perf_counter()
         for led in range(0, self.strip.numLEDs):
-            self.strip.setPixel(led, *self.active_color)
+            self.strip.set_pixel(led, *self.active_color)
             self.strip.show()
-            self.strip.setPixel(led, *self.passed_color)
+            self.strip.set_pixel(led, *self.passed_color)
         stop_time = time.perf_counter()
 
         time_elapsed = stop_time - start_time
@@ -66,8 +66,8 @@ class MeasureFPS:
         framerate = number_of_frames / time_elapsed
 
         time.sleep(1)
-        self.strip.clearStrip()
-        self.strip.clearStrip()
+        self.strip.clear_strip()
+        self.strip.clear_strip()
 
         return framerate, time_elapsed, number_of_frames
 
@@ -144,7 +144,7 @@ class SmoothBlend:
         # buffer current status
         initial_colors = []
         for ledNum in range(self.strip.numLEDs):
-            initial_colors.append(self.strip.getPixel(ledNum))
+            initial_colors.append(self.strip.get_pixel(ledNum))
 
         # do the actual fadeout
         now = time.perf_counter()
@@ -153,13 +153,13 @@ class SmoothBlend:
             fade_progress = (end_time - now) / time_sec
             for ledNum in range(self.strip.numLEDs):
                 color = blend_function(initial_colors[ledNum], self.target_colors[ledNum], fade_progress)
-                self.strip.setPixel(ledNum, *color)
+                self.strip.set_pixel(ledNum, *color)
             self.strip.show()
             now = time.perf_counter()
 
         # set to final target state
         for ledNum in range(self.strip.numLEDs):
-            self.strip.setPixel(ledNum, *(self.target_colors[ledNum]))
+            self.strip.set_pixel(ledNum, *(self.target_colors[ledNum]))
 
 
 def blend_whole_strip_to_color(strip: APA102, color: tuple, fadetime_sec: int = 2):

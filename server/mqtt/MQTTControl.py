@@ -29,24 +29,24 @@ class MQTTControl:
     # send to the MQTT notification channel: Node-RED will display a toast notification
     def notify_user(self, message, qos=0):
         paho.mqtt.publish.single(
-            topic=self.conf.mqtt.notification_path.format(prefix=self.conf.mqtt.prefix, sys_name=self.conf.sys_name),
+            topic=self.conf.MQTT.notification_path.format(prefix=self.conf.MQTT.prefix, sys_name=self.conf.sys_name),
             payload=message,
             qos=qos,
-            hostname=self.conf.mqtt.broker.host,
-            port=self.conf.mqtt.broker.port,
-            keepalive=self.conf.mqtt.broker.keepalive
+            hostname=self.conf.MQTT.Broker.host,
+            port=self.conf.MQTT.Broker.port,
+            keepalive=self.conf.MQTT.Broker.keepalive
         )
 
     def on_connect(self, client, userdata, flags, rc):
         """ subscribe to all messages related to this LED installation """
-        subscription_path = self.conf.mqtt.general_path.format(
-            prefix=self.conf.mqtt.prefix,
+        subscription_path = self.conf.MQTT.general_path.format(
+            prefix=self.conf.MQTT.prefix,
             sys_name=self.conf.sys_name,
             show_name="+",
             command="+")
         client.subscribe(subscription_path)
-        log.info("subscription on broker {host} for {path}".format(
-            host=self.conf.mqtt.broker.host, path=subscription_path))
+        log.info("subscription on Broker {host} for {path}".format(
+            host=self.conf.MQTT.Broker.host, path=subscription_path))
 
     def on_message(self, client, userdata, msg):
         """ react to a received message and eventually starts/stops a show """
@@ -115,31 +115,31 @@ class MQTTControl:
             log.info("no show running; all good")
 
     def set_strip_brightness(self, brightness: int):
-        if type(brightness) is not int or brightness < 0 or brightness > self.conf.strip.max_brightness:
+        if type(brightness) is not int or brightness < 0 or brightness > self.conf.Strip.max_brightness:
             log.warning("set brightness value \"{brightness}\" is not an integer between 0 and {max_brightness}".format(
-                brightness=brightness, max_brightness=self.conf.strip.max_brightness))
+                brightness=brightness, max_brightness=self.conf.Strip.max_brightness))
             return
         else:
-            self.strip.setGlobalBrightness(brightness)
+            self.strip.set_global_brightness(brightness)
             self.strip.show()
 
     def run(self) -> None:
         log.info("Starting {name}".format(name=self.conf.sys_name))
 
         log.info("Initializing LED strip...")
-        self.strip = APA102(numLEDs=self.conf.strip.num_leds,
-                            globalBrightness=self.conf.strip.initial_brightness,
+        self.strip = APA102(num_leds=self.conf.Strip.num_leds,
+                            global_brightness=self.conf.Strip.initial_brightness,
                             order='rgb',
-                            max_spi_speed_hz=self.conf.strip.max_spi_speed_hz,
+                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
                             multiprocessing=True)
 
-        log.info("Connecting to the MQTT broker")
+        log.info("Connecting to the MQTT Broker")
         client = paho.mqtt.client.Client()
         client.on_connect = self.on_connect
         client.on_message = self.on_message
-        if self.conf.mqtt.username is not None:
-            client.username_pw_set(self.conf.mqtt.username, self.conf.mqtt.password)
-        client.connect(self.conf.mqtt.broker.host, self.conf.mqtt.broker.port, self.conf.mqtt.broker.keepalive)
+        if self.conf.MQTT.username is not None:
+            client.username_pw_set(self.conf.MQTT.username, self.conf.MQTT.password)
+        client.connect(self.conf.MQTT.Broker.host, self.conf.MQTT.Broker.port, self.conf.MQTT.Broker.keepalive)
         log.info("{name} is ready".format(name=self.conf.sys_name))
 
         client.loop_forever()

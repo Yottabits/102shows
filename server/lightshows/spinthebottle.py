@@ -93,9 +93,9 @@ class SpinTheBottle(Lightshow):
             if distance <= highlight_radius:
                 dim_factor = (1 - (distance / highlight_radius)) ** 2
                 color = linear_dim(self.highlight_color, dim_factor)
-                self.strip.setPixel(led, *color)
+                self.strip.set_pixel(led, *color)
             else:
-                self.strip.setPixel(led, *self.background_color)
+                self.strip.set_pixel(led, *self.background_color)
         self.strip.show()
 
     def run(self):

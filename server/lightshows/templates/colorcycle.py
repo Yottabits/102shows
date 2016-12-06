@@ -79,7 +79,7 @@ class ColorCycle(Lightshow):
 
     def cleanup(self):
         self.shutdown()
-        self.strip.clearStrip()
+        self.strip.clear_strip()
         log.debug('Strip cleared')
         self.strip.cleanup()
         log.debug('SPI closed')

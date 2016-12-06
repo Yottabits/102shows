@@ -29,8 +29,8 @@ class Clear(Lightshow):
 
     def run(self):
         blend_whole_strip_to_color(self.strip, (0, 0, 0), self.fadetime_sec)  # fadeout
-        self.strip.clearStrip()
-        self.strip.clearStrip()  # just to be sure
+        self.strip.clear_strip()
+        self.strip.clear_strip()  # just to be sure
 
     def check_runnable(self):
         # do we have at least one LED?

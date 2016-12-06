@@ -6,20 +6,20 @@ class Configuration:
     sys_name = None  # string
     shows = None  # dict: string <=> show module
 
-    class mqtt:
+    class MQTT:
         prefix = "led"
         general_path = "{prefix}/{sys_name}/show/{show_name}/{command}"
         notification_path = "{prefix}/{sys_name}/notification"
         username = None
         password = None
 
-        class broker:
+        class Broker:
             host = "localhost"
             port = 1883
             keepalive = 60  # in seconds
 
-    class strip:
+    class Strip:
         num_leds = None  # integer
-        max_spi_speed_hz = 4000000  # maximum for "large" strips of more than 500 LEDs
+        max_clock_speed_hz = 4000000  # 4 MHz is the maximum for "large" strips of more than 500 LEDs.
         initial_brightness = 16  # integer from 0 to 31
         max_brightness = 20  # maximum brightness

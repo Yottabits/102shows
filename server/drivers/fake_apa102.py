@@ -33,7 +33,7 @@ class APA102:
 
         log.info("initialized a strip with {num} LEDs".format(num=numLEDs))
 
-    def getPixel(self, ledNum: int) -> tuple:
+    def get_pixel(self, ledNum: int) -> tuple:
         if ledNum < 0:
             raise IndexError("led_num cannot be < 0!")
         if ledNum >= self.numLEDs:
@@ -44,7 +44,7 @@ class APA102:
         blue = self.leds[startIndex + self.rgb[2]]
         return red, green, blue
 
-    def setPixel(self, ledNum, red, green, blue):
+    def set_pixel(self, ledNum, red, green, blue):
         if ledNum < 0:
             return  # Pixel is invisible, so ignore
         if ledNum >= self.numLEDs:
@@ -65,10 +65,10 @@ class APA102:
         self.leds[startIndex + self.rgb[2]] = blue
         log.debug("{ledNum} => ({r},{g},{b})".format(ledNum=ledNum, r=red, g=green, b=blue))
 
-    def setPixelRGB(self, ledNum, rgbColor):
-        self.setPixel(ledNum, (rgbColor & 0xFF0000) >> 16, (rgbColor & 0x00FF00) >> 8, rgbColor & 0x0000FF)
+    def set_pixel_bytes(self, ledNum, rgbColor):
+        self.set_pixel(ledNum, (rgbColor & 0xFF0000) >> 16, (rgbColor & 0x00FF00) >> 8, rgbColor & 0x0000FF)
 
-    def setGlobalBrightness(self, brightness: int, update_buffer: bool = True):
+    def set_global_brightness(self, brightness: int, update_buffer: bool = True):
         # validate
         try:
             verify.integer(brightness, "brightness", minimum=0, maximum=31)
@@ -83,31 +83,31 @@ class APA102:
     def show(self):
         log.debug("show!")
 
-    def clearBuffer(self):
+    def clear_buffer(self):
         for led in range(self.numLEDs):
-            self.setPixel(led, 0, 0, 0)
+            self.set_pixel(led, 0, 0, 0)
 
-    def clearStrip(self):
-        self.clearBuffer()
+    def clear_strip(self):
+        self.clear_buffer()
         self.show()
 
     def cleanup(self):
         log.debug("cleanup!")
 
-    def combineColor(self, red, green, blue):
+    def combine_color(self, red, green, blue):
         return (red << 16) + (green << 8) + blue
 
     def wheel(self, wheelPos):
         if wheelPos > 254:
             wheelPos = 254  # Safeguard
         if wheelPos < 85:  # Green -> Red
-            return self.combineColor(wheelPos * 3, 255 - wheelPos * 3, 0)
+            return self.combine_color(wheelPos * 3, 255 - wheelPos * 3, 0)
         elif wheelPos < 170:  # Red -> Blue
             wheelPos -= 85
-            return self.combineColor(255 - wheelPos * 3, 0, wheelPos * 3)
+            return self.combine_color(255 - wheelPos * 3, 0, wheelPos * 3)
         else:  # Blue -> Green
             wheelPos -= 170
-            return self.combineColor(0, wheelPos * 3, 255 - wheelPos * 3)
+            return self.combine_color(0, wheelPos * 3, 255 - wheelPos * 3)
 
     def rotate(self, positions=1):
         cutoff = 4 * (positions % self.numLEDs)

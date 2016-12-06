@@ -10,17 +10,17 @@ The original version by Martin Erzberger can be found at https://github.com/tinu
 
 
 Public methods are:
- - setPixel
- - setPixelRGB
- - getPixel
- - setGlobalBrightness
+ - set_pixel
+ - set_pixel_bytes
+ - get_pixel
+ - set_global_brightness
  - show
- - clearBuffer
- - clearStrip
+ - clear_buffer
+ - clear_strip
  - cleanup
 
 Helper methods for color manipulation are:
- - combineColor
+ - combine_color
  - wheel
 
 
@@ -65,31 +65,31 @@ rgb_map = {'rgb': [3, 2, 1], 'rbg': [3, 1, 2], 'grb': [2, 3, 1], 'gbr': [2, 1, 3
 
 
 class APA102:
-    def __init__(self, numLEDs, globalBrightness=31, order='rgb', max_spi_speed_hz=8000000, multiprocessing=False):
-        self.numLEDs = numLEDs
+    def __init__(self, num_leds, global_brightness=31, order='rgb', max_clock_speed_hz=8000000, multiprocessing=False):
+        self.numLEDs = num_leds
         order = order.lower()
         self.rgb = rgb_map.get(order, rgb_map['rgb'])
         # LED startframe is three "1" bits, followed by 5 brightness bits
-        self.ledstart = None  # this is set by self.setGlobalBrightness()
-        self.setGlobalBrightness(brightness=globalBrightness, update_buffer=False)
+        self.ledstart = None  # this is set by self.set_global_brightness()
+        self.set_global_brightness(brightness=global_brightness, update_buffer=False)
         self.leds = [self.ledstart, 0, 0, 0] * self.numLEDs  # Pixel buffer
         self.multiprocessing = multiprocessing  # if multiprocessing enabled: convert array to a shared state
         if self.multiprocessing:
             self.leds = multiprocessing_array('i', self.leds)
         self.spi = spidev.SpiDev()  # Init the SPI device
         self.spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
-        self.spi.max_speed_hz = max_spi_speed_hz  # should not be higher than 8000000
+        self.spi.max_speed_hz = max_clock_speed_hz  # should not be higher than 8000000
 
     """
-    void clockStartFrame()
+    void clock_start_frame()
     This method clocks out a start frame, telling the receiving LED that it must update its own color now.
     """
 
-    def clockStartFrame(self):
+    def clock_start_frame(self):
         self.spi.xfer2([0] * 4)  # Start frame, 32 zero bits
 
     """
-    void clockEndFrame()
+    void clock_end_frame()
     As explained above, dummy data must be sent after the last real color information so that all of the data
     can reach its destination down the line.
     The delay is not as bad as with the human example above. It is only 1/2 bit per LED. This is because the
@@ -105,57 +105,57 @@ class APA102:
 
     Ultimately, we need to send additional numLEDs/2 arbitrary data bits, in order to trigger numLEDs/2 additional clock
     changes. This driver sends zeroes, which has the benefit of getting LED one partially or fully ready for the next
-    update to the strip. An optimized version of the driver could omit the "clockStartFrame" method if enough zeroes
-    have been sent as part of "clockEndFrame".
+    update to the strip. An optimized version of the driver could omit the "clock_start_frame" method if enough zeroes
+    have been sent as part of "clock_end_frame".
     """
 
-    def clockEndFrame(self):
+    def clock_end_frame(self):
         for _ in range((self.numLEDs + 15) // 16):  # Round up numLEDs/2 bits (or numLEDs/16 bytes)
             self.spi.xfer2([0x00])
 
     """
-    void clearBuffer()
+    void clear_buffer()
     Clears the entire buffer without displaying the result
     """
 
-    def clearBuffer(self):
+    def clear_buffer(self):
         for led in range(self.numLEDs):
-            self.setPixel(led, 0, 0, 0)
+            self.set_pixel(led, 0, 0, 0)
 
     """
-    void clearStrip()
+    void clear_strip()
     Sets the color for the entire strip to black, and immediately shows the result.
     """
 
-    def clearStrip(self):
-        self.clearBuffer()
+    def clear_strip(self):
+        self.clear_buffer()
         self.show()
 
     """
-    void getPixel(ledNum)
+    void get_pixel(ledNum)
     Returns the color of the pixel at ledNum as a tuple. Note that the data returned come from the pixel buffer,
     so it is possible that the output does not match the actual color of the LED if strip.show() was not
     called recently.
     """
 
-    def getPixel(self, ledNum: int) -> tuple:
-        if ledNum < 0:
+    def get_pixel(self, led_num: int) -> tuple:
+        if led_num < 0:
             raise IndexError("led_num cannot be < 0!")
-        if ledNum >= self.numLEDs:
+        if led_num >= self.numLEDs:
             raise IndexError("led_num is out of bounds!")
-        startIndex = 4 * ledNum
+        startIndex = 4 * led_num
         red = self.leds[startIndex + self.rgb[0]]
         green = self.leds[startIndex + self.rgb[1]]
         blue = self.leds[startIndex + self.rgb[2]]
         return red, green, blue
 
     """
-    void setGlobalBrightness(brightness)
+    void set_global_brightness(brightness)
     Writes the global ledstart prefix that defines the brightness of all pixels.
     If update_buffer is false, the new prefixes are not written to the buffer.
     """
 
-    def setGlobalBrightness(self, brightness: int, update_buffer: bool = True):
+    def set_global_brightness(self, brightness: int, update_buffer: bool = True):
         # validate
         try:
             verify.integer(brightness, "brightness", minimum=0, maximum=31)
@@ -171,39 +171,39 @@ class APA102:
                 self.leds[4 * ledNum] = self.ledstart
 
     """
-    void setPixel(ledNum, red, green, blue)
+    void set_pixel(ledNum, red, green, blue)
     Sets the color of one pixel in the LED stripe. The changed pixel is not shown yet on the Stripe, it is only
     written to the pixel buffer. Colors are passed individually.
     """
 
-    def setPixel(self, ledNum, red, green, blue):
-        if ledNum < 0:
+    def set_pixel(self, led_num, red, green, blue):
+        if led_num < 0:
             return  # Pixel is invisible, so ignore
-        if ledNum >= self.numLEDs:
+        if led_num >= self.numLEDs:
             return  # again, invsible
 
         for component in (red, green, blue):
             if type(component) is not int:
-                log.debug("RGB value for pixel {num} is not an integer!".format(num=ledNum))
+                log.debug("RGB value for pixel {num} is not an integer!".format(num=led_num))
                 component = int(component)
             if component < 0 or component > 255:
-                log.warning("RGB value for pixel {num} is out of bounds! (0-255)".format(num=ledNum))
+                log.warning("RGB value for pixel {num} is out of bounds! (0-255)".format(num=led_num))
                 return
 
-        startIndex = 4 * ledNum
+        startIndex = 4 * led_num
         self.leds[startIndex] = self.ledstart
         self.leds[startIndex + self.rgb[0]] = red
         self.leds[startIndex + self.rgb[1]] = green
         self.leds[startIndex + self.rgb[2]] = blue
 
     """
-    void setPixelRGB(ledNum,rgbColor)
+    void set_pixel_bytes(ledNum,rgbColor)
     Sets the color of one pixel in the LED stripe. The changed pixel is not shown yet on the Stripe, it is only
     written to the pixel buffer. Colors are passed combined (3 bytes concatenated)
     """
 
-    def setPixelRGB(self, ledNum, rgbColor):
-        self.setPixel(ledNum, (rgbColor & 0xFF0000) >> 16, (rgbColor & 0x00FF00) >> 8, rgbColor & 0x0000FF)
+    def set_pixel_bytes(self, led_num, rgb_color):
+        self.set_pixel(led_num, (rgb_color & 0xFF0000) >> 16, (rgb_color & 0x00FF00) >> 8, rgb_color & 0x0000FF)
 
     """
     void rotate(positions)
@@ -224,9 +224,9 @@ class APA102:
     """
 
     def show(self):
-        self.clockStartFrame()
+        self.clock_start_frame()
         self.spi.xfer2(list(self.leds))  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
-        self.clockEndFrame()
+        self.clock_end_frame()
 
     """
     void cleanup()
@@ -237,28 +237,27 @@ class APA102:
         self.spi.close()  # ... close SPI port
 
     """
-    color combineColor(red,green,blue)
+    color combine_color(red,green,blue)
     Make one 3*8 byte color value
     """
 
     @staticmethod
-    def combineColor(red, green, blue):
+    def combine_color(red, green, blue):
         return (red << 16) + (green << 8) + blue
 
-    """
-    color wheel(wheelPos)
-    Get a color from a color wheel
-    Green -> Red -> Blue -> Green
-    """
-
-    def wheel(self, wheelPos):
-        if wheelPos > 254:
-            wheelPos = 254  # Safeguard
-        if wheelPos < 85:  # Green -> Red
-            return self.combineColor(wheelPos * 3, 255 - wheelPos * 3, 0)
-        elif wheelPos < 170:  # Red -> Blue
-            wheelPos -= 85
-            return self.combineColor(255 - wheelPos * 3, 0, wheelPos * 3)
+    def wheel(self, wheel_pos):
+        """
+        color wheel(wheelPos)
+        Get a color from a color wheel
+        Green -> Red -> Blue -> Green
+        """
+        if wheel_pos > 254:
+            wheel_pos = 254  # Safeguard
+        if wheel_pos < 85:  # Green -> Red
+            return self.combine_color(wheel_pos * 3, 255 - wheel_pos * 3, 0)
+        elif wheel_pos < 170:  # Red -> Blue
+            wheel_pos -= 85
+            return self.combine_color(255 - wheel_pos * 3, 0, wheel_pos * 3)
         else:  # Blue -> Green
-            wheelPos -= 170
-            return self.combineColor(0, wheelPos * 3, 255 - wheelPos * 3)
+            wheel_pos -= 170
+            return self.combine_color(0, wheel_pos * 3, 255 - wheel_pos * 3)

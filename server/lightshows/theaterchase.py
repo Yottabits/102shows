@@ -28,7 +28,7 @@ class TheaterChase(ColorCycle):
         for pixel in range(self.strip.numLEDs):
             # Two LEDs out of 7 are blank. At each step, the blank ones move one pixel ahead.
             if ((pixel + start_index) % 7 == 0) or ((pixel + start_index) % 7 == 1):
-                self.strip.setPixelRGB(pixel, 0)
+                self.strip.set_pixel_bytes(pixel, 0)
             else:
-                self.strip.setPixelRGB(pixel, color_index)
+                self.strip.set_pixel_bytes(pixel, color_index)
         return 1
