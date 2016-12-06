@@ -233,7 +233,7 @@ class APA102:
     """
 
     def cleanup(self):
-        self.spi.close()  # ... SPI Port schliessen
+        self.spi.close()  # ... close SPI port
 
     """
     color combineColor(red,green,blue)

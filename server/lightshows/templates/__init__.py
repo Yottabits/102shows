@@ -1,2 +1,2 @@
 __all__ = ['base',
-           'colorcycletemplate']
+           'colorcycle']

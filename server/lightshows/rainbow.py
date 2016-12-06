@@ -1,5 +1,5 @@
 """
-Rainbox
+Rainbow
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
 
 Rotates a rainbow color wheel around the strip.
