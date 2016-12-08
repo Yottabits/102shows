@@ -666,8 +666,8 @@
             "6fe58346.25829c",
             "18673723.cbc129"
         ],
-        "x": 899.75,
-        "y": 119.5,
+        "x": 4109.750244140625,
+        "y": 394.5001220703125,
         "wires": [
             [
                 "cbcf1d62.3459c8"
@@ -682,8 +682,8 @@
         "func": "var param_name = \"parameters_\" + msg.show;\n\nvar params = flow.get(param_name);\nparams[msg.topic] = msg.payload;\nflow.set(param_name, params)\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 1058,
-        "y": 120.5,
+        "x": 4268.000244140625,
+        "y": 395.5001220703125,
         "wires": [
             []
         ]
@@ -1593,6 +1593,74 @@
         "wires": [
             [
                 "14aa04d6.195683"
+            ]
+        ]
+    },
+    {
+        "id": "28d795a5.9110e2",
+        "type": "mqtt in",
+        "z": "b0c966b5.2cbe3",
+        "name": "",
+        "topic": "+/+/notification",
+        "qos": "2",
+        "broker": "fde4817a.c48af",
+        "x": 277.90020751953125,
+        "y": 358.01434326171875,
+        "wires": [
+            [
+                "ad3b739e.814d38"
+            ]
+        ]
+    },
+    {
+        "id": "ad3b739e.814d38",
+        "type": "function",
+        "z": "b0c966b5.2cbe3",
+        "name": "prefix and sys_name filter",
+        "func": "// get to work\nvar topic_path = msg.topic.split(\"/\");\n\nvar mqtt_prefix = topic_path[0];\nvar mqtt_sys_name = topic_path[1];\n\n// filters\nif (mqtt_prefix !== flow.get(\"mqtt_prefix\")) {\n    return;\n}\nif (mqtt_sys_name !== flow.get(\"mqtt_sys_name\")) {\n    return;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 491.1642761230469,
+        "y": 358.38189697265625,
+        "wires": [
+            [
+                "9ee3cac1.15ef78"
+            ]
+        ]
+    },
+    {
+        "id": "593bc1b7.a74328",
+        "type": "ui_toast",
+        "z": "b0c966b5.2cbe3",
+        "position": "top right",
+        "displayTime": "5",
+        "name": "",
+        "x": 877.6361999511719,
+        "y": 359.09088134765625,
+        "wires": []
+    },
+    {
+        "id": "9ee3cac1.15ef78",
+        "type": "change",
+        "z": "b0c966b5.2cbe3",
+        "name": "",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "topic",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 698.2727661132812,
+        "y": 358.727294921875,
+        "wires": [
+            [
+                "593bc1b7.a74328"
             ]
         ]
     }
