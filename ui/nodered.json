@@ -470,12 +470,12 @@
         "icon": "",
         "payload": "",
         "payloadType": "str",
-        "topic": "led/couch/show/all/stop",
+        "topic": "show/all/stop",
         "x": 297.78564453125,
         "y": 166.21420288085938,
         "wires": [
             [
-                "7a4da43c.36f6fc"
+                "efb8cbac.0be618"
             ]
         ]
     },
@@ -488,8 +488,8 @@
         "qos": "",
         "retain": "",
         "broker": "fde4817a.c48af",
-        "x": 536.5857543945312,
-        "y": 188.21420288085938,
+        "x": 729.0858154296875,
+        "y": 190.7142333984375,
         "wires": []
     },
     {
@@ -1302,12 +1302,12 @@
         "icon": "",
         "payload": "{\"fadetime_sec\": 1}",
         "payloadType": "str",
-        "topic": "led/couch/show/clear/start",
+        "topic": "show/clear/start",
         "x": 279.5333251953125,
         "y": 211.19998168945312,
         "wires": [
             [
-                "7a4da43c.36f6fc"
+                "efb8cbac.0be618"
             ]
         ]
     },
@@ -1661,6 +1661,22 @@
         "wires": [
             [
                 "593bc1b7.a74328"
+            ]
+        ]
+    },
+    {
+        "id": "efb8cbac.0be618",
+        "type": "function",
+        "z": "b0c966b5.2cbe3",
+        "name": "add prefix and sys_name",
+        "func": "msg.topic = flow.get(\"mqtt_prefix\") + \"/\"  + flow.get(\"mqtt_sys_name\") + \"/\" + msg.topic;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 527.25,
+        "y": 191.00003051757812,
+        "wires": [
+            [
+                "7a4da43c.36f6fc"
             ]
         ]
     }
