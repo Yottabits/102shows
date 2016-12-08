@@ -43,13 +43,13 @@ class SpinTheBottle(Lightshow):
             verify.boolean(value, param_name)
             self.fadeout = value
         elif param_name == "lower_border":
-            verify.integer(value, param_name, minimum=0, maximum=self.strip.numLEDs - 2)
+            verify.integer(value, param_name, minimum=0, maximum=self.strip.num_leds - 2)
             self.lower_border = value
         elif param_name == "upper_border":
-            verify.integer(value, param_name, minimum=1, maximum=self.strip.numLEDs - 1)
+            verify.integer(value, param_name, minimum=1, maximum=self.strip.num_leds - 1)
             self.upper_border = value
         elif param_name == "highlight_sections":
-            verify.integer(value, param_name, minimum=1, maximum=self.strip.numLEDs)
+            verify.integer(value, param_name, minimum=1, maximum=self.strip.num_leds)
             self.highlight_sections = value
         else:
             raise InvalidParameters.unknown(param_name)
@@ -61,12 +61,12 @@ class SpinTheBottle(Lightshow):
         self.fadeout = None
 
         self.lower_border = 0
-        self.upper_border = self.strip.numLEDs - 1
+        self.upper_border = self.strip.num_leds - 1
         self.highlight_sections = 72
 
     def check_runnable(self):
         # do we have enough LEDs
-        if self.strip.numLEDs < self.minimal_number_of_leds:
+        if self.strip.num_leds < self.minimal_number_of_leds:
             InvalidStrip("This show needs a strip of at last {} LEDs to run correctly!".format(
                 self.minimal_number_of_leds))
         # do we have all necessary parameters?
@@ -88,7 +88,7 @@ class SpinTheBottle(Lightshow):
                 self.highlight_sections))
 
     def highlight(self, position: int, highlight_radius: int = 3):
-        for led in range(0, self.strip.numLEDs):
+        for led in range(0, self.strip.num_leds):
             distance = abs(led - position)  # distance to highlight center
             if distance <= highlight_radius:
                 dim_factor = (1 - (distance / highlight_radius)) ** 2
@@ -114,7 +114,7 @@ class SpinTheBottle(Lightshow):
         # focus on target
         for led in range(self.lower_border, target_led, section_width):
             self.highlight(led)
-            relative_distance = abs(led - target_led) / self.strip.numLEDs
+            relative_distance = abs(led - target_led) / self.strip.num_leds
             sleep(0.0006 * self.time_sec / relative_distance)  # slow down a little
         self.highlight(target_led, highlight_radius=section_width // 2)
 

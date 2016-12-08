@@ -63,6 +63,15 @@ class LEDStrip(metaclass=ABCMeta):
         for led_num in range(self.num_leds):
             self.__brightness_buffer[led_num] = new_buffer[led_num]
 
+    def get_pixel(self, led_num):
+        """
+        gets the pixel at index led_num
+
+        :param led_num: the index of the pixel you want to get
+        :return: (red, green, blue) tuple
+        """
+        return self.color_buffer[led_num]
+
     def set_pixel(self, led_num, red, green, blue) -> None:
         """
         Changes the pixel led_num to red, green, blue IN THE BUFFER!

@@ -14,7 +14,7 @@ from lightshows.templates.colorcycle import *
 class StrandTest(ColorCycle):
     def init_parameters(self):
         super().init_parameters()
-        self.num_steps_per_cycle = self.strip.numLEDs
+        self.num_steps_per_cycle = self.strip.num_leds
 
     def before_start(self):
         self.color = 0x000000  # Initialize with black

@@ -22,8 +22,8 @@ class TwoColorBlend(Lightshow):
     def run(self):
         transition = SmoothBlend(self.strip)
 
-        for led in range(self.strip.numLEDs):
-            normal_distance = led / (self.strip.numLEDs - 1)
+        for led in range(self.strip.num_leds):
+            normal_distance = led / (self.strip.num_leds - 1)
             component1 = linear_dim(self.color1, 1 - normal_distance)
             component2 = linear_dim(self.color2, normal_distance)
             led_color = add_tuples(component1, component2)

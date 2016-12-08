@@ -34,5 +34,5 @@ class Clear(Lightshow):
 
     def check_runnable(self):
         # do we have at least one LED?
-        if self.strip.numLEDs < 1:
-            raise InvalidStrip("This show needs a strip of at least {} LEDs to run!".format(self.strip.numLEDs))
+        if self.strip.num_leds < 1:
+            raise InvalidStrip("This show needs a strip of at least {} LEDs to run!".format(self.strip.num_leds))

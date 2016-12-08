@@ -62,13 +62,13 @@ rgb_map = {'rgb': [3, 2, 1], 'rbg': [3, 1, 2], 'grb': [2, 3, 1], 'gbr': [2, 1, 3
 
 class APA102:
     def __init__(self, num_leds, global_brightness=31, order='rgb', max_clock_speed_hz=8000000, multiprocessing=False):
-        self.numLEDs = num_leds
+        self.num_leds = num_leds
         order = order.lower()
         self.rgb = rgb_map.get(order, rgb_map['rgb'])
         # LED startframe is three "1" bits, followed by 5 brightness bits
         self.ledstart = None  # this is set by self.set_global_brightness()
         self.set_global_brightness(brightness=global_brightness, update_buffer=False)
-        self.leds = [self.ledstart, 0, 0, 0] * self.numLEDs  # Pixel buffer
+        self.leds = [self.ledstart, 0, 0, 0] * self.num_leds  # Pixel buffer
         self.multiprocessing = multiprocessing  # if multiprocessing enabled: convert array to a shared state
         if self.multiprocessing:
             self.leds = multiprocessing_array('i', self.leds)
@@ -99,14 +99,14 @@ class APA102:
     for every two LEDs, one bit of delay gets accumulated. For 300 LEDs, 150 additional bits must be fed to
     the input of LED one so that the data can reach the last LED.
 
-    Ultimately, we need to send additional numLEDs/2 arbitrary data bits, in order to trigger numLEDs/2 additional clock
+    Ultimately, we need to send additional num_leds/2 arbitrary data bits, in order to trigger num_leds/2 additional clock
     changes. This driver sends zeroes, which has the benefit of getting LED one partially or fully ready for the next
     update to the strip. An optimized version of the driver could omit the "clock_start_frame" method if enough zeroes
     have been sent as part of "clock_end_frame".
     """
 
     def clock_end_frame(self):
-        for _ in range((self.numLEDs + 15) // 16):  # Round up numLEDs/2 bits (or numLEDs/16 bytes)
+        for _ in range((self.num_leds + 15) // 16):  # Round up num_leds/2 bits (or num_leds/16 bytes)
             self.spi.xfer2([0x00])
 
     """
@@ -115,7 +115,7 @@ class APA102:
     """
 
     def clear_color_buffer(self):
-        for led in range(self.numLEDs):
+        for led in range(self.num_leds):
             self.set_pixel(led, 0, 0, 0)
 
     """
@@ -128,8 +128,8 @@ class APA102:
         self.show()
 
     """
-    void get_pixel(ledNum)
-    Returns the color of the pixel at ledNum as a tuple. Note that the data returned come from the pixel buffer,
+    void get_pixel(led_num)
+    Returns the color of the pixel at led_num as a tuple. Note that the data returned come from the pixel buffer,
     so it is possible that the output does not match the actual color of the LED if strip.show() was not
     called recently.
     """
@@ -137,7 +137,7 @@ class APA102:
     def get_pixel(self, led_num: int) -> tuple:
         if led_num < 0:
             raise IndexError("led_num cannot be < 0!")
-        if led_num >= self.numLEDs:
+        if led_num >= self.num_leds:
             raise IndexError("led_num is out of bounds!")
         startIndex = 4 * led_num
         red = self.leds[startIndex + self.rgb[0]]
@@ -163,11 +163,11 @@ class APA102:
 
         # write to buffer
         if update_buffer:
-            for ledNum in range(self.numLEDs):
-                self.leds[4 * ledNum] = self.ledstart
+            for led_num in range(self.num_leds):
+                self.leds[4 * led_num] = self.ledstart
 
     """
-    void set_pixel(ledNum, red, green, blue)
+    void set_pixel(led_num, red, green, blue)
     Sets the color of one pixel in the LED stripe. The changed pixel is not shown yet on the Stripe, it is only
     written to the pixel buffer. Colors are passed individually.
     """
@@ -175,7 +175,7 @@ class APA102:
     def set_pixel(self, led_num, red, green, blue):
         if led_num < 0:
             return  # Pixel is invisible, so ignore
-        if led_num >= self.numLEDs:
+        if led_num >= self.num_leds:
             return  # again, invsible
 
         for component in (red, green, blue):
@@ -193,7 +193,7 @@ class APA102:
         self.leds[startIndex + self.rgb[2]] = blue
 
     """
-    void set_pixel_bytes(ledNum,rgbColor)
+    void set_pixel_bytes(led_num,rgbColor)
     Sets the color of one pixel in the LED stripe. The changed pixel is not shown yet on the Stripe, it is only
     written to the pixel buffer. Colors are passed combined (3 bytes concatenated)
     """
@@ -208,7 +208,7 @@ class APA102:
     """
 
     def rotate(self, positions=1):
-        cutoff = 4 * (positions % self.numLEDs)
+        cutoff = 4 * (positions % self.num_leds)
         self.leds = self.leds[cutoff:] + self.leds[:cutoff]
         if self.multiprocessing:
             self.leds = multiprocessing_array('i', self.leds)

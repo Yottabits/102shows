@@ -7,7 +7,7 @@ A Dummy Driver that does not need any interface
 
 import logging as log
 
-from drivers.apa102 import LEDStrip
+from drivers.abstract import LEDStrip
 
 
 class DummyDriver(LEDStrip):
