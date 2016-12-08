@@ -59,7 +59,7 @@ class ColorCycle(Lightshow):
     This method is called at the end, when the light program should terminate
     """
 
-    def shutdown(self, strip):
+    def shutdown(self):
         # The default does nothing
         log.debug('Shutdown not implemented')
 
@@ -91,15 +91,15 @@ class ColorCycle(Lightshow):
     def run(self):
         self.before_start()  # Call the subclasses before_start method
         self.strip.show()
-        currentCycle = 0
+        current_cycle = 0
         while True:  # Loop forever (no 'for' here due to the possibility of infinite loops)
             for currentStep in range(self.num_steps_per_cycle):
-                needRepaint = self.update(currentStep, currentCycle)  # Call the subclasses update method
-                if needRepaint:
+                need_repaint = self.update(currentStep, current_cycle)  # Call the subclasses update method
+                if need_repaint:
                     self.strip.show()  # Display, only if required
                 time.sleep(self.pause_sec)  # Pause until the next step
-            currentCycle += 1
-            if currentCycle >= self.num_cycles:
+            current_cycle += 1
+            if current_cycle >= self.num_cycles:
                 break
         # Finished, cleanup everything
         self.cleanup()

@@ -1,3 +1,4 @@
+# noinspection PyUnresolvedReferences
 """
 Rainbow
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
@@ -5,7 +6,7 @@ Rainbow
 Rotates a rainbow color wheel around the strip.
 
 Parameters:
-    None
+    No parameters
 """
 
 from lightshows.templates.colorcycle import *

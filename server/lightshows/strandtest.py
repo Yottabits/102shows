@@ -5,7 +5,7 @@ Strand Test
 Displays a classical LED test
 
 Parameters:
-    None
+    No Parameters
 """
 
 from lightshows.templates.colorcycle import *

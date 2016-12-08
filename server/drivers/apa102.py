@@ -70,7 +70,7 @@ class APA102(LEDStrip):
         :return:
         """
         num_leds = len(color_buffer)
-        spi_msg= []
+        spi_msg = []
 
         for led_num in range(num_leds):
             # for each led the spi message consists of 4 bytes:
@@ -131,10 +131,10 @@ class APA102(LEDStrip):
         for every two LEDs, one bit of delay gets accumulated. For 300 LEDs, 150 additional bits must be fed to
         the input of LED one so that the data can reach the last LED.
 
-        Ultimately, we need to send additional num_leds/2 arbitrary data bits, in order to trigger num_leds/2 additional clock
-        changes. This driver sends zeroes, which has the benefit of getting LED one partially or fully ready for the next
-        update to the strip. An optimized version of the driver could omit the "clock_start_frame" method if enough zeroes
-        have been sent as part of "clock_end_frame".
+        Ultimately, we need to send additional num_leds/2 arbitrary data bits, in order to trigger num_leds/2
+        additional clock changes. This driver sends zeroes, which has the benefit of getting LED one partially or
+        fully ready for the next update to the strip. An optimized version of the driver could omit the
+        "clock_start_frame" method if enough zeroes have been sent as part of "clock_end_frame".
         """
         for _ in range((self.num_leds + 15) // 16):  # Round up num_leds/2 bits (or num_leds/16 bytes)
             self.spi.xfer2([0x00])

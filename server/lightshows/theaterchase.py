@@ -5,7 +5,7 @@ Theater Chase
 Theater Chase: https://www.youtube.com/watch?v=rzDw4Yu_S6U
 
 Parameters:
-    None
+    No Parameters
 """
 
 from lightshows.templates.colorcycle import *

@@ -5,7 +5,7 @@ RGBTest
 turns on all red, then all green, then all blue leds and then all together
 
 Parameters:
-    None
+    No parameters
 """
 import time
 
