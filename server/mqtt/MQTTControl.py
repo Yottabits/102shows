@@ -13,7 +13,6 @@ import paho.mqtt.client
 import paho.mqtt.publish
 
 import mqtt.helpers as helpers
-from drivers.apa102 import APA102
 from lightshows.templates.base import *
 from lightshows.utilities.verifyparameters import InvalidStrip, InvalidConf, InvalidParameters
 from mqtt.helpers import TopicAspect
@@ -127,10 +126,10 @@ class MQTTControl:
         log.info("Starting {name}".format(name=self.conf.sys_name))
 
         log.info("Initializing LED strip...")
-        self.strip = APA102(num_leds=self.conf.Strip.num_leds,
-                            global_brightness=self.conf.Strip.initial_brightness,
-                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
-                            multiprocessing=True)
+        self.strip = self.conf.Strip.Driver(num_leds=self.conf.Strip.num_leds,
+                                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
+                                            multiprocessing=True)
+        self.strip.set_global_brightness(self.conf.Strip.initial_brightness)   # set initial brightness from config
 
         log.info("Connecting to the MQTT Broker")
         client = paho.mqtt.client.Client()

@@ -4,7 +4,7 @@ import paho.mqtt.client
 
 import mqtt.helpers
 from DefaultConfig import Configuration
-from drivers.apa102 import APA102 as LEDStrip
+from drivers.abstract import LEDStrip
 
 
 class Lightshow(metaclass=ABCMeta):

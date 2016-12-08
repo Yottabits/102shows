@@ -1,6 +1,8 @@
 # THIS IS THE DEFAULT CONFIGURATION FILE, DO NOT CHANGE THIS!
 # SET YOUR PARAMETERS IN config.py
 
+from drivers.apa102 import APA102
+
 
 class Configuration:
     sys_name = None  # string
@@ -19,7 +21,8 @@ class Configuration:
             keepalive = 60  # in seconds
 
     class Strip:
+        Driver = APA102
         num_leds = None  # integer
         max_clock_speed_hz = 4000000  # 4 MHz is the maximum for "large" strips of more than 500 LEDs.
-        initial_brightness = 16  # integer from 0 to 31
-        max_brightness = 20  # maximum brightness
+        initial_brightness = 50  # integer from 0 to 100
+        max_brightness = 75  # maximum brightness

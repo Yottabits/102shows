@@ -1,14 +1,15 @@
-import DefaultConfig
+from DefaultConfig import *
 from lightshows import *
 
 # load default configuration
-configuration = DefaultConfig.Configuration()
+configuration = Configuration()
 
 ################################# CUSTOM SETTINGS #################################
 # set your own parameters here, look at DefaultConfig.py for all possible options #
 ###################################################################################
 # for example:
 # configuration.sys_name = "MyLED"
+# configuration.Strip.Driver = APA102
 # configuration.strip.num_leds = 144
 # configuration.strip.max_brightness = 20
 # configuration.strip.initial_brightness = 14
