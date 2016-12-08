@@ -9,7 +9,6 @@ from lightshows import *
 class Configuration:
     sys_name = None  # string
     shows = {'clear': clear.Clear,  # A list of available shows
-             'dummy': dummy.Dummy,
              'rainbow': rainbow.Rainbow,
              'rgbtest': rgbtest.RGBTest,
              'spinthebottle': spinthebottle.SpinTheBottle,
