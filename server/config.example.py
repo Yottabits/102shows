@@ -12,6 +12,9 @@ configuration = DefaultConfig.Configuration()
 # configuration.strip.num_leds = 144
 # configuration.strip.max_brightness = 20
 # configuration.strip.initial_brightness = 14
+
+# configuration.MQTT.Broker.host = "127.0.0.1"
+# configuration.MQTT.Broker.port = 1883
 # configuration.mqtt.username = ...
 # configuration.mqtt.password = ...
 
