@@ -6,3 +6,7 @@ Thumbs.db
 
 # any specific configuration
 config.py
+
+# setuptools
+server/dist
+*.egg-info
