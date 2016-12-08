@@ -15,17 +15,13 @@ Public methods are:
  - get_pixel
  - set_global_brightness
  - show
- - clear_buffer
+ - clear_color_buffer
  - clear_strip
  - cleanup
 
 Helper methods for color manipulation are:
  - combine_color
  - wheel
-
-
-If the parameter multiprocessing is enabled in the constructor, the LED buffer is stored in a static array which is
-available to all processes of apa102.py
 
 The rest of the methods are used internally and should not be used by the user of the library.
 
@@ -114,11 +110,11 @@ class APA102:
             self.spi.xfer2([0x00])
 
     """
-    void clear_buffer()
+    void clear_color_buffer()
     Clears the entire buffer without displaying the result
     """
 
-    def clear_buffer(self):
+    def clear_color_buffer(self):
         for led in range(self.numLEDs):
             self.set_pixel(led, 0, 0, 0)
 
@@ -128,7 +124,7 @@ class APA102:
     """
 
     def clear_strip(self):
-        self.clear_buffer()
+        self.clear_color_buffer()
         self.show()
 
     """
@@ -235,29 +231,3 @@ class APA102:
 
     def cleanup(self):
         self.spi.close()  # ... close SPI port
-
-    """
-    color combine_color(red,green,blue)
-    Make one 3*8 byte color value
-    """
-
-    @staticmethod
-    def combine_color(red, green, blue):
-        return (red << 16) + (green << 8) + blue
-
-    def wheel(self, wheel_pos):
-        """
-        color wheel(wheelPos)
-        Get a color from a color wheel
-        Green -> Red -> Blue -> Green
-        """
-        if wheel_pos > 254:
-            wheel_pos = 254  # Safeguard
-        if wheel_pos < 85:  # Green -> Red
-            return self.combine_color(wheel_pos * 3, 255 - wheel_pos * 3, 0)
-        elif wheel_pos < 170:  # Red -> Blue
-            wheel_pos -= 85
-            return self.combine_color(255 - wheel_pos * 3, 0, wheel_pos * 3)
-        else:  # Blue -> Green
-            wheel_pos -= 170
-            return self.combine_color(0, wheel_pos * 3, 255 - wheel_pos * 3)

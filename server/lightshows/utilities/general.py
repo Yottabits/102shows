@@ -166,3 +166,22 @@ def blend_whole_strip_to_color(strip: APA102, color: tuple, fadetime_sec: int = 
     transition = SmoothBlend(strip)
     transition.set_color_for_whole_strip(*color)
     transition.blend(time_sec=fadetime_sec)
+
+
+def wheel(wheel_pos: int):
+    """
+    Get a color from a color wheel
+    Green -> Red -> Blue -> Green
+    """
+    if wheel_pos > 254:
+        wheel_pos = 254  # Safeguard
+    if wheel_pos < 85:  # Green -> Red
+        color = (wheel_pos * 3, 255 - wheel_pos * 3, 0)
+    elif wheel_pos < 170:  # Red -> Blue
+        wheel_pos -= 85
+        color = (255 - wheel_pos * 3, 0, wheel_pos * 3)
+    else:  # Blue -> Green
+        wheel_pos -= 170
+        color = (0, wheel_pos * 3, 255 - wheel_pos * 3)
+
+    return color

@@ -129,7 +129,6 @@ class MQTTControl:
         log.info("Initializing LED strip...")
         self.strip = APA102(num_leds=self.conf.Strip.num_leds,
                             global_brightness=self.conf.Strip.initial_brightness,
-                            order='rgb',
                             max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
                             multiprocessing=True)
 
