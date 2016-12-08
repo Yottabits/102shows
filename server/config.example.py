@@ -1,5 +1,4 @@
 from DefaultConfig import *
-from lightshows import *
 
 # load default configuration
 configuration = Configuration()
@@ -19,16 +18,3 @@ configuration = Configuration()
 # configuration.MQTT.Broker.port = 1883
 # configuration.MQTT.username = ...
 # configuration.MQTT.password = ...
-
-
-# A list of available shows
-configuration.shows = {
-    'clear': clear.Clear,
-    'dummy': dummy.Dummy,
-    'rainbow': rainbow.Rainbow,
-    'rgbtest': rgbtest.RGBTest,
-    'spinthebottle': spinthebottle.SpinTheBottle,
-    'solidcolor': solidcolor.SolidColor,
-    'theaterchase': theaterchase.TheaterChase,
-    'twocolorblend': twocolorblend.TwoColorBlend,
-}
