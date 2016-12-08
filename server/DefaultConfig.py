@@ -2,6 +2,7 @@
 # SET YOUR PARAMETERS IN config.py
 
 from drivers.apa102 import APA102
+from drivers.dummy import DummyDriver as Dummy
 
 
 class Configuration:
