@@ -36,3 +36,4 @@ class Configuration:
         max_clock_speed_hz = 4000000  # 4 MHz is the maximum for "large" strips of more than 500 LEDs.
         initial_brightness = 50  # integer from 0 to 100
         max_brightness = 75  # maximum brightness
+        anti_glitch = True

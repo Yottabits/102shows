@@ -30,8 +30,8 @@ class MQTTControl:
 
         # initialize Anti Glitch Thread
         self.anti_glitch_thread = threading.Thread(target=self.run_anti_glitch, daemon=True)
-        self.anti_glitch_delay_sec = 0.01
-        self.anti_glitch = True
+        self.anti_glitch_delay_sec = 1
+        self.anti_glitch = self.conf.Strip.anti_glitch
 
     # send to the MQTT notification channel: Node-RED will display a toast notification
     def notify_user(self, message, qos=0):

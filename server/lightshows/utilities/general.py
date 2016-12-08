@@ -161,6 +161,7 @@ class SmoothBlend:
         # set to final target state
         for led_num in range(self.strip.num_leds):
             self.strip.set_pixel(led_num, *(self.target_colors[led_num]))
+        self.strip.show()
 
 
 def blend_whole_strip_to_color(strip: LEDStrip, color: tuple, fadetime_sec: int = 2):
