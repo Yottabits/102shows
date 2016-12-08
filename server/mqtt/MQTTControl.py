@@ -31,7 +31,6 @@ class MQTTControl:
         self.anti_glitch_thread = threading.Thread(target=self.run_anti_glitch, daemon=True)
         self.anti_glitch_delay_sec = 0.01
         self.anti_glitch = True
-        self.anti_glitch_thread.start()
 
     # send to the MQTT notification channel: Node-RED will display a toast notification
     def notify_user(self, message, qos=0):
@@ -152,6 +151,7 @@ class MQTTControl:
                                             max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
                                             multiprocessing=True)
         self.strip.set_global_brightness(self.conf.Strip.initial_brightness)   # set initial brightness from config
+        self.anti_glitch_thread.start()
 
         log.info("Connecting to the MQTT Broker")
         client = paho.mqtt.client.Client()
