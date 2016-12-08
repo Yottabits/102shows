@@ -14,10 +14,11 @@ import time
 import paho.mqtt.client
 import paho.mqtt.publish
 
+from mqtt.helpers import TopicAspect
 import mqtt.helpers as helpers
+from DefaultConfig import Configuration
 from lightshows.templates.base import *
 from lightshows.utilities.verifyparameters import InvalidStrip, InvalidConf, InvalidParameters
-from mqtt.helpers import TopicAspect
 
 
 class MQTTControl:
@@ -150,7 +151,7 @@ class MQTTControl:
         self.strip = self.conf.Strip.Driver(num_leds=self.conf.Strip.num_leds,
                                             max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
                                             multiprocessing=True)
-        self.strip.set_global_brightness(self.conf.Strip.initial_brightness)   # set initial brightness from config
+        self.strip.set_global_brightness(self.conf.Strip.initial_brightness)  # set initial brightness from config
         self.anti_glitch_thread.start()
 
         log.info("Connecting to the MQTT Broker")
@@ -161,8 +162,6 @@ class MQTTControl:
             client.username_pw_set(self.conf.MQTT.username, self.conf.MQTT.password)
         client.connect(self.conf.MQTT.Broker.host, self.conf.MQTT.Broker.port, self.conf.MQTT.Broker.keepalive)
         log.info("{name} is ready".format(name=self.conf.sys_name))
-
-
 
         client.loop_forever()
         log.critical("MQTTControl.py has exited")

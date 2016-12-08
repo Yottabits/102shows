@@ -3,12 +3,11 @@ from abc import ABCMeta, abstractmethod
 import paho.mqtt.client
 
 import mqtt.helpers
-from DefaultConfig import Configuration
 from drivers.abstract import LEDStrip
 
 
 class Lightshow(metaclass=ABCMeta):
-    def __init__(self, strip: LEDStrip, conf: Configuration, parameters: dict):
+    def __init__(self, strip: LEDStrip, conf, parameters: dict):
         self.strip = strip
         self.conf = conf
 
