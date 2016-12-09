@@ -1,15 +1,6 @@
 """
 Two Color Blend
 (c) 2016 Simon Leiner
-
-linear transition between two colors across the strip
-
-Parameters:
-   =====================================================================
-   ||                     ||    python     ||   JSON representation   ||
-   || color1:             ||   3x1 tuple   ||       3x1 array         ||
-   || color2:             ||   3x1 tuple   ||       3x1 array         ||
-   =====================================================================
 """
 
 from lightshows.templates.base import *
@@ -19,6 +10,16 @@ from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class TwoColorBlend(Lightshow):
+    """
+    linear transition between two colors across the strip
+
+    Parameters:
+       =====================================================================
+       ||                     ||    python     ||   JSON representation   ||
+       || color1:             ||   3x1 tuple   ||       3x1 array         ||
+       || color2:             ||   3x1 tuple   ||       3x1 array         ||
+       =====================================================================
+    """
     def run(self):
         transition = SmoothBlend(self.strip)
 

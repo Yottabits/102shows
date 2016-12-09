@@ -1,11 +1,6 @@
 """
 Theater Chase
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
-
-Theater Chase: https://www.youtube.com/watch?v=rzDw4Yu_S6U
-
-Parameters:
-    No Parameters
 """
 
 from lightshows.templates.colorcycle import *
@@ -13,6 +8,11 @@ from lightshows.utilities.general import wheel
 
 
 class TheaterChase(ColorCycle):
+    """
+    Theater Chase: https://www.youtube.com/watch?v=rzDw4Yu_S6U
+
+    No parameters necessary
+    """
     def init_parameters(self):
         super().init_parameters()
         self.num_steps_per_cycle = 35
@@ -20,7 +20,7 @@ class TheaterChase(ColorCycle):
     def before_start(self):
         pass
 
-    def update(self, current_step: int, current_cycle):
+    def update(self, current_step: int, current_cycle) -> bool:
         # One cycle = One trip through the color wheel, 0..254
         # Few cycles = quick transition, lots of cycles = slow transition
         # Note: For a smooth transition between cycles, numStepsPerCycle must be a multiple of 7

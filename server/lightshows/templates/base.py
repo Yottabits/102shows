@@ -1,3 +1,8 @@
+"""
+Lightshow base template
+(c) 2016 Simon Leiner
+"""
+
 from abc import ABCMeta, abstractmethod
 
 import paho.mqtt.client
@@ -7,12 +12,18 @@ from drivers.abstract import LEDStrip
 
 
 class Lightshow(metaclass=ABCMeta):
+    """
+    This class defines the interfaces and a few helper functions for lightshows.
+    It is highly recommended to use it as your base class when writing your own show.
+    """
     def __init__(self, strip: LEDStrip, conf, parameters: dict):
+        # store parameters
         self.strip = strip
         self.conf = conf
 
-        self.init_parameters()
+        self.init_parameters()  # let the child class set its own default parameters
 
+        # then overwrite with any directly given parameters
         parameters_valid = type(parameters) is dict
 
         # store given parameters
@@ -37,12 +48,25 @@ class Lightshow(metaclass=ABCMeta):
 
     @abstractmethod
     def set_parameter(self, param_name: str, value):
+        """
+        Take a parameter and store it.
+
+        :param param_name: name of the parameter to be stored
+        :param value: new value of the parameter to be stored
+        :return: usually nothing
+        """
         pass
 
     def init_parameters(self):
+        """
+        functions can inherit this to set their default parameters
+        this function is called at initialization of a show object
+        """
         pass
 
     class MQTTListener:
+        """ Helper class for handling MQTT parameter changes"""
+
         def __init__(self, lightshow):
             self.lightshow = lightshow
             self.client = paho.mqtt.client.Client()
@@ -66,6 +90,11 @@ class Lightshow(metaclass=ABCMeta):
             self.lightshow.set_parameter(command, payload)
 
         def start(self):
+            """
+            if this method is called by the show object, incoming MQTT messages will be parsed,
+            given they have the path: $prefix/$sys_name/$show_name/$parameter
+            $parameter and the $payload will be given to show.set_parameter($parameter, $payload)
+            """
             if self.lightshow.conf.mqtt.username is not None:
                 self.client.username_pw_set(self.lightshow.conf.mqtt.username, self.lightshow.conf.mqtt.password)
             self.client.connect(self.lightshow.conf.mqtt.broker.host,

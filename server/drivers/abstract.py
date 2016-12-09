@@ -1,6 +1,5 @@
 """
 Abstract Driver
-
 (c) Simon Leiner 2016
 """
 

@@ -1,17 +1,17 @@
 """
 Strand Test
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
-
-Displays a classical LED test
-
-Parameters:
-    No Parameters
 """
 
 from lightshows.templates.colorcycle import *
 
 
 class StrandTest(ColorCycle):
+    """
+    Displays a classical LED test
+
+    No parameters necessary
+    """
     def init_parameters(self):
         super().init_parameters()
         self.num_steps_per_cycle = self.strip.num_leds

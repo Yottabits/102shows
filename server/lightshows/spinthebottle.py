@@ -1,17 +1,6 @@
 """
 SpinTheBottle
 (c) 2016 Simon Leiner
-
-A light beam runs back and forth the strip and stops at a random location
-
-Parameters:
-   =====================================================================
-   ||                     ||    python     ||   JSON representation   ||
-   || highlight_color:    ||   3x1 tuple   ||       3x1 array         ||
-   || background_color:   ||   3x1 tuple   ||       3x1 array         ||
-   || time_sec:           ||    numeric    ||        numeric          ||
-   || fadeout:            ||     bool      ||          bool           ||
-   =====================================================================
 """
 import random
 from time import sleep
@@ -23,6 +12,18 @@ from lightshows.utilities.verifyparameters import InvalidStrip, InvalidParameter
 
 
 class SpinTheBottle(Lightshow):
+    """
+    A light beam runs back and forth the strip and stops at a random location
+
+    Parameters:
+       =====================================================================
+       ||                     ||    python     ||   JSON representation   ||
+       || highlight_color:    ||   3x1 tuple   ||       3x1 array         ||
+       || background_color:   ||   3x1 tuple   ||       3x1 array         ||
+       || time_sec:           ||    numeric    ||        numeric          ||
+       || fadeout:            ||     bool      ||          bool           ||
+       =====================================================================
+    """
     minimal_number_of_leds = 144
 
     def set_parameter(self, param_name: str, value):

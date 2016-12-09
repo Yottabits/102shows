@@ -1,8 +1,6 @@
 """
-Fake Driver
+Dummy Driver
 (c) 2016 Simon Leiner
-
-A Dummy Driver that does not need any interface
 """
 
 import logging as log
@@ -11,6 +9,10 @@ from drivers.abstract import LEDStrip
 
 
 class DummyDriver(LEDStrip):
+    """
+    A Dummy Driver that just shows the LED states on the log.
+    This can be useful for developing without having a real LED strip at hand.
+    """
     def show(self) -> None:
         log.debug("FAKE LED STRIP SHOWS: ")
         for led_num in range(self.num_leds):

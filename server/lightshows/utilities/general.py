@@ -1,12 +1,13 @@
 """
-utilities
+Utilities
 (c) 2016 Simon Leiner
 
 This class provides helper functions and classes for the lightshows:
     - linear_dim(undimmed, factor)
     - is_rgb_color_tuple(to_check)
     - add_tuples(tuple1, tuple2)
-    - blend_whole_strip_to_color(strip, color, fadetime_sec):
+    - blend_whole_strip_to_color(strip, color, fadetime_sec)
+    - wheel(wheel_pos)
 
     - SmoothBlend
     - MeasureFPS
@@ -18,9 +19,35 @@ import time
 from drivers.abstract import LEDStrip
 
 
+def wheel(wheel_pos: int):
+    """
+    Get a color from a color wheel: Green -> Red -> Blue -> Green
+
+    :param wheel_pos: integer from 0 to 254
+    :return: RGB color tuple
+    """
+
+    if wheel_pos > 254:
+        wheel_pos = 254  # Safeguard
+    if wheel_pos < 85:  # Green -> Red
+        color = (wheel_pos * 3, 255 - wheel_pos * 3, 0)
+    elif wheel_pos < 170:  # Red -> Blue
+        wheel_pos -= 85
+        color = (255 - wheel_pos * 3, 0, wheel_pos * 3)
+    else:  # Blue -> Green
+        wheel_pos -= 170
+        color = (0, wheel_pos * 3, 255 - wheel_pos * 3)
+
+    return color
+
+
 def linear_dim(undimmed: tuple, factor: float) -> tuple:
-    """ multiply all components of :param undimmed with :param factor
-    :return: resulting vector, as int
+    """
+    multiply all components of undimmed with factor
+
+    :param undimmed: the vector
+    :param factor: the factor to multiply the components of the vector byy
+    :return: resulting RGB color vector
     """
     dimmed = ()
     for i in undimmed:
@@ -30,7 +57,14 @@ def linear_dim(undimmed: tuple, factor: float) -> tuple:
 
 
 def add_tuples(tuple1: tuple, tuple2: tuple):
-    """add :param tuple1 component-wise to :param tuple2"""
+    """
+    add two tuples component-wise
+
+    :param tuple1: summand
+    :param tuple2: summand
+    :return: sum
+    """
+
     if len(tuple1) is not len(tuple2):
         return None  # this type of addition is not defined for tuples with different lengths
     # calculate sum
@@ -38,39 +72,6 @@ def add_tuples(tuple1: tuple, tuple2: tuple):
     for i in range(len(tuple1)):
         sum_of_two.append(tuple1[i] + tuple2[i])
     return tuple(sum_of_two)
-
-
-class MeasureFPS:
-    """ measures the refresh rate available to the strip"""
-
-    def __init__(self, strip: LEDStrip):
-        self.strip = strip
-        self.active_color = (255, 255, 255)
-        self.passed_color = (0, 100, 100)
-
-    def run(self):
-        """runs a test on the LED strip framerate
-        :return: a tuple with (framerate, time_elapsed, number_of_frames)
-        """
-        self.strip.clear_strip()
-        self.strip.clear_strip()  # just to be sure ;)
-
-        start_time = time.perf_counter()
-        for led in range(0, self.strip.num_leds):
-            self.strip.set_pixel(led, *self.active_color)
-            self.strip.show()
-            self.strip.set_pixel(led, *self.passed_color)
-        stop_time = time.perf_counter()
-
-        time_elapsed = stop_time - start_time
-        number_of_frames = self.strip.num_leds
-        framerate = number_of_frames / time_elapsed
-
-        time.sleep(1)
-        self.strip.clear_strip()
-        self.strip.clear_strip()
-
-        return framerate, time_elapsed, number_of_frames
 
 
 class SmoothBlend:
@@ -164,26 +165,48 @@ class SmoothBlend:
         self.strip.show()
 
 
-def blend_whole_strip_to_color(strip: LEDStrip, color: tuple, fadetime_sec: int = 2):
+def blend_whole_strip_to_color(strip: LEDStrip, color: tuple, fadetime_sec: int = 2) -> None:
+    """
+    this name is pretty self-explanatory ;-)
+
+    :param strip: LEDStrip object
+    :param color: the color to blend two
+    :param fadetime_sec: the time in seconds to blend in
+    """
     transition = SmoothBlend(strip)
     transition.set_color_for_whole_strip(*color)
     transition.blend(time_sec=fadetime_sec)
 
 
-def wheel(wheel_pos: int):
-    """
-    Get a color from a color wheel
-    Green -> Red -> Blue -> Green
-    """
-    if wheel_pos > 254:
-        wheel_pos = 254  # Safeguard
-    if wheel_pos < 85:  # Green -> Red
-        color = (wheel_pos * 3, 255 - wheel_pos * 3, 0)
-    elif wheel_pos < 170:  # Red -> Blue
-        wheel_pos -= 85
-        color = (255 - wheel_pos * 3, 0, wheel_pos * 3)
-    else:  # Blue -> Green
-        wheel_pos -= 170
-        color = (0, wheel_pos * 3, 255 - wheel_pos * 3)
+class MeasureFPS:
+    """ measures the refresh rate available to the strip"""
 
-    return color
+    def __init__(self, strip: LEDStrip):
+        self.strip = strip
+        self.active_color = (255, 255, 255)
+        self.passed_color = (0, 100, 100)
+
+    def run(self):
+        """runs a test on the LED strip framerate
+
+        :return: a tuple with (framerate, time_elapsed, number_of_frames)
+        """
+        self.strip.clear_strip()
+        self.strip.clear_strip()  # just to be sure ;)
+
+        start_time = time.perf_counter()
+        for led in range(0, self.strip.num_leds):
+            self.strip.set_pixel(led, *self.active_color)
+            self.strip.show()
+            self.strip.set_pixel(led, *self.passed_color)
+        stop_time = time.perf_counter()
+
+        time_elapsed = stop_time - start_time
+        number_of_frames = self.strip.num_leds
+        framerate = number_of_frames / time_elapsed
+
+        time.sleep(1)
+        self.strip.clear_strip()
+        self.strip.clear_strip()
+
+        return framerate, time_elapsed, number_of_frames

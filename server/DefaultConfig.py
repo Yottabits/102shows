@@ -1,6 +1,7 @@
 # THIS IS THE DEFAULT CONFIGURATION FILE, DO NOT CHANGE THIS!
-# SET YOUR PARAMETERS IN config.py
+# COPY config.example.py TO config.py AND ADJUST THE CONFIGURATION THERE!
 
+import logging as log
 from drivers.apa102 import APA102
 from drivers.dummy import DummyDriver as Dummy
 from lightshows import *
@@ -8,6 +9,7 @@ from lightshows import *
 
 class Configuration:
     sys_name = None  # string
+    log_level = log.INFO  # standard log level
     shows = {'clear': clear.Clear,  # A list of available shows
              'rainbow': rainbow.Rainbow,
              'rgbtest': rgbtest.RGBTest,

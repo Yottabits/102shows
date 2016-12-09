@@ -1,10 +1,6 @@
 """
 Color Cycle Template
-(c) 2015 Martin Erzberger, modified 2016 by Simon Leiner
-
-This class is the basis of all color cycles, such as rainbow or theater chase.
-A specific color cycle must subclass this template, and implement at least the
-'update' method.
+(c) 2015 Martin Erzberger, 2016 Simon Leiner
 """
 
 import logging as log
@@ -16,10 +12,19 @@ from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class ColorCycle(Lightshow):
+    """
+    This class is the basis of all color cycles, such as rainbow or theater chase.
+    A specific color cycle must subclass this template, and implement at least the
+    following methods:
+     - before_start()
+     - update()
+    """
+
     def init_parameters(self):
+        """ default parameters"""
         self.pause_sec = 0
         self.num_steps_per_cycle = None
-        self.num_cycles = float("inf")
+        self.num_cycles = float("inf")  # loop forever
         self.order = 'rgb'  # this should not be changed!
 
     def set_parameter(self, param_name: str, value):
@@ -36,6 +41,7 @@ class ColorCycle(Lightshow):
             raise InvalidParameters.unknown(param_name)
 
     def check_runnable(self):
+        """ checks if all necessary parameters are set """
         if self.pause_sec is None:
             raise InvalidParameters("Missing parameter \"pause_sec\"!")
         if self.num_steps_per_cycle is None:
@@ -43,38 +49,35 @@ class ColorCycle(Lightshow):
         if self.num_cycles is None:
             raise InvalidParameters("Missing parameter \"num_cycles\"!")
 
-    """
-    void before_start()
-    This method is called to initialize a color program.
-    """
-
     @abstractmethod
     def before_start(self):
-        # The default does nothing. A particular subclass could setup variables, or
-        # even light the strip in an initial color.
+        """
+        This method is called to initialize a color program.
+        A particular subclass could setup variables, or even light the strip in an initial color.
+        """
+        pass
+
+    def shutdown(self):
+        """ called before termination of the lightshow """
         pass
 
     """
-    void shutdown()
-    This method is called at the end, when the light program should terminate
-    """
-
-    def shutdown(self):
-        # The default does nothing
-        log.debug('Shutdown not implemented')
-
-    """
     void update()
-    This method paints one subcycle. It must be implemented
-    currentStep: This goes from zero to numStepsPerCycle-1, and then back to zero. It is up to the subclass to define
-                 what is done in one cycle. One cycle could be one pass through the rainbow. Or it could
-                 be one pixel wandering through the entire strip (so for this case, the numStepsPerCycle should be
-                 equal to num_leds).
-    currentCycle: Starts with zero, and goes up by one whenever a full cycle has completed.
+
     """
 
     @abstractmethod
-    def update(self, current_step: int, current_cycle: int):
+    def update(self, current_step: int, current_cycle: int) -> bool:
+        """
+        This method paints one subcycle. It must be implemented
+
+        :param current_step:  This goes from zero to numStepsPerCycle-1, and then back to zero. It is up to the subclass
+                              to define what is done in one cycle. One cycle could be one pass through the rainbow.
+                              Or it could be one pixel wandering through the entire strip (so for this case,
+                              the numStepsPerCycle should be equal to num_leds).
+        :param current_cycle: Starts with zero, and goes up by one whenever a full cycle has completed.
+        :return: Is it necessary to invoke strip.show() after the update() method is finished?
+        """
         raise NotImplementedError("Please implement the update() method")
 
     def cleanup(self):
@@ -82,17 +85,14 @@ class ColorCycle(Lightshow):
         self.strip.clear_strip()
         log.debug('Strip cleared')
         self.strip.cleanup()
-        log.debug('SPI closed')
-
-    """
-    Start the actual work
-    """
+        log.debug('Connection closed')
 
     def run(self):
+        """ start the actual work """
         self.before_start()  # Call the subclasses before_start method
         self.strip.show()
         current_cycle = 0
-        while True:  # Loop forever (no 'for' here due to the possibility of infinite loops)
+        while True:  # Loop forever (for would not work for num_cycles = infinity)
             for currentStep in range(self.num_steps_per_cycle):
                 need_repaint = self.update(currentStep, current_cycle)  # Call the subclasses update method
                 if need_repaint:

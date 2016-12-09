@@ -1,14 +1,6 @@
 """
 SolidColor
 (c) 2016 Simon Leiner
-
-The whole strip shines in the same color.
-
-Parameters:
-   =====================================================================
-   ||                     ||    python     ||   JSON representation   ||
-   ||       color:        ||   3x1 tuple   ||       3x1 array         ||
-   =====================================================================
 """
 
 from lightshows.templates.base import *
@@ -18,6 +10,15 @@ from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class SolidColor(Lightshow):
+    """
+    The whole strip shines in the same color.
+
+    Parameters:
+       =====================================================================
+       ||                     ||    python     ||   JSON representation   ||
+       ||       color:        ||   3x1 tuple   ||       3x1 array         ||
+       =====================================================================
+    """
     def run(self):
         blend_whole_strip_to_color(self.strip, self.color)
 

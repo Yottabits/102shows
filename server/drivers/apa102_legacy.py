@@ -1,8 +1,3 @@
-import spidev
-import logging as log
-from multiprocessing import Array as multiprocessing_array
-from lightshows.utilities import verifyparameters as verify
-
 """
 Driver for APA102 LEDS (aka "DotStar").
 (c) Martin Erzberger 2016, modified by Simon Leiner 2016
@@ -56,6 +51,12 @@ you will see that not even person 9 knows the color yet. This information is sti
 Essentially the driver sends additional zeroes to LED 1 as long as it takes for the last color frame
 to make it down the line to the last LED.
 """
+
+import spidev
+import logging as log
+from multiprocessing import Array as multiprocessing_array
+
+from lightshows.utilities import verifyparameters as verify
 
 rgb_map = {'rgb': [3, 2, 1], 'rbg': [3, 1, 2], 'grb': [2, 3, 1], 'gbr': [2, 1, 3], 'brg': [1, 3, 2], 'bgr': [1, 2, 3]}
 

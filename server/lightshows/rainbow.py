@@ -1,12 +1,7 @@
-# noinspection PyUnresolvedReferences
 """
 Rainbow
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
 
-Rotates a rainbow color wheel around the strip.
-
-Parameters:
-    No parameters
 """
 
 from lightshows.templates.colorcycle import *
@@ -14,6 +9,11 @@ from lightshows.utilities.general import wheel
 
 
 class Rainbow(ColorCycle):
+    """
+    Rotates a rainbow color wheel around the strip.
+
+    No parameters necessary
+    """
     def init_parameters(self):
         super().init_parameters()
         self.num_steps_per_cycle = 255
@@ -21,7 +21,7 @@ class Rainbow(ColorCycle):
     def before_start(self):
         pass
 
-    def update(self, current_step: int, current_cycle: int):
+    def update(self, current_step: int, current_cycle: int) -> bool:
         # One cycle = One trip through the color wheel, 0..254
         # Few cycles = quick transition, lots of cycles = slow transition
         # -> LED 0 goes from index 0 to 254 in numStepsPerCycle cycles. So it might have to step up

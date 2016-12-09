@@ -1,13 +1,6 @@
 """
-clear
-
-This lightshow just turns the whole strip off.
-
-Parameters:
-   =====================================================================
-   ||                     ||    python     ||   JSON representation   ||
-   || fadetime_sec:       ||    numeric    ||        numeric          ||
-   =====================================================================
+Clear
+(c) 2016 Simon Leiner
 """
 
 from lightshows.templates.base import *
@@ -17,6 +10,15 @@ from lightshows.utilities.verifyparameters import InvalidStrip, InvalidParameter
 
 
 class Clear(Lightshow):
+    """
+    This lightshow just turns the whole strip off.
+
+    Parameters:
+       =====================================================================
+       ||                     ||    python     ||   JSON representation   ||
+       || fadetime_sec:       ||    numeric    ||        numeric          ||
+       =====================================================================
+    """
     def init_parameters(self):
         self.fadetime_sec = None
 

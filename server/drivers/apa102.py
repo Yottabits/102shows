@@ -1,42 +1,6 @@
 """
 Driver for APA102 LED strips (aka "DotStar")
-
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
-
-Very brief overview of APA102: An APA102 LED is addressed with SPI. The bits are shifted in one by one,
-starting with the least significant bit.
-
-An LED usually just forwards everything that is sent to its data-in to data-out. While doing this, it
-remembers its own color and keeps glowing with that color as long as there is power.
-
-An LED can be switched to not forward the data, but instead use the data to change it's own color.
-This is done by sending (at least) 32 bits of zeroes to data-in. The LED then accepts the next
-correct 32 bit LED frame (with color information) as its new color setting.
-
-After having received the 32 bit color frame, the LED changes color, and then resumes to just copying
-data-in to data-out.
-
-The really clever bit is this: While receiving the 32 bit LED frame, the LED sends zeroes on its
-data-out line. Because a color frame is 32 bits, the LED sends 32 bits of zeroes to the next LED.
-As we have seen above, this means that the next LED is now ready to accept a color frame and
-update its color.
-
-So that's really the entire protocol:
-- Start by sending 32 bits of zeroes. This prepares LED 1 to update its color.
-- Send color information one by one, starting with the color for LED 1, then LED 2 etc.
-- Finish off by cycling the clock line a few times to get all data to the very last LED on the strip
-
-The last step is necessary, because each LED delays forwarding the data a bit. Imagine ten people in
-a row. When you yell the last color information, i.e. the one for person ten, to the first person in
-the line, then you are not finished yet. Person one has to turn around and yell it to person 2, and
-so on. So it takes ten additional "dummy" cycles until person ten knows the color. When you look closer,
-you will see that not even person 9 knows the color yet. This information is still with person 2.
-Essentially the driver sends additional zeroes to LED 1 as long as it takes for the last color frame
-to make it down the line to the last LED.
-
-Restrictions:
-    - strips cannot have more than 1024 LEDs
-
 """
 
 import spidev
@@ -45,6 +9,41 @@ from drivers.abstract import LEDStrip
 
 
 class APA102(LEDStrip):
+    """
+    Very brief overview of APA102: An APA102 LED is addressed with SPI. The bits are shifted in one by one,
+    starting with the least significant bit.
+
+    An LED usually just forwards everything that is sent to its data-in to data-out. While doing this, it
+    remembers its own color and keeps glowing with that color as long as there is power.
+
+    An LED can be switched to not forward the data, but instead use the data to change it's own color.
+    This is done by sending (at least) 32 bits of zeroes to data-in. The LED then accepts the next
+    correct 32 bit LED frame (with color information) as its new color setting.
+
+    After having received the 32 bit color frame, the LED changes color, and then resumes to just copying
+    data-in to data-out.
+
+    The really clever bit is this: While receiving the 32 bit LED frame, the LED sends zeroes on its
+    data-out line. Because a color frame is 32 bits, the LED sends 32 bits of zeroes to the next LED.
+    As we have seen above, this means that the next LED is now ready to accept a color frame and
+    update its color.
+
+    So that's really the entire protocol:
+    - Start by sending 32 bits of zeroes. This prepares LED 1 to update its color.
+    - Send color information one by one, starting with the color for LED 1, then LED 2 etc.
+    - Finish off by cycling the clock line a few times to get all data to the very last LED on the strip
+
+    The last step is necessary, because each LED delays forwarding the data a bit. Imagine ten people in
+    a row. When you yell the last color information, i.e. the one for person ten, to the first person in
+    the line, then you are not finished yet. Person one has to turn around and yell it to person 2, and
+    so on. So it takes ten additional "dummy" cycles until person ten knows the color. When you look closer,
+    you will see that not even person 9 knows the color yet. This information is still with person 2.
+    Essentially the driver sends additional zeroes to LED 1 as long as it takes for the last color frame
+    to make it down the line to the last LED.
+
+    Restrictions:
+        - strips cannot have more than 1024 LEDs
+    """
     def initialize_strip_connection(self):
         """ initializes the strip connection via SPI """
         # check if we do not have too much LEDs in the strip

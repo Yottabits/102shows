@@ -1,8 +1,6 @@
 """
 MQTT Control
 (c) 2016 Simon Leiner
-
-This script starts/stops the shows under lightshows/ according to the commands it receives via MQTT
 """
 
 import json
@@ -22,6 +20,10 @@ from lightshows.utilities.verifyparameters import InvalidStrip, InvalidConf, Inv
 
 
 class MQTTControl:
+    """
+    This class provides function to start/stop the shows under lightshows/
+    according to the commands it receives via MQTT
+    """
     def __init__(self, config: Configuration):
         # global handles
         self.conf = config  # the user config
@@ -33,8 +35,13 @@ class MQTTControl:
         self.anti_glitch_delay_sec = 1
         self.anti_glitch = self.conf.Strip.anti_glitch
 
-    # send to the MQTT notification channel: Node-RED will display a toast notification
-    def notify_user(self, message, qos=0):
+    def notify_user(self, message, qos=0) -> None:
+        """
+        send to the MQTT notification channel: Node-RED will display a toast notification
+
+        :param message: the text to be displayed
+        :param qos: MQTT parameter
+        """
         paho.mqtt.publish.single(
             topic=self.conf.MQTT.notification_path.format(prefix=self.conf.MQTT.prefix, sys_name=self.conf.sys_name),
             payload=message,
@@ -104,7 +111,14 @@ class MQTTControl:
                 self.strip.show()
                 time.sleep(self.anti_glitch_delay_sec)
 
-    def start_show(self, show_name: str, parameters: dict):
+    def start_show(self, show_name: str, parameters: dict) -> None:
+        """
+        looks for a show, checks if it can run
+        and if so, starts it in an own process
+
+        :param show_name: name of the show to be started
+        :param parameters: these are passed to the show
+        """
         # search for show module
         if show_name not in self.conf.shows:
             log.error("Show \"{name}\" was not found!".format(name=show_name))
@@ -121,12 +135,22 @@ class MQTTControl:
         self.show_process = Process(target=show.run, name=show_name)
         self.show_process.start()
 
-    def stop_show(self, show_name: str):
+    def stop_show(self, show_name: str) -> None:
+        """
+        stops a show with a given name.
+        If this show is not running, the function does nothing.
+
+        :param show_name: name of the show to be stopped
+        """
         if show_name == self.show_process.name or show_name == "all":
             self.stop_running_show()
-            return
 
-    def stop_running_show(self, timeout_sec: int = 0.5):
+    def stop_running_show(self, timeout_sec: int = 0.5) -> None:
+        """
+        stops any running show
+
+        :param timeout_sec: time the show process has until it is terminated
+        """
         if self.show_process.is_alive():
             self.show_process.join(timeout_sec)
             if self.show_process.is_alive():
@@ -135,7 +159,12 @@ class MQTTControl:
         else:
             log.info("no show running; all good")
 
-    def set_strip_brightness(self, brightness: int):
+    def set_strip_brightness(self, brightness: int) -> None:
+        """
+        set brightness for the whole strip
+
+        :param brightness: integer between 0 and 100
+        """
         if type(brightness) is not int or brightness < 0 or brightness > self.conf.Strip.max_brightness:
             log.warning("set brightness value \"{brightness}\" is not an integer between 0 and {max_brightness}".format(
                 brightness=brightness, max_brightness=self.conf.Strip.max_brightness))
@@ -145,6 +174,7 @@ class MQTTControl:
             self.strip.show()
 
     def run(self) -> None:
+        """ start the listener """
         log.info("Starting {name}".format(name=self.conf.sys_name))
 
         log.info("Initializing LED strip...")

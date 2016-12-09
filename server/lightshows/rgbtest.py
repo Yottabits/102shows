@@ -1,11 +1,7 @@
 """
 RGBTest
+
 (c) 2016 Simon Leiner
-
-turns on all red, then all green, then all blue leds and then all together
-
-Parameters:
-    No parameters
 """
 import time
 
@@ -15,6 +11,11 @@ from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class RGBTest(Lightshow):
+    """
+    turns on all red, then all green, then all blue leds and then all together
+
+    No parameters necessary
+    """
     def set_parameter(self, param_name: str, value):
         raise InvalidParameters.unknown(param_name)
 
