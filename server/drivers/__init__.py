@@ -9,7 +9,7 @@ from multiprocessing import Array as SharedArray
 
 from lightshows.utilities import verifyparameters as verify
 
-__all__ = ['abstract', 'apa102']
+__all__ = ['apa102', 'dummy']
 __drivers__ = ['Dummy', 'APA102']
 
 
