@@ -5,7 +5,7 @@ Dummy Driver
 
 import logging as log
 
-from drivers.abstract import LEDStrip
+from drivers import LEDStrip
 
 
 class DummyDriver(LEDStrip):

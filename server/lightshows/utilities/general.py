@@ -16,7 +16,7 @@ import types
 import logging as log
 import time
 
-from drivers.abstract import LEDStrip
+from drivers import LEDStrip
 
 
 def wheel(wheel_pos: int):

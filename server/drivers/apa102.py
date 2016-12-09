@@ -5,7 +5,7 @@ Driver for APA102 LED strips (aka "DotStar")
 
 import spidev
 
-from drivers.abstract import LEDStrip
+from drivers import LEDStrip
 
 
 class APA102(LEDStrip):

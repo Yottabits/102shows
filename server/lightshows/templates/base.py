@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 import paho.mqtt.client
 
 import mqtt.helpers
-from drivers.abstract import LEDStrip
+from drivers import LEDStrip
 
 
 class Lightshow(metaclass=ABCMeta):
