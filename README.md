@@ -12,5 +12,5 @@ Its responsive layout makes it ideal for both smartphones, tablets and computers
 ## Installation
 Take a look at the [wiki](https://github.com/Yottabits/102shows/wiki/Installation)
 
-## Questions?
+## Questions? 🤔
 Write an e-mail to me: 102shows@leiner.me
