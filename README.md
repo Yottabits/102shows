@@ -10,7 +10,7 @@ And for those who do not prefer sending raw MQTT messages from the console, ther
 Its responsive layout makes it ideal for both smartphones, tablets and computers.
 
 ## Installation
-Take a look at the [wiki](https://github.com/Yottabits/102shows/wiki/Installation)
+There is a manual. Take a look at this wiki [article](https://github.com/Yottabits/102shows/wiki/Installation)
 
 ## Questions? 🤔
 Write an e-mail to me: 102shows@leiner.me
