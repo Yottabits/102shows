@@ -89,7 +89,7 @@ def integer(candidate, param_name: str = None, minimum: float = None, maximum: f
     """
     integer (between minimum and maximum)
 
-    :param param_name: the object to be tested
+    :param candidate: the object to be tested
     :param param_name: name of the parameter (to be included in the error message)
     :param minimum: minimum
     :param maximum: maximum

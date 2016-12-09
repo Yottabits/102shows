@@ -5,4 +5,4 @@ MQTT for 102shows
 everything 102shows needs to listen to commands via MQTT
 """
 
-__all__= ['helpers', 'MQTTControl']
+__all__ = ['helpers', 'MQTTControl']

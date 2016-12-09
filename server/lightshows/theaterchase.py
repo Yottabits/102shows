@@ -32,4 +32,4 @@ class TheaterChase(ColorCycle):
                 self.strip.set_pixel(pixel, 0, 0, 0)
             else:
                 self.strip.set_pixel(pixel, *color_index)
-        return 1
+        return True
