@@ -43,6 +43,8 @@ class LEDStrip(metaclass=ABCMeta):
             self.__color_buffer = [(0, 0, 0)] * self.num_leds  # these two definitions are (in the view of class members
             self.__brightness_buffer = [100] * self.num_leds  # ... equivalent to the two definitions above
 
+        self.initialize_strip_connection()
+
     @abstractmethod
     def initialize_strip_connection(self):
         """ in child classes, the strip connection should be established here """
@@ -197,6 +199,7 @@ class SharedColorBuffer:
     """
 
     def __init__(self, size: int):
+        self.__size = size
         self.__r = SharedArray('i', [0, ] * size)
         self.__g = SharedArray('i', [0, ] * size)
         self.__b = SharedArray('i', [0, ] * size)
@@ -209,3 +212,6 @@ class SharedColorBuffer:
         self.__r[key] = r
         self.__g[key] = g
         self.__b[key] = b
+
+    def __len__(self):
+        return self.__size
