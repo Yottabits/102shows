@@ -58,7 +58,8 @@ class APA102(LEDStrip):
         self.spi = spidev.SpiDev()  # Init the SPI device
         self.spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
         self.spi.max_speed_hz = self.max_clock_speed_hz  # should not be higher than 8000000
-        self.spi_buffer = [self.led_prefix(initial_brightness), 0, 0, 0] * self.num_leds
+        self.leds = [0, 0, 0, 0] * self.num_leds  # 4 bytes per LED
+        self.set_global_brightness(initial_brightness)
 
     def set_pixel(self, led_num, red, green, blue) -> None:
         if led_num < 0:
@@ -71,27 +72,27 @@ class APA102(LEDStrip):
         #   2. Blue grayscale:  8 bits <=> 256 steps
         #   3. Green grayscale: 8 bits <=> 256 steps
         #   4. Red grayscale:   8 bits <=> 256 steps
-        start_index = 4 * led_num
-        self.spi_buffer[start_index + 3] = red
-        self.spi_buffer[start_index + 2] = green
-        self.spi_buffer[start_index + 1] = blue
+        start_index = 4 * led_num  # 4 bytes per LED
+        self.leds[start_index + 3] = red
+        self.leds[start_index + 2] = green
+        self.leds[start_index + 1] = blue
 
     def get_pixel(self, led_num):
-        # for an explanation regarding the structure of the array, see set_pixel()
-        start_index = 4 * led_num
+        """
+        gets the buffer value of the pixel at the given index
 
-        red = self.spi_buffer[start_index + 3]
-        green = self.spi_buffer[start_index + 2]
-        blue = self.spi_buffer[start_index + 1]
+        :param led_num: index of the pixel
+        :return: RGB color tuple
+        """
+        start_index = 4 * led_num  # 4 bytes per LED
+        red = self.leds[start_index + 3]
+        green = self.leds[start_index + 2]
+        blue = self.leds[start_index + 1]
 
         return red, green, blue
 
     def set_brightness(self, led_num: int, brightness: int) -> None:
-        self.spi_buffer[led_num] = self.led_prefix(brightness)
-
-    def clock_start_frame(self):
-        """ This method clocks out a start frame, telling the receiving LED that it must update its own color now. """
-        self.spi.xfer2([0] * 4)  # Start frame, 4 empty bytes <=> 32 zero bits
+        self.leds[4 * led_num] = self.led_prefix(brightness)
 
     @classmethod
     def led_prefix(cls, brightness: int) -> int:
@@ -112,15 +113,13 @@ class APA102(LEDStrip):
 
         return prefix_byte
 
-    def show(self):
-        """ sends the buffered color and brightness values to the strip """
-        self.clock_start_frame()
+    @staticmethod
+    def spi_start_frame() -> list:
+        """ To start a transmission, one must send 32 empty bits """
+        return [0, 0, 0, 0]  # Start frame, 4 empty bytes <=> 32 zero bits
 
-        self.spi.xfer2(self.spi_buffer)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
-
-        self.clock_end_frame()
-
-    def clock_end_frame(self):
+    @staticmethod
+    def spi_end_frame(num_leds) -> list:
         """
         As explained above, dummy data must be sent after the last real color information so that all of the data
         can reach its destination down the line.
@@ -133,12 +132,29 @@ class APA102(LEDStrip):
 
         After one LED the clock is inverted, and after two LEDs it is in sync again, but one cycle behind. Therefore,
         for every two LEDs, one bit of delay gets accumulated. For 300 LEDs, 150 additional bits must be fed to
-        the input of LED one so that the data can reach the last LED.
+        the input of LED one so that the data can reach the last LED. In this implementation we add a few more zero
+        bytes at the end, just to be sure.
 
         Ultimately, we need to send additional num_leds/2 arbitrary data bits, in order to trigger num_leds/2
         additional clock changes. This driver sends zeroes, which has the benefit of getting LED one partially or
         fully ready for the next update to the strip. An optimized version of the driver could omit the
         "clock_start_frame" method if enough zeroes have been sent as part of "clock_end_frame".
         """
-        for _ in range((self.num_leds + 15) // 16):  # Round up num_leds/2 bits (or num_leds/16 bytes)
-            self.spi.xfer2([0x00])
+        return [0x00] * ((num_leds + 15) // 16)  # Round up num_leds/2 bits (or num_leds/16 bytes)
+
+    def show(self):
+        """ sends the buffered color and brightness values to the strip """
+        self.spi.xfer2(self.spi_start_frame())
+        self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
+        self.spi.xfer2(self.spi_end_frame(self.num_leds))
+
+    def rotate(self, positions=1):
+        """
+        Treating the internal leds array as a circular buffer, rotate it by the specified number of positions.
+        The number could be negative, which means rotating in the opposite direction.
+
+        :param positions: rotate by how many steps
+        :return: none
+        """
+        cutoff = 4 * (positions % self.num_leds)
+        self.leds = self.leds[cutoff:] + self.leds[:cutoff]
