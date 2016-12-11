@@ -10,3 +10,6 @@ config.py
 # setuptools
 server/dist
 *.egg-info
+
+# tests
+tests/
