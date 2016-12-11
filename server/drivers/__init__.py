@@ -155,3 +155,13 @@ class LEDStrip(metaclass=ABCMeta):
         """
         self.clear_buffer()
         self.show()
+
+    @abstractmethod
+    def write_buffer(self) -> None:
+        """ copies the local SPI buffer to a shared object so other processes can see the current strip state """
+        pass
+
+    @abstractmethod
+    def read_buffer(self) -> None:
+        """ applies the shared buffer to the local SPI buffer """
+        pass

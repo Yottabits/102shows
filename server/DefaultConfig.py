@@ -10,7 +10,9 @@ from lightshows import *
 class Configuration:
     sys_name = None  # string
     log_level = log.INFO  # standard log level
+
     shows = {'clear': clear.Clear,  # A list of available shows
+             'christmas': christmas.Christmas,
              'rainbow': rainbow.Rainbow,
              'rgbtest': rgbtest.RGBTest,
              'spinthebottle': spinthebottle.SpinTheBottle,
@@ -31,10 +33,13 @@ class Configuration:
             port = 1883
             keepalive = 60  # in seconds
 
+    class MultiShowSync:
+        active = True
+        delay_sec = 1
+
     class Strip:
         Driver = APA102
         num_leds = None  # integer
         max_clock_speed_hz = 4000000  # 4 MHz is the maximum for "large" strips of more than 500 LEDs.
         initial_brightness = 50  # integer from 0 to 100
         max_brightness = 75  # maximum brightness
-        anti_glitch = True

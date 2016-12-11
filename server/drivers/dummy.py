@@ -4,6 +4,7 @@ Dummy Driver
 """
 
 import logging as log
+from multiprocessing import Array as SyncedArray
 
 from drivers import LEDStrip
 
@@ -18,6 +19,9 @@ class DummyDriver(LEDStrip):
         super().__init__(num_leds, max_clock_speed_hz, initial_brightness)  #
         self.color_buffer = [(0, 0, 0)] * self.num_leds
         self.brightness_buffer = [initial_brightness] * self.num_leds
+
+        self.synced_color_buffer = SyncedArray('i', self.color_buffer)
+        self.synced_brightness_buffer = SyncedArray('i', self.brightness_buffer)
 
     def set_pixel(self, led_num, red, green, blue) -> None:
         self.color_buffer[led_num] = (red, green, blue)
@@ -42,5 +46,14 @@ class DummyDriver(LEDStrip):
                                                                                          b=blue,
                                                                                          brightness=brightness))
 
-    def initialize_strip_connection(self):
-        log.debug("init")
+    def write_buffer(self) -> None:
+        """ write to the synced buffer """
+        for i, _ in enumerate(self.color_buffer):
+            self.synced_color_buffer[i] = self.color_buffer[i]
+            self.synced_brightness_buffer[i] = self.brightness_buffer[i]
+
+    def read_buffer(self) -> None:
+        """ read from the synced buffer """
+        for i, _ in enumerate(self.synced_color_buffer):
+            self.color_buffer[i] = self.synced_color_buffer[i]
+            self.brightness_buffer[i] = self.synced_brightness_buffer[i]

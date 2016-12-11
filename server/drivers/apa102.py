@@ -4,6 +4,8 @@ Driver for APA102 LED strips (aka "DotStar")
 """
 
 import spidev
+import logging as log
+from multiprocessing import Array as SyncedArray
 
 from drivers import LEDStrip
 
@@ -59,6 +61,7 @@ class APA102(LEDStrip):
         self.spi.max_speed_hz = self.max_clock_speed_hz  # should not be higher than 8000000
         self.leds = [0, 0, 0, 0] * self.num_leds  # 4 bytes per LED
         self.set_global_brightness(initial_brightness)
+        self.synced_buffer = SyncedArray('i', self.leds)
 
     def set_pixel(self, led_num, red, green, blue) -> None:
         if led_num < 0:
@@ -146,6 +149,18 @@ class APA102(LEDStrip):
         self.spi.xfer2(self.spi_start_frame())
         self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
         self.spi.xfer2(self.spi_end_frame(self.num_leds))
+
+    def write_buffer(self) -> None:
+        """ write to the synced buffer """
+        log.debug("writing buffer")
+        for i, _ in enumerate(self.leds):
+            self.synced_buffer[i] = self.leds[i]
+
+    def read_buffer(self) -> None:
+        """ read from the synced buffer """
+        log.debug("reading buffer")
+        for i, _ in enumerate(self.synced_buffer):
+            self.leds[i] = self.synced_buffer[i]
 
     def rotate(self, positions=1):
         """

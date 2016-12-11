@@ -4,6 +4,10 @@ Lightshow base template
 """
 
 from abc import ABCMeta, abstractmethod
+import logging as log
+from threading import Thread
+from time import sleep
+from multiprocessing import Value as SyncedValue
 
 import paho.mqtt.client
 
@@ -21,6 +25,13 @@ class Lightshow(metaclass=ABCMeta):
         self.strip = strip
         self.conf = conf
 
+        # MQTT listener
+        self.mqtt_listener = self.MQTTListener(self)
+
+        # initialize stop signal variable
+        self.synced_stop_signal = None
+        self.stop_watchdog_thread = Thread(target=self.stop_watchdog, daemon=True)
+
         self.init_parameters()  # let the child class set its own default parameters
 
         # then overwrite with any directly given parameters
@@ -30,6 +41,18 @@ class Lightshow(metaclass=ABCMeta):
         if parameters_valid:
             for param_name in parameters:
                 self.set_parameter(param_name, parameters[param_name])
+
+    def init_stop_signal(self, signal: SyncedValue):
+        self.synced_stop_signal = signal
+        self.stop_watchdog_thread.start()
+
+    def stop_watchdog(self):
+        while True:
+            if self.synced_stop_signal.value:
+                self.stop()
+                self.synced_stop_signal.value = False
+                return
+            sleep(0.1)
 
     @property
     def name(self) -> str:
@@ -41,10 +64,25 @@ class Lightshow(metaclass=ABCMeta):
         """ Raise an exception (InvalidStrip, InvalidConf or InvalidParameters) if the show is not runnable"""
         raise NotImplementedError
 
+    def writes_buffer(self, function):
+        def wrapper():
+            function()
+            self.strip.write_buffer()
+        return wrapper
+
+    def start(self):
+        """ invokes the run() method and after that synchronizes the shard buffer """
+        self.run()
+        self.strip.write_buffer()
+
+    def stop(self):
+        """ Other classes can call this method to stop the lightshow """
+        log.warning("This Lightshow does not implement a stop() method")
+
     @abstractmethod
     def run(self):
-        """Start the show with the parameters given in the constructor"""
-        raise NotImplementedError
+        """ run the show (obviously this must be inherited) """
+        pass
 
     @abstractmethod
     def set_parameter(self, param_name: str, value):
@@ -75,11 +113,12 @@ class Lightshow(metaclass=ABCMeta):
 
         def subscribe_to_show(self, client, userdata, flags, rc):
             subscription_path = self.lightshow.conf.mqtt.general_path.format(
-                prefix=self.lightshow.conf.mqtt.prefix,
+                prefix=self.lightshow.conf.MQTTMQTTfix,
                 sys_name=self.lightshow.conf.sys_name,
-                show_name=self.lightshow.namelightshow.conf,
+                show_name=self.lightshow.name,
                 command="+")
             client.subscribe(subscription_path)
+            log.debug("show subscribed to {}".format(subscription_path))
 
         def store_to_parameters(self, client, userdata, msg):
             command = mqtt.helpers.get_from_topic(mqtt.helpers.TopicAspect.command, str(msg.topic))
@@ -95,10 +134,10 @@ class Lightshow(metaclass=ABCMeta):
             given they have the path: $prefix/$sys_name/$show_name/$parameter
             $parameter and the $payload will be given to show.set_parameter($parameter, $payload)
             """
-            if self.lightshow.conf.mqtt.username is not None:
-                self.client.username_pw_set(self.lightshow.conf.mqtt.username, self.lightshow.conf.mqtt.password)
-            self.client.connect(self.lightshow.conf.mqtt.broker.host,
-                                self.lightshow.conf.mqtt.broker.port,
-                                self.lightshow.conf.mqtt.broker.keepalive)
+            if self.lightshow.conf.MQTT.username is not None:
+                self.client.username_pw_set(self.lightshow.conf.MQTT.username, self.lightshow.conf.MQTT.password)
+            self.client.connect(self.lightshow.conf.MQTT.Broker.host,
+                                self.lightshow.conf.MQTT.Broker.port,
+                                self.lightshow.conf.MQTT.Broker.keepalive)
 
 
