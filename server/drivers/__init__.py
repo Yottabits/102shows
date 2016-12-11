@@ -22,10 +22,10 @@ class LEDStrip(metaclass=ABCMeta):
         - pixel resolution (number of dim-steps per color component) is 8-bit, so 0 - 255
     """
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int,
-                 initial_brightness: int = 100, multiprocessing: bool = True):
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, initial_brightness: int = 100):
         """
         stores the given parameters and initializes the color and brightness buffers
+        drivers should extend this method
 
         :param num_leds: number of LEDs in the strip
         :param max_clock_speed_hz: maximum clock speed (Hz) of the bus
@@ -35,7 +35,6 @@ class LEDStrip(metaclass=ABCMeta):
         # store the given parameters
         self.num_leds = num_leds
         self.max_clock_speed_hz = max_clock_speed_hz
-        self.multiprocessing = multiprocessing
 
     @abstractmethod
     def get_pixel(self, led_num):
@@ -58,11 +57,6 @@ class LEDStrip(metaclass=ABCMeta):
         :param blue: blue component of the pixel
         :return: none
         """
-        if led_num < 0:
-            raise IndexError("led_num cannot be < 0!")
-        if led_num >= self.num_leds:
-            raise IndexError("led_num is out of bounds!")
-        verify.rgb_color_tuple((red, green, blue))
 
     def set_pixel_bytes(self, led_num: int, rgb_color):
         """
@@ -112,6 +106,7 @@ class LEDStrip(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def rotate(self, positions=1):
         """
         Treating the internal leds array as a circular buffer, rotate it by the specified number of positions.
@@ -120,8 +115,7 @@ class LEDStrip(metaclass=ABCMeta):
         :param positions: rotate by how many steps
         :return: none
         """
-        cutoff = 4 * (positions % self.num_leds)
-        self.color_buffer = self.color_buffer[cutoff:] + self.color_buffer[:cutoff]
+        pass
 
     @abstractmethod
     def set_brightness(self, led_num: int, brightness: int) -> None:
@@ -144,7 +138,7 @@ class LEDStrip(metaclass=ABCMeta):
         for led_num in range(self.num_leds):
             self.set_brightness(led_num, brightness)
 
-    def clear_color_buffer(self) -> None:
+    def clear_buffer(self) -> None:
         """
         sets all pixels in the color buffer to (0,0,0)
 
@@ -159,5 +153,5 @@ class LEDStrip(metaclass=ABCMeta):
 
         :return: none
         """
-        self.clear_color_buffer()
+        self.clear_buffer()
         self.show()

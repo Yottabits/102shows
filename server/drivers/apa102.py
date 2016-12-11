@@ -45,10 +45,9 @@ class APA102(LEDStrip):
         - strips cannot have more than 1024 LEDs
     """
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int,
-                 initial_brightness: int = 100, multiprocessing: bool = True):
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, initial_brightness: int = 100):
         """ initializes the strip connection via SPI """
-        super().__init__(num_leds, max_clock_speed_hz, initial_brightness, multiprocessing)
+        super().__init__(num_leds, max_clock_speed_hz, initial_brightness)
 
         # check if we do not have too much LEDs in the strip
         if self.num_leds > 1024:
