@@ -6,6 +6,7 @@ MQTT Control
 import json
 import logging as log
 from multiprocessing import Process
+from multiprocessing import Value as SyncedValue
 import threading
 import time
 
@@ -29,11 +30,12 @@ class MQTTControl:
         self.conf = config  # the user config
         self.show_process = Process()  # for the process in which the lightshows run in
         self.strip = None  # for the LED strip
+        self.synced_stop_signal = SyncedValue('b', False)
 
         # initialize Anti Glitch Thread
-        self.anti_glitch_thread = threading.Thread(target=self.run_anti_glitch, daemon=True)
-        self.anti_glitch_delay_sec = 1
-        self.anti_glitch = self.conf.Strip.anti_glitch
+        self.multishow_sync_thread = threading.Thread(target=self.run_synchronizer, daemon=True)
+        self.multishow_sync_active = self.conf.MultiShowSync.active
+        self.multishow_sync_delay_sec = self.conf.MultiShowSync.delay_sec
 
     def notify_user(self, message, qos=0) -> None:
         """
@@ -94,10 +96,11 @@ class MQTTControl:
             self.stop_show(show_name)
         elif command == "brightness":
             self.set_strip_brightness(int(payload))
+            self.strip.write_buffer()
         else:
             log.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
 
-    def run_anti_glitch(self):
+    def run_synchronizer(self):
         """
         This function should be called periodically to write the buffer to the strip.
         That is useful for cases where plugging or unplugging another electric device
@@ -105,11 +108,12 @@ class MQTTControl:
         until the next call of strip.show(). Because of that it is useful to write the
         buffer to the strip every now and then.
         """
-        while self.anti_glitch is True:
-            if not self.show_process.is_alive() and self.anti_glitch:  # execute only if no lightshow is running
-                log.debug("Invoking periodic show() command")
+        while self.multishow_sync_active:
+            if not self.show_process.is_alive():  # execute only if no lightshow is running
+                log.debug("synchronizing...")
+                self.strip.read_buffer()
                 self.strip.show()
-                time.sleep(self.anti_glitch_delay_sec)
+                time.sleep(self.multishow_sync_delay_sec)
 
     def start_show(self, show_name: str, parameters: dict) -> None:
         """
@@ -131,8 +135,10 @@ class MQTTControl:
             log.error(error_message)
             return
 
+        self.synced_stop_signal.value = False  # Reset the stop signal
+
         log.info("Starting the show " + show_name)
-        self.show_process = Process(target=show.run, name=show_name)
+        self.show_process = Process(target=show.start, name=show_name)
         self.show_process.start()
 
     def stop_show(self, show_name: str) -> None:
@@ -145,13 +151,14 @@ class MQTTControl:
         if show_name == self.show_process.name or show_name == "all":
             self.stop_running_show()
 
-    def stop_running_show(self, timeout_sec: int = 0.5) -> None:
+    def stop_running_show(self, timeout_sec: int = 0.7) -> None:
         """
         stops any running show
 
         :param timeout_sec: time the show process has until it is terminated
         """
         if self.show_process.is_alive():
+            self.synced_stop_signal.value = True  # send the stop signal
             self.show_process.join(timeout_sec)
             if self.show_process.is_alive():
                 log.info("{show_name} is running. Terminating...".format(show_name=self.show_process.name))
@@ -179,10 +186,9 @@ class MQTTControl:
 
         log.info("Initializing LED strip...")
         self.strip = self.conf.Strip.Driver(num_leds=self.conf.Strip.num_leds,
-                                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
-                                            multiprocessing=True)
+                                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz)
         self.strip.set_global_brightness(self.conf.Strip.initial_brightness)  # set initial brightness from config
-        self.anti_glitch_thread.start()
+        self.multishow_sync_thread.start()
 
         log.info("Connecting to the MQTT Broker")
         client = paho.mqtt.client.Client()

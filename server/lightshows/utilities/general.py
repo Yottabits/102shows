@@ -176,37 +176,3 @@ def blend_whole_strip_to_color(strip: LEDStrip, color: tuple, fadetime_sec: int 
     transition = SmoothBlend(strip)
     transition.set_color_for_whole_strip(*color)
     transition.blend(time_sec=fadetime_sec)
-
-
-class MeasureFPS:
-    """ measures the refresh rate available to the strip"""
-
-    def __init__(self, strip: LEDStrip):
-        self.strip = strip
-        self.active_color = (255, 255, 255)
-        self.passed_color = (0, 100, 100)
-
-    def run(self):
-        """runs a test on the LED strip framerate
-
-        :return: a tuple with (framerate, time_elapsed, number_of_frames)
-        """
-        self.strip.clear_strip()
-        self.strip.clear_strip()  # just to be sure ;)
-
-        start_time = time.perf_counter()
-        for led in range(0, self.strip.num_leds):
-            self.strip.set_pixel(led, *self.active_color)
-            self.strip.show()
-            self.strip.set_pixel(led, *self.passed_color)
-        stop_time = time.perf_counter()
-
-        time_elapsed = stop_time - start_time
-        number_of_frames = self.strip.num_leds
-        framerate = number_of_frames / time_elapsed
-
-        time.sleep(1)
-        self.strip.clear_strip()
-        self.strip.clear_strip()
-
-        return framerate, time_elapsed, number_of_frames

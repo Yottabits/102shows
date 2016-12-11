@@ -22,52 +22,21 @@ class LEDStrip(metaclass=ABCMeta):
         - pixel resolution (number of dim-steps per color component) is 8-bit, so 0 - 255
     """
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int, multiprocessing: bool = True):
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, initial_brightness: int = 100):
         """
         stores the given parameters and initializes the color and brightness buffers
+        drivers should extend this method
 
         :param num_leds: number of LEDs in the strip
         :param max_clock_speed_hz: maximum clock speed (Hz) of the bus
+        :param initial_brightness: initial brightness for the whole strip (to be used in child classes)
         :param multiprocessing: will this object be accessed by multiple processes?
         """
         # store the given parameters
         self.num_leds = num_leds
         self.max_clock_speed_hz = max_clock_speed_hz
-        self.multiprocessing = multiprocessing
-
-        # initialize the color and brightness buffers
-        if self.multiprocessing:
-            self.__color_buffer = SharedColorBuffer(size=self.num_leds)  # SharedColorBuffer initializes with (0,0,0)s
-            self.__brightness_buffer = SharedArray('i', [100] * self.num_leds)  # full brightness
-        else:
-            self.__color_buffer = [(0, 0, 0)] * self.num_leds  # these two definitions are (in the view of class members
-            self.__brightness_buffer = [100] * self.num_leds  # ... equivalent to the two definitions above
-
-        self.initialize_strip_connection()
 
     @abstractmethod
-    def initialize_strip_connection(self):
-        """ in child classes, the strip connection should be established here """
-        pass
-
-    @property
-    def color_buffer(self):
-        return self.__color_buffer
-
-    @color_buffer.setter
-    def color_buffer(self, new_buffer):
-        for led_num in range(self.num_leds):
-            self.__color_buffer[led_num] = new_buffer[led_num]
-
-    @property
-    def brightness_buffer(self):
-        return self.__brightness_buffer
-
-    @brightness_buffer.setter
-    def brightness_buffer(self, new_buffer):
-        for led_num in range(self.num_leds):
-            self.__brightness_buffer[led_num] = new_buffer[led_num]
-
     def get_pixel(self, led_num):
         """
         gets the pixel at index led_num
@@ -75,8 +44,8 @@ class LEDStrip(metaclass=ABCMeta):
         :param led_num: the index of the pixel you want to get
         :return: (red, green, blue) tuple
         """
-        return self.color_buffer[led_num]
 
+    @abstractmethod
     def set_pixel(self, led_num, red, green, blue) -> None:
         """
         Changes the pixel led_num to red, green, blue IN THE BUFFER!
@@ -88,12 +57,6 @@ class LEDStrip(metaclass=ABCMeta):
         :param blue: blue component of the pixel
         :return: none
         """
-        if led_num < 0:
-            raise IndexError("led_num cannot be < 0!")
-        if led_num >= self.num_leds:
-            raise IndexError("led_num is out of bounds!")
-        verify.rgb_color_tuple((red, green, blue))
-        self.color_buffer[led_num] = (red, green, blue)
 
     def set_pixel_bytes(self, led_num: int, rgb_color):
         """
@@ -143,6 +106,7 @@ class LEDStrip(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def rotate(self, positions=1):
         """
         Treating the internal leds array as a circular buffer, rotate it by the specified number of positions.
@@ -151,9 +115,9 @@ class LEDStrip(metaclass=ABCMeta):
         :param positions: rotate by how many steps
         :return: none
         """
-        cutoff = 4 * (positions % self.num_leds)
-        self.color_buffer = self.color_buffer[cutoff:] + self.color_buffer[:cutoff]
+        pass
 
+    @abstractmethod
     def set_brightness(self, led_num: int, brightness: int) -> None:
         """
         sets the brightness for a single LED in the strip
@@ -162,8 +126,7 @@ class LEDStrip(metaclass=ABCMeta):
         :param brightness: the desired brightness (0 - 100)
         :return: none
         """
-        verify.integer(brightness, "brightness", minimum=0, maximum=100)
-        self.brightness_buffer[led_num] = brightness
+        pass
 
     def set_global_brightness(self, brightness: int) -> None:
         """
@@ -175,13 +138,14 @@ class LEDStrip(metaclass=ABCMeta):
         for led_num in range(self.num_leds):
             self.set_brightness(led_num, brightness)
 
-    def clear_color_buffer(self) -> None:
+    def clear_buffer(self) -> None:
         """
         sets all pixels in the color buffer to (0,0,0)
 
         :return: none
         """
-        self.color_buffer = [(0, 0, 0)] * self.num_leds
+        for led_num in range(self.num_leds):
+            self.set_pixel(led_num, 0, 0, 0)
 
     def clear_strip(self) -> None:
         """
@@ -189,29 +153,15 @@ class LEDStrip(metaclass=ABCMeta):
 
         :return: none
         """
-        self.clear_color_buffer()
+        self.clear_buffer()
         self.show()
 
+    @abstractmethod
+    def write_buffer(self) -> None:
+        """ copies the local SPI buffer to a shared object so other processes can see the current strip state """
+        pass
 
-class SharedColorBuffer:
-    """
-    A static array that stores integer triplets.
-    """
-
-    def __init__(self, size: int):
-        self.__size = size
-        self.__r = SharedArray('i', [0, ] * size)
-        self.__g = SharedArray('i', [0, ] * size)
-        self.__b = SharedArray('i', [0, ] * size)
-
-    def __getitem__(self, key: int):
-        return self.__r[key], self.__g[key], self.__b[key]
-
-    def __setitem__(self, key: int, value: tuple) -> None:
-        r, g, b = value
-        self.__r[key] = r
-        self.__g[key] = g
-        self.__b[key] = b
-
-    def __len__(self):
-        return self.__size
+    @abstractmethod
+    def read_buffer(self) -> None:
+        """ applies the shared buffer to the local SPI buffer """
+        pass
