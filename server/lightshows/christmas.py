@@ -9,6 +9,7 @@ import time
 from lightshows.templates.base import *
 from lightshows.utilities.general import SmoothBlend, blend_whole_strip_to_color
 from lightshows.utilities import verifyparameters as verify
+from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class Christmas(Lightshow):
@@ -30,11 +31,14 @@ class Christmas(Lightshow):
         elif param_name == "velocity":
             verify.integer(value, "velocity", minimum=1, maximum=10)
             self.velocity = value
+        else:
+            raise InvalidParameters.unknown(param_name)
 
     def check_runnable(self):
         pass
 
     def run(self):
+        self.strip.set_global_brightness(40)
         self.mqtt_listener.start()
 
         while True:
