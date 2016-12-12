@@ -5,9 +5,7 @@
 This module contains the drivers for the LED strips
 """
 from abc import ABCMeta, abstractmethod
-from multiprocessing import Array as SharedArray
-
-from lightshows.utilities import verifyparameters as verify
+import logging as log
 
 __all__ = ['apa102', 'dummy']
 __drivers__ = ['Dummy', 'APA102']
@@ -36,6 +34,20 @@ class LEDStrip(metaclass=ABCMeta):
         self.num_leds = num_leds
         self.max_clock_speed_hz = max_clock_speed_hz
 
+        # private variables
+        self.__frozen = False
+
+    def freeze(self):
+        """
+        freezes the strip. All state-changing methods (__set_pixel() and __set_brightness())
+        will not do anything anymore and leave the buffer unchanged
+        """
+        self.__frozen = True
+
+    def unfreeze(self):
+        """ revokes all effects of freeze() """
+        self.__frozen = False
+
     @abstractmethod
     def get_pixel(self, led_num):
         """
@@ -45,8 +57,19 @@ class LEDStrip(metaclass=ABCMeta):
         :return: (red, green, blue) tuple
         """
 
-    @abstractmethod
+        pass
+
     def set_pixel(self, led_num, red, green, blue) -> None:
+        """
+        subclasses should not inherit this method!
+        calls __set_pixel() if not frozen
+        """
+
+        if not self.__frozen:
+            self.__set_pixel(led_num, red, green, blue)
+
+    @abstractmethod
+    def __set_pixel(self, led_num, red, green, blue) -> None:
         """
         Changes the pixel led_num to red, green, blue IN THE BUFFER!
         To send the buffer to the strip and show the changes, invoke strip.show()
@@ -117,8 +140,16 @@ class LEDStrip(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
     def set_brightness(self, led_num: int, brightness: int) -> None:
+        """
+        subclasses should not inherit this method!
+        calls __set_brightness() if not frozen
+        """
+        if not self.__frozen:
+            self.__set_brightness(led_num, brightness)
+
+    @abstractmethod
+    def __set_brightness(self, led_num: int, brightness: int) -> None:
         """
         sets the brightness for a single LED in the strip
 
@@ -157,11 +188,11 @@ class LEDStrip(metaclass=ABCMeta):
         self.show()
 
     @abstractmethod
-    def write_buffer(self) -> None:
+    def sync_up(self) -> None:
         """ copies the local SPI buffer to a shared object so other processes can see the current strip state """
         pass
 
     @abstractmethod
-    def read_buffer(self) -> None:
+    def sync_down(self) -> None:
         """ applies the shared buffer to the local SPI buffer """
         pass

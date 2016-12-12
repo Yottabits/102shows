@@ -23,13 +23,13 @@ class DummyDriver(LEDStrip):
         self.synced_color_buffer = SyncedArray('i', self.color_buffer)
         self.synced_brightness_buffer = SyncedArray('i', self.brightness_buffer)
 
-    def set_pixel(self, led_num, red, green, blue) -> None:
+    def __set_pixel(self, led_num, red, green, blue) -> None:
         self.color_buffer[led_num] = (red, green, blue)
 
     def get_pixel(self, led_num):
         return self.color_buffer[led_num]
 
-    def set_brightness(self, led_num: int, brightness: int) -> None:
+    def __set_brightness(self, led_num: int, brightness: int) -> None:
         self.brightness_buffer[led_num] = brightness
 
     def rotate(self, positions=1):
@@ -46,13 +46,13 @@ class DummyDriver(LEDStrip):
                                                                                          b=blue,
                                                                                          brightness=brightness))
 
-    def write_buffer(self) -> None:
+    def sync_up(self) -> None:
         """ write to the synced buffer """
         for i, _ in enumerate(self.color_buffer):
             self.synced_color_buffer[i] = self.color_buffer[i]
             self.synced_brightness_buffer[i] = self.brightness_buffer[i]
 
-    def read_buffer(self) -> None:
+    def sync_down(self) -> None:
         """ read from the synced buffer """
         for i, _ in enumerate(self.synced_color_buffer):
             self.color_buffer[i] = self.synced_color_buffer[i]

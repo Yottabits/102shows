@@ -12,6 +12,7 @@ from multiprocessing import Value as SyncedValue
 import paho.mqtt.client
 
 import mqtt.helpers
+import lightshows.utilities.verifyparameters as verify
 from drivers import LEDStrip
 
 
@@ -26,11 +27,11 @@ class Lightshow(metaclass=ABCMeta):
         self.conf = conf
 
         # MQTT listener
-        self.mqtt_listener = self.MQTTListener(self)
+        self.mqtt = self.MQTTListener(self)
 
         # initialize stop signal variable
-        self.synced_stop_signal = None
-        self.stop_watchdog_thread = Thread(target=self.stop_watchdog, daemon=True)
+        self.__synced_stop_signal = SyncedValue('b', False)
+        self.__stop_watchdog_thread = Thread(target=self.stop_watchdog, daemon=True)
 
         self.init_parameters()  # let the child class set its own default parameters
 
@@ -42,17 +43,19 @@ class Lightshow(metaclass=ABCMeta):
             for param_name in parameters:
                 self.set_parameter(param_name, parameters[param_name])
 
-    def init_stop_signal(self, signal: SyncedValue):
-        self.synced_stop_signal = signal
-        self.stop_watchdog_thread.start()
-
     def stop_watchdog(self):
         while True:
-            if self.synced_stop_signal.value:
-                self.stop()
-                self.synced_stop_signal.value = False
+            if self.__synced_stop_signal.value:  # stop signal was set!
+
+                self.strip.freeze()
+                sleep(0.01)  # wait for any running buffer-changing activity to terminate
+
+                self.cleanup()  # give the show a chance to clean up (but without changing the buffer)
+                self.strip.sync_up()
+
+                self.__synced_stop_signal.value = False  # reset the stop signal
                 return
-            sleep(0.1)
+            sleep(0.05)  # give the processor some rest
 
     @property
     def name(self) -> str:
@@ -64,24 +67,35 @@ class Lightshow(metaclass=ABCMeta):
         """ Raise an exception (InvalidStrip, InvalidConf or InvalidParameters) if the show is not runnable"""
         raise NotImplementedError
 
-    def writes_buffer(self, function):
-        def wrapper():
-            function()
-            self.strip.write_buffer()
-        return wrapper
-
     def start(self):
-        """ invokes the run() method and after that synchronizes the shard buffer """
-        self.run()
-        self.strip.write_buffer()
+        """ invokes the run() method and after that synchronizes the shared buffer """
+        # before
+        self.strip.sync_down()
+        self.__stop_watchdog_thread.start()
+        self.mqtt.start_listening()
 
-    def stop(self):
-        """ Other classes can call this method to stop the lightshow """
-        log.warning("This Lightshow does not implement a stop() method")
+        self.run()  # run the show
+
+        self.cleanup()
+        self.strip.freeze()
+        self.strip.sync_up()
+
+    def stop(self) -> None:
+        """
+        sends stop signal to itself
+
+        this is usually necessary because stop() is called from the controller ("parent") process,
+        but start() is called from the show ("child") process
+        """
+        self.__synced_stop_signal.value = True
 
     @abstractmethod
     def run(self):
         """ run the show (obviously this must be inherited) """
+        pass
+
+    def cleanup(self):
+        """ called before the show is terminated """
         pass
 
     @abstractmethod
@@ -108,27 +122,60 @@ class Lightshow(metaclass=ABCMeta):
         def __init__(self, lightshow):
             self.lightshow = lightshow
             self.client = paho.mqtt.client.Client()
-            self.client.on_connect = self.subscribe_to_show
-            self.client.on_message = self.store_to_parameters
+            self.client.on_connect = self.subscribe
+            self.client.on_message = self.parse_message
+            self.parse_parameter_changes = False
 
-        def subscribe_to_show(self, client, userdata, flags, rc):
-            subscription_path = self.lightshow.conf.mqtt.general_path.format(
+        def subscribe(self, client, userdata, flags, rc):
+            brightness_path = self.lightshow.conf.mqtt.general_path.format(
+                prefix=self.lightshow.conf.MQTTMQTTfix,
+                sys_name=self.lightshow.conf.sys_name,
+                show_name="+",
+                command="brightness")
+            parameter_path = self.lightshow.conf.mqtt.general_path.format(
                 prefix=self.lightshow.conf.MQTTMQTTfix,
                 sys_name=self.lightshow.conf.sys_name,
                 show_name=self.lightshow.name,
                 command="+")
-            client.subscribe(subscription_path)
-            log.debug("show subscribed to {}".format(subscription_path))
 
-        def store_to_parameters(self, client, userdata, msg):
+            client.subscribe(brightness_path)
+            log.debug("show subscribed to {}".format(brightness_path))
+            client.subscribe(parameter_path)
+            log.debug("show subscribed to {}".format(parameter_path))
+
+        def parse_message(self, client, userdata, msg):
             command = mqtt.helpers.get_from_topic(mqtt.helpers.TopicAspect.command, str(msg.topic))
             if type(msg.payload) is bytes:  # might be a byte encoded string that must be stripped
                 payload = mqtt.helpers.binary_to_string(msg.payload)
             else:
                 payload = str(msg.payload)
-            self.lightshow.set_parameter(command, payload)
 
-        def start(self):
+            if command == "brightness":
+                self.set_brightness(payload)
+            else:
+                if self.parse_parameter_changes:
+                    self.lightshow.set_parameter(command, payload)
+
+        def set_brightness(self, payload: str) -> None:
+            """
+            try to cast the payload as an integer between 0 and 100,
+            then invoke the strip's set_global_brightness()
+
+            :param payload: string containing the brightness as integer
+            """
+            try:
+                brightness = int(payload)
+            except ValueError:
+                log.error("Could not parse set brightness as integer!")
+                return
+            try:
+                verify.integer(brightness, "brightness", minimum=0, maximum=100)
+            except verify.InvalidParameters as error_msg:
+                log.error(error_msg)
+                return
+            self.lightshow.strip.set_global_brightness(brightness)
+
+        def start_listening(self) -> None:
             """
             if this method is called by the show object, incoming MQTT messages will be parsed,
             given they have the path: $prefix/$sys_name/$show_name/$parameter
@@ -139,5 +186,12 @@ class Lightshow(metaclass=ABCMeta):
             self.client.connect(self.lightshow.conf.MQTT.Broker.host,
                                 self.lightshow.conf.MQTT.Broker.port,
                                 self.lightshow.conf.MQTT.Broker.keepalive)
+
+        def stop_listening(self) -> None:
+            """
+            ends the connection to the MQTT broker
+            the subscribed topics are not parsed anymore
+            """
+            self.client.disconnect()
 
 

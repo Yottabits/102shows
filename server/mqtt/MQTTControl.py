@@ -96,7 +96,7 @@ class MQTTControl:
             self.stop_show(show_name)
         elif command == "brightness":
             self.set_strip_brightness(int(payload))
-            self.strip.write_buffer()
+            self.strip.sync_up()
         else:
             log.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
 
@@ -111,7 +111,7 @@ class MQTTControl:
         while self.multishow_sync_active:
             if not self.show_process.is_alive():  # execute only if no lightshow is running
                 log.debug("synchronizing...")
-                self.strip.read_buffer()
+                self.strip.sync_down()
                 self.strip.show()
                 time.sleep(self.multishow_sync_delay_sec)
 
