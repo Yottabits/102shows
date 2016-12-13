@@ -11,8 +11,9 @@ class Configuration:
     sys_name = None  # string
     log_level = log.INFO  # standard log level
 
-    shows = {'clear': clear.Clear,  # A list of available shows
-             'christmas': christmas.Christmas,
+    shows = {'christmas': christmas.Christmas,
+             'clear': clear.Clear,  # A list of available shows
+             'idle': idle.Idle,
              'rainbow': rainbow.Rainbow,
              'rgbtest': rgbtest.RGBTest,
              'spinthebottle': spinthebottle.SpinTheBottle,
@@ -32,10 +33,6 @@ class Configuration:
             host = "localhost"
             port = 1883
             keepalive = 60  # in seconds
-
-    class MultiShowSync:
-        active = True
-        delay_sec = 1
 
     class Strip:
         Driver = APA102

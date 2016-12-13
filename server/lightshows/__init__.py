@@ -5,8 +5,9 @@ Lightshows
 That's what it's all about.
 """
 
-__all__ = ['clear',
-           'christmas',
+__all__ = ['christmas',
+           'clear',
+           'idle',
            'rainbow',
            'rgbtest',
            'solidcolor',

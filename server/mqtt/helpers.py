@@ -53,11 +53,11 @@ def parse_json_safely(payload: str) -> dict:
         try:
             unpacked = json.loads(payload)
         except Exception as error:
-            log.warning("Could not parse this payload: {}".format(error))
+            log.debug("Could not parse this payload: {}".format(error))
             return {}
         else:
             if type(unpacked) is not dict:
-                log.warning("This payload is not a JSON object!")
+                log.debug("This payload is not a JSON object!")
                 return {}
         return unpacked
     else:
