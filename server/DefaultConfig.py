@@ -12,6 +12,7 @@ class Configuration:
     log_level = log.INFO  # standard log level
 
     shows = {'clear': clear.Clear,  # A list of available shows
+             'idle': idle.Idle,
              'rainbow': rainbow.Rainbow,
              'rgbtest': rgbtest.RGBTest,
              'spinthebottle': spinthebottle.SpinTheBottle,
