@@ -39,7 +39,7 @@ class LEDStrip(metaclass=ABCMeta):
 
     def freeze(self):
         """
-        freezes the strip. All state-changing methods (__set_pixel() and __set_brightness())
+        freezes the strip. All state-changing methods (_set_pixel() and _set_brightness())
         will not do anything anymore and leave the buffer unchanged
         """
         self.__frozen = True
@@ -62,14 +62,14 @@ class LEDStrip(metaclass=ABCMeta):
     def set_pixel(self, led_num, red, green, blue) -> None:
         """
         subclasses should not inherit this method!
-        calls __set_pixel() if not frozen
+        calls _set_pixel() if not frozen
         """
 
         if not self.__frozen:
-            self.__set_pixel(led_num, red, green, blue)
+            self._set_pixel(led_num, red, green, blue)
 
     @abstractmethod
-    def __set_pixel(self, led_num, red, green, blue) -> None:
+    def _set_pixel(self, led_num, red, green, blue) -> None:
         """
         Changes the pixel led_num to red, green, blue IN THE BUFFER!
         To send the buffer to the strip and show the changes, invoke strip.show()
@@ -143,13 +143,13 @@ class LEDStrip(metaclass=ABCMeta):
     def set_brightness(self, led_num: int, brightness: int) -> None:
         """
         subclasses should not inherit this method!
-        calls __set_brightness() if not frozen
+        calls _set_brightness() if not frozen
         """
         if not self.__frozen:
-            self.__set_brightness(led_num, brightness)
+            self._set_brightness(led_num, brightness)
 
     @abstractmethod
-    def __set_brightness(self, led_num: int, brightness: int) -> None:
+    def _set_brightness(self, led_num: int, brightness: int) -> None:
         """
         sets the brightness for a single LED in the strip
 

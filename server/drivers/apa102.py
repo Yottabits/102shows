@@ -63,7 +63,7 @@ class APA102(LEDStrip):
         self.set_global_brightness(initial_brightness)
         self.synced_buffer = SyncedArray('i', self.leds)
 
-    def __set_pixel(self, led_num, red, green, blue) -> None:
+    def _set_pixel(self, led_num, red, green, blue) -> None:
         if led_num < 0:
             return  # Pixel is invisible, so ignore
         if led_num >= self.num_leds:
@@ -93,7 +93,7 @@ class APA102(LEDStrip):
 
         return red, green, blue
 
-    def __set_brightness(self, led_num: int, brightness: int) -> None:
+    def _set_brightness(self, led_num: int, brightness: int) -> None:
         self.leds[4 * led_num] = self.led_prefix(brightness)
 
     @classmethod

@@ -91,7 +91,7 @@ class ColorCycle(Lightshow):
                     self.strip.show()  # Display, only if required
                 time.sleep(self.pause_sec)  # Pause until the next step
             current_cycle += 1
-            if current_cycle >= self.num_cycles or self.__stop_show:
+            if current_cycle >= self.num_cycles:
                 break
         # Finished, cleanup everything
         self.cleanup()

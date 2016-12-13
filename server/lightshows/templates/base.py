@@ -5,9 +5,8 @@ Lightshow base template
 
 from abc import ABCMeta, abstractmethod
 import logging as log
-from threading import Thread
-from time import sleep
-from multiprocessing import Value as SyncedValue
+import os
+import signal
 
 import paho.mqtt.client
 
@@ -21,6 +20,7 @@ class Lightshow(metaclass=ABCMeta):
     This class defines the interfaces and a few helper functions for lightshows.
     It is highly recommended to use it as your base class when writing your own show.
     """
+
     def __init__(self, strip: LEDStrip, conf, parameters: dict):
         # store parameters
         self.strip = strip
@@ -29,33 +29,15 @@ class Lightshow(metaclass=ABCMeta):
         # MQTT listener
         self.mqtt = self.MQTTListener(self)
 
-        # initialize stop signal variable
-        self.__synced_stop_signal = SyncedValue('b', False)
-        self.__stop_watchdog_thread = Thread(target=self.stop_watchdog, daemon=True)
+        # attach stop() to SIGSTOP
+        signal.signal(signal.SIGINT, self.stop)
 
+        # Parameters
         self.init_parameters()  # let the child class set its own default parameters
-
-        # then overwrite with any directly given parameters
-        parameters_valid = type(parameters) is dict
-
-        # store given parameters
+        parameters_valid = type(parameters) is dict  # then overwrite with any directly given parameters
         if parameters_valid:
             for param_name in parameters:
                 self.set_parameter(param_name, parameters[param_name])
-
-    def stop_watchdog(self):
-        while True:
-            if self.__synced_stop_signal.value:  # stop signal was set!
-
-                self.strip.freeze()
-                sleep(0.01)  # wait for any running buffer-changing activity to terminate
-
-                self.cleanup()  # give the show a chance to clean up (but without changing the buffer)
-                self.strip.sync_up()
-
-                self.__synced_stop_signal.value = False  # reset the stop signal
-                return
-            sleep(0.05)  # give the processor some rest
 
     @property
     def name(self) -> str:
@@ -71,7 +53,6 @@ class Lightshow(metaclass=ABCMeta):
         """ invokes the run() method and after that synchronizes the shared buffer """
         # before
         self.strip.sync_down()
-        self.__stop_watchdog_thread.start()
         self.mqtt.start_listening()
 
         self.run()  # run the show
@@ -80,14 +61,15 @@ class Lightshow(metaclass=ABCMeta):
         self.strip.freeze()
         self.strip.sync_up()
 
-    def stop(self) -> None:
-        """
-        sends stop signal to itself
+    def stop(self, signum, frame) -> None:
+        self.strip.freeze()
+        self.cleanup()  # give the show a chance to clean up (but without changing the buffer)
+        self.strip.sync_up()
+        self.suicide()  # then kill all running threads in this process
 
-        this is usually necessary because stop() is called from the controller ("parent") process,
-        but start() is called from the show ("child") process
-        """
-        self.__synced_stop_signal.value = True
+    def suicide(self) -> None:
+        """ terminates its own process """
+        os.kill(os.getpid(), signal.SIGKILL)
 
     @abstractmethod
     def run(self):
@@ -126,14 +108,21 @@ class Lightshow(metaclass=ABCMeta):
             self.client.on_message = self.parse_message
             self.parse_parameter_changes = False
 
+            # connect
+            if self.lightshow.conf.MQTT.username is not None:
+                self.client.username_pw_set(self.lightshow.conf.MQTT.username, self.lightshow.conf.MQTT.password)
+            self.client.connect(self.lightshow.conf.MQTT.Broker.host,
+                                self.lightshow.conf.MQTT.Broker.port,
+                                self.lightshow.conf.MQTT.Broker.keepalive)
+
         def subscribe(self, client, userdata, flags, rc):
-            brightness_path = self.lightshow.conf.mqtt.general_path.format(
-                prefix=self.lightshow.conf.MQTTMQTTfix,
+            brightness_path = self.lightshow.conf.MQTT.general_path.format(
+                prefix=self.lightshow.conf.MQTT.prefix,
                 sys_name=self.lightshow.conf.sys_name,
                 show_name="+",
                 command="brightness")
-            parameter_path = self.lightshow.conf.mqtt.general_path.format(
-                prefix=self.lightshow.conf.MQTTMQTTfix,
+            parameter_path = self.lightshow.conf.MQTT.general_path.format(
+                prefix=self.lightshow.conf.MQTT.prefix,
                 sys_name=self.lightshow.conf.sys_name,
                 show_name=self.lightshow.name,
                 command="+")
@@ -163,6 +152,8 @@ class Lightshow(metaclass=ABCMeta):
 
             :param payload: string containing the brightness as integer
             """
+
+            # check general restrictions
             try:
                 brightness = int(payload)
             except ValueError:
@@ -173,6 +164,16 @@ class Lightshow(metaclass=ABCMeta):
             except verify.InvalidParameters as error_msg:
                 log.error(error_msg)
                 return
+
+            # confine brightness to configured value
+            max_brightness = self.lightshow.conf.Strip.max_brightness
+            if brightness > max_brightness:
+                log.info("tried to set brightness {set} but maximum brightness is {max}.".format(
+                    set=brightness, max=max_brightness))
+                log.info("setting {max} as brightness instead...".format(max=max_brightness))
+                brightness = max_brightness
+
+            # finally: set brightness
             self.lightshow.strip.set_global_brightness(brightness)
 
         def start_listening(self) -> None:
@@ -181,17 +182,11 @@ class Lightshow(metaclass=ABCMeta):
             given they have the path: $prefix/$sys_name/$show_name/$parameter
             $parameter and the $payload will be given to show.set_parameter($parameter, $payload)
             """
-            if self.lightshow.conf.MQTT.username is not None:
-                self.client.username_pw_set(self.lightshow.conf.MQTT.username, self.lightshow.conf.MQTT.password)
-            self.client.connect(self.lightshow.conf.MQTT.Broker.host,
-                                self.lightshow.conf.MQTT.Broker.port,
-                                self.lightshow.conf.MQTT.Broker.keepalive)
+            self.client.loop_start()
 
         def stop_listening(self) -> None:
             """
             ends the connection to the MQTT broker
             the subscribed topics are not parsed anymore
             """
-            self.client.disconnect()
-
-
+            self.client.loop_stop()

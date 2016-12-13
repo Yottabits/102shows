@@ -32,10 +32,6 @@ class Configuration:
             port = 1883
             keepalive = 60  # in seconds
 
-    class MultiShowSync:
-        active = True
-        delay_sec = 1
-
     class Strip:
         Driver = APA102
         num_leds = None  # integer
