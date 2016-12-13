@@ -4,11 +4,8 @@ MQTT Control
 """
 
 import json
-import logging as log
 from multiprocessing import Process
-from multiprocessing import Value as SyncedValue
-import threading
-import time
+from threading import Thread
 
 import paho.mqtt.client
 import paho.mqtt.publish
@@ -29,13 +26,8 @@ class MQTTControl:
         # global handles
         self.conf = config  # the user config
         self.show_process = Process()  # for the process in which the lightshows run in
+        self.scheduled_show_name = None
         self.strip = None  # for the LED strip
-        self.synced_stop_signal = SyncedValue('b', False)
-
-        # initialize Anti Glitch Thread
-        self.multishow_sync_thread = threading.Thread(target=self.run_synchronizer, daemon=True)
-        self.multishow_sync_active = self.conf.MultiShowSync.active
-        self.multishow_sync_delay_sec = self.conf.MultiShowSync.delay_sec
 
     def notify_user(self, message, qos=0) -> None:
         """
@@ -55,14 +47,21 @@ class MQTTControl:
 
     def on_connect(self, client, userdata, flags, rc):
         """ subscribe to all messages related to this LED installation """
-        subscription_path = self.conf.MQTT.general_path.format(
+        start_path = self.conf.MQTT.general_path.format(
             prefix=self.conf.MQTT.prefix,
             sys_name=self.conf.sys_name,
             show_name="+",
-            command="+")
-        client.subscribe(subscription_path)
-        log.info("subscription on Broker {host} for {path}".format(
-            host=self.conf.MQTT.Broker.host, path=subscription_path))
+            command="start")
+        stop_path = self.conf.MQTT.general_path.format(
+            prefix=self.conf.MQTT.prefix,
+            sys_name=self.conf.sys_name,
+            show_name="+",
+            command="stop")
+
+        client.subscribe(start_path)
+        client.subscribe(stop_path)
+        log.info("subscription on Broker {host} for {start_path} and {stop_path}".format(
+            host=self.conf.MQTT.Broker.host, start_path=start_path, stop_path=stop_path))
 
     def on_message(self, client, userdata, msg):
         """ react to a received message and eventually starts/stops a show """
@@ -90,35 +89,21 @@ class MQTTControl:
                            command=command,
                            parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
                            ))
-            self.stop_running_show(timeout_sec=0)  # stop any running show
+
+            # set scheduled_show_name so that the idle show does not get started after the old show was quit:
+            self.scheduled_show_name = show_name
+            self.stop_running_show()  # stop any running show
             self.start_show(show_name, parameters)
+            self.scheduled_show_name = None  # delete flag so idle show gets started if the show terminates by itself
         elif command == "stop":
             self.stop_show(show_name)
-        elif command == "brightness":
-            self.set_strip_brightness(int(payload))
-            self.strip.write_buffer()
         else:
             log.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
 
-    def run_synchronizer(self):
-        """
-        This function should be called periodically to write the buffer to the strip.
-        That is useful for cases where plugging or unplugging another electric device
-        in the room induces a glitch in the LED strip. This glitch will be visible
-        until the next call of strip.show(). Because of that it is useful to write the
-        buffer to the strip every now and then.
-        """
-        while self.multishow_sync_active:
-            if not self.show_process.is_alive():  # execute only if no lightshow is running
-                log.debug("synchronizing...")
-                self.strip.read_buffer()
-                self.strip.show()
-                time.sleep(self.multishow_sync_delay_sec)
-
     def start_show(self, show_name: str, parameters: dict) -> None:
         """
-        looks for a show, checks if it can run
-        and if so, starts it in an own process
+        looks for a show, checks if it can run and if so, starts it in an own process
+        the method waits for the process to terminate and then gets the buffer of the ended show
 
         :param show_name: name of the show to be started
         :param parameters: these are passed to the show
@@ -128,6 +113,7 @@ class MQTTControl:
             log.error("Show \"{name}\" was not found!".format(name=show_name))
             return
 
+        # initialize show object
         try:
             show = self.conf.shows[show_name](self.strip, self.conf, parameters)
             show.check_runnable()
@@ -135,11 +121,28 @@ class MQTTControl:
             log.error(error_message)
             return
 
-        self.synced_stop_signal.value = False  # Reset the stop signal
-
+        # start the show
         log.info("Starting the show " + show_name)
         self.show_process = Process(target=show.start, name=show_name)
         self.show_process.start()
+
+        # spawn thread that gets the final buffer state of the lightshow
+        def wait_for_show_end():
+            self.show_process.join()  # wait for the process to terminate
+            self.after_show_end()
+        Thread(target=wait_for_show_end, name="wait for " + show_name, daemon=True).start()
+
+    def after_show_end(self) -> None:
+        """
+        clean up after a show ended:
+          - synchronize the strip state
+          - start idle show (not if we just got out of 'idle')
+
+        :param ended_show_name: name of the show that just ended
+        """
+        self.strip.sync_down()  # get the buffer of the stopped lightshow
+        if self.scheduled_show_name is None:  # run idle show if no other show is scheduled
+            self.start_show("idle", {})
 
     def stop_show(self, show_name: str) -> None:
         """
@@ -151,34 +154,20 @@ class MQTTControl:
         if show_name == self.show_process.name or show_name == "all":
             self.stop_running_show()
 
-    def stop_running_show(self, timeout_sec: int = 0.7) -> None:
+    def stop_running_show(self, timeout_sec: int = 5) -> None:
         """
         stops any running show
 
         :param timeout_sec: time the show process has until it is terminated
         """
         if self.show_process.is_alive():
-            self.synced_stop_signal.value = True  # send the stop signal
+            os.kill(self.show_process.pid, signal.SIGINT)  # the stop signal has a handle attached to it
             self.show_process.join(timeout_sec)
             if self.show_process.is_alive():
                 log.info("{show_name} is running. Terminating...".format(show_name=self.show_process.name))
                 self.show_process.terminate()
         else:
             log.info("no show running; all good")
-
-    def set_strip_brightness(self, brightness: int) -> None:
-        """
-        set brightness for the whole strip
-
-        :param brightness: integer between 0 and 100
-        """
-        if type(brightness) is not int or brightness < 0 or brightness > self.conf.Strip.max_brightness:
-            log.warning("set brightness value \"{brightness}\" is not an integer between 0 and {max_brightness}".format(
-                brightness=brightness, max_brightness=self.conf.Strip.max_brightness))
-            return
-        else:
-            self.strip.set_global_brightness(brightness)
-            self.strip.show()
 
     def run(self) -> None:
         """ start the listener """
@@ -188,7 +177,8 @@ class MQTTControl:
         self.strip = self.conf.Strip.Driver(num_leds=self.conf.Strip.num_leds,
                                             max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz)
         self.strip.set_global_brightness(self.conf.Strip.initial_brightness)  # set initial brightness from config
-        self.multishow_sync_thread.start()
+        self.strip.sync_up()  # to store brightness
+        self.strip.show()
 
         log.info("Connecting to the MQTT Broker")
         client = paho.mqtt.client.Client()
@@ -198,6 +188,9 @@ class MQTTControl:
             client.username_pw_set(self.conf.MQTT.username, self.conf.MQTT.password)
         client.connect(self.conf.MQTT.Broker.host, self.conf.MQTT.Broker.port, self.conf.MQTT.Broker.keepalive)
         log.info("{name} is ready".format(name=self.conf.sys_name))
+
+        # start Idle show to listen for brightness changes and refresh the strip regularly
+        self.start_show("idle", {})
 
         client.loop_forever()
         log.critical("MQTTControl.py has exited")

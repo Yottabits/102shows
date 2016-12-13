@@ -26,7 +26,6 @@ class ColorCycle(Lightshow):
         self.num_steps_per_cycle = None
         self.num_cycles = float("inf")  # loop forever
         self.order = 'rgb'  # this should not be changed!
-        self.__stop_show = False
 
     def set_parameter(self, param_name: str, value):
         if param_name == "pause_sec":
@@ -62,9 +61,6 @@ class ColorCycle(Lightshow):
         """ called before termination of the lightshow """
         pass
 
-    def stop(self):
-        self.__stop_show = True
-
     @abstractmethod
     def update(self, current_step: int, current_cycle: int) -> bool:
         """
@@ -81,7 +77,7 @@ class ColorCycle(Lightshow):
 
     def cleanup(self):
         self.shutdown()
-        self.strip.write_buffer()
+        self.strip.sync_up()
 
     def run(self):
         """ start the actual work """
@@ -95,7 +91,7 @@ class ColorCycle(Lightshow):
                     self.strip.show()  # Display, only if required
                 time.sleep(self.pause_sec)  # Pause until the next step
             current_cycle += 1
-            if current_cycle >= self.num_cycles or self.__stop_show:
+            if current_cycle >= self.num_cycles:
                 break
         # Finished, cleanup everything
         self.cleanup()

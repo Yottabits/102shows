@@ -63,7 +63,7 @@ class APA102(LEDStrip):
         self.set_global_brightness(initial_brightness)
         self.synced_buffer = SyncedArray('i', self.leds)
 
-    def set_pixel(self, led_num, red, green, blue) -> None:
+    def _set_pixel(self, led_num, red, green, blue) -> None:
         if led_num < 0:
             return  # Pixel is invisible, so ignore
         if led_num >= self.num_leds:
@@ -93,7 +93,7 @@ class APA102(LEDStrip):
 
         return red, green, blue
 
-    def set_brightness(self, led_num: int, brightness: int) -> None:
+    def _set_brightness(self, led_num: int, brightness: int) -> None:
         self.leds[4 * led_num] = self.led_prefix(brightness)
 
     @classmethod
@@ -150,25 +150,34 @@ class APA102(LEDStrip):
         self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
         self.spi.xfer2(self.spi_end_frame(self.num_leds))
 
-    def write_buffer(self) -> None:
+    def sync_up(self) -> None:
         """ write to the synced buffer """
         log.debug("writing buffer")
         for i, _ in enumerate(self.leds):
             self.synced_buffer[i] = self.leds[i]
 
-    def read_buffer(self) -> None:
+    def sync_down(self) -> None:
         """ read from the synced buffer """
         log.debug("reading buffer")
         for i, _ in enumerate(self.synced_buffer):
             self.leds[i] = self.synced_buffer[i]
 
-    def rotate(self, positions=1):
+    def rotate(self, positions=1) -> None:
         """
         Treating the internal leds array as a circular buffer, rotate it by the specified number of positions.
         The number could be negative, which means rotating in the opposite direction.
+        Note that the brightness of the individual leds does not get rotated.
 
         :param positions: rotate by how many steps
-        :return: none
         """
-        cutoff = 4 * (positions % self.num_leds)
-        self.leds = self.leds[cutoff:] + self.leds[:cutoff]
+        # build color buffer
+        color_buffer = [(0, 0, 0)] * self.num_leds
+        for led_num in range(self.num_leds):
+            color_buffer[led_num] = self.get_pixel(led_num)
+
+        # rotate
+        color_buffer = color_buffer[positions:] + color_buffer[:positions]
+
+        # apply the rotated color buffer
+        for led_num in range(self.num_leds):
+            self.set_pixel(led_num, *color_buffer[led_num])
