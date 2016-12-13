@@ -10,7 +10,6 @@ This class provides helper functions and classes for the lightshows:
     - wheel(wheel_pos)
 
     - SmoothBlend
-    - MeasureFPS
 """
 import types
 import logging as log
