@@ -52,11 +52,12 @@ Essentially the driver sends additional zeroes to LED 1 as long as it takes for 
 to make it down the line to the last LED.
 """
 
-import spidev
 import logging as log
+import spidev
 from multiprocessing import Array as multiprocessing_array
 
-from lightshows.utilities import verifyparameters as verify
+import helpers.exceptions
+from helpers import verify as verify
 
 rgb_map = {'rgb': [3, 2, 1], 'rbg': [3, 1, 2], 'grb': [2, 3, 1], 'gbr': [2, 1, 3], 'brg': [1, 3, 2], 'bgr': [1, 2, 3]}
 
@@ -156,7 +157,7 @@ class APA102:
         # validate
         try:
             verify.integer(brightness, "brightness", minimum=0, maximum=31)
-        except verify.InvalidParameters as error:
+        except helpers.exceptions.InvalidParameters as error:
             log.warning(str(error))
 
         # set bitmask ledstart

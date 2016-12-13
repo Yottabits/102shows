@@ -1,5 +1,5 @@
 """
-Utilities
+Color Helpers
 (c) 2016 Simon Leiner
 
 This class provides helper functions and classes for the lightshows:

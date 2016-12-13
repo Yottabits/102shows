@@ -5,7 +5,6 @@
 This module contains the drivers for the LED strips
 """
 from abc import ABCMeta, abstractmethod
-import logging as log
 
 __all__ = ['apa102', 'dummy']
 __drivers__ = ['Dummy', 'APA102']
@@ -28,7 +27,6 @@ class LEDStrip(metaclass=ABCMeta):
         :param num_leds: number of LEDs in the strip
         :param max_clock_speed_hz: maximum clock speed (Hz) of the bus
         :param initial_brightness: initial brightness for the whole strip (to be used in child classes)
-        :param multiprocessing: will this object be accessed by multiple processes?
         """
         # store the given parameters
         self.num_leds = num_leds

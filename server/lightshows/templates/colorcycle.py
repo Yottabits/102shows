@@ -3,12 +3,10 @@ Color Cycle Template
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
 """
 
-import logging as log
 import time
 
+from helpers.exceptions import InvalidParameters
 from lightshows.templates.base import *
-from lightshows.utilities import verifyparameters as verify
-from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class ColorCycle(Lightshow):

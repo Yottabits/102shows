@@ -4,8 +4,8 @@ Rainbow
 
 """
 
+from helpers.color import wheel
 from lightshows.templates.colorcycle import *
-from lightshows.utilities.general import wheel
 
 
 class Rainbow(ColorCycle):

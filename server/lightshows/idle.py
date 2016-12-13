@@ -5,7 +5,6 @@ Idle Show
 from time import sleep
 
 from lightshows.templates.base import *
-from lightshows.utilities import verifyparameters as verify
 
 
 class Idle(Lightshow):
@@ -21,7 +20,6 @@ class Idle(Lightshow):
     def set_parameter(self, param_name: str, value):
         if param_name == "pause_sec":
             verify.not_negative_numeric(value, "pause_sec")
-
 
     def check_runnable(self):
         pass  # always runnable

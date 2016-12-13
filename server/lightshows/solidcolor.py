@@ -3,10 +3,9 @@ SolidColor
 (c) 2016 Simon Leiner
 """
 
+from helpers.color import blend_whole_strip_to_color
+from helpers.exceptions import InvalidParameters
 from lightshows.templates.base import *
-from lightshows.utilities import verifyparameters as verify
-from lightshows.utilities.general import blend_whole_strip_to_color
-from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class SolidColor(Lightshow):

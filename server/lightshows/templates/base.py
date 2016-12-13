@@ -3,15 +3,16 @@ Lightshow base template
 (c) 2016 Simon Leiner
 """
 
-from abc import ABCMeta, abstractmethod
 import logging as log
 import os
 import signal
+from abc import ABCMeta, abstractmethod
 
 import paho.mqtt.client
 
-import mqtt.helpers
-import lightshows.utilities.verifyparameters as verify
+import helpers.exceptions
+import helpers.mqtt
+import helpers.verify as verify
 from drivers import LEDStrip
 
 
@@ -133,9 +134,9 @@ class Lightshow(metaclass=ABCMeta):
             log.debug("show subscribed to {}".format(parameter_path))
 
         def parse_message(self, client, userdata, msg):
-            command = mqtt.helpers.get_from_topic(mqtt.helpers.TopicAspect.command, str(msg.topic))
+            command = helpers.mqtt.get_from_topic(helpers.mqtt.TopicAspect.command, str(msg.topic))
             if type(msg.payload) is bytes:  # might be a byte encoded string that must be stripped
-                payload = mqtt.helpers.binary_to_string(msg.payload)
+                payload = helpers.mqtt.binary_to_string(msg.payload)
             else:
                 payload = str(msg.payload)
 
@@ -161,7 +162,7 @@ class Lightshow(metaclass=ABCMeta):
                 return
             try:
                 verify.integer(brightness, "brightness", minimum=0, maximum=100)
-            except verify.InvalidParameters as error_msg:
+            except helpers.exceptions.InvalidParameters as error_msg:
                 log.error(error_msg)
                 return
 

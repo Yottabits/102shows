@@ -10,11 +10,11 @@ from threading import Thread
 import paho.mqtt.client
 import paho.mqtt.publish
 
-from mqtt.helpers import TopicAspect
-import mqtt.helpers as helpers
+import helpers.mqtt
 from DefaultConfig import Configuration
+from helpers.mqtt import TopicAspect
+from helpers.exceptions import InvalidStrip, InvalidConf, InvalidParameters
 from lightshows.templates.base import *
-from lightshows.utilities.verifyparameters import InvalidStrip, InvalidConf, InvalidParameters
 
 
 class MQTTControl:
@@ -68,18 +68,18 @@ class MQTTControl:
         # store parameters as strings
         topic = str(msg.topic)
         if type(msg.payload) is bytes:  # might be a byte encoded string that must be stripped
-            payload = helpers.binary_to_string(msg.payload)
+            payload = helpers.mqtt.binary_to_string(msg.payload)
         else:
             payload = str(msg.payload)
 
         # extract the essentials
-        show_name = helpers.get_from_topic(TopicAspect.show_name, topic)
-        command = helpers.get_from_topic(TopicAspect.command, topic)
+        show_name = helpers.mqtt.get_from_topic(TopicAspect.show_name, topic)
+        command = helpers.mqtt.get_from_topic(TopicAspect.command, topic)
 
         # execute
         if command == "start":
             # parse parameters
-            parameters = helpers.parse_json_safely(payload)
+            parameters = helpers.mqtt.parse_json_safely(payload)
             log.debug(
                 """for show: \"{show}\":
                    received command: \"{command}\"
@@ -137,8 +137,6 @@ class MQTTControl:
         clean up after a show ended:
           - synchronize the strip state
           - start idle show (not if we just got out of 'idle')
-
-        :param ended_show_name: name of the show that just ended
         """
         self.strip.sync_down()  # get the buffer of the stopped lightshow
         if self.scheduled_show_name is None:  # run idle show if no other show is scheduled

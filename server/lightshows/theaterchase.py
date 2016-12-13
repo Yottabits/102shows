@@ -3,8 +3,8 @@ Theater Chase
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
 """
 
+from helpers.color import wheel
 from lightshows.templates.colorcycle import *
-from lightshows.utilities.general import wheel
 
 
 class TheaterChase(ColorCycle):
