@@ -162,13 +162,22 @@ class APA102(LEDStrip):
         for i, _ in enumerate(self.synced_buffer):
             self.leds[i] = self.synced_buffer[i]
 
-    def rotate(self, positions=1):
+    def rotate(self, positions=1) -> None:
         """
         Treating the internal leds array as a circular buffer, rotate it by the specified number of positions.
         The number could be negative, which means rotating in the opposite direction.
+        Note that the brightness of the individual leds does not get rotated.
 
         :param positions: rotate by how many steps
-        :return: none
         """
-        cutoff = 4 * (positions % self.num_leds)
-        self.leds = self.leds[cutoff:] + self.leds[:cutoff]
+        # build color buffer
+        color_buffer = [(0, 0, 0)] * self.num_leds
+        for led_num in range(self.num_leds):
+            color_buffer[led_num] = self.get_pixel(led_num)
+
+        # rotate
+        color_buffer = color_buffer[positions:] + color_buffer[:positions]
+
+        # apply the rotated color buffer
+        for led_num in range(self.num_leds):
+            self.set_pixel(led_num, *color_buffer[led_num])
