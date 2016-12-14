@@ -20,7 +20,8 @@ class LEDStrip(metaclass=ABCMeta):
         - pixel resolution (number of dim-steps per color component) is 8-bit, so 0 - 255
     """
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, initial_brightness: int = 100):
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000,
+                 initial_brightness: int = 100, gamma: float = 2.8):
         """
         stores the given parameters and initializes the color and brightness buffers
         drivers should extend this method
@@ -41,6 +42,9 @@ class LEDStrip(metaclass=ABCMeta):
         self.synced_green_buffer = SyncedArray('i', [0] * self.num_leds)
         self.synced_blue_buffer = SyncedArray('i', [0] * self.num_leds)
         self.synced_brightness_buffer = SyncedArray('i', self.brightness_buffer)
+
+        # gamma correction
+        self.gamma_table = self.get_gamma_table(gamma)
 
         # private variables
         self.__frozen = False
@@ -210,3 +214,21 @@ class LEDStrip(metaclass=ABCMeta):
 
             # brightness
             self.synced_brightness_buffer[led_num] = self.brightness_buffer[led_num]
+
+    @staticmethod
+    def get_gamma_table(gamma, max_in: int = 255, max_out: int = 255):
+        """
+        returns a lookup table that can be used for gamma correction.
+        The formula comes from Phillip Burgess.
+        For more information about gamma correction, see https://learn.adafruit.com/led-tricks-gamma-correction/
+
+        :param gamma: gamma factor (mathematically seen an exponent)
+        :param max_in: maximum input value
+        :param max_out: maximum output value
+        :return: array. at the index of uncorrected_value lies the gamma-corrected value
+        """
+        gamma_table = [] * max_in
+        for uncorrected in range(max_in + 1):  # range(n) delivers from 0 to n-1. but we want 0 to max_in
+            corrected = ((uncorrected / max_in) ** gamma) * max_out
+            gamma_table[uncorrected] = corrected
+        return gamma_table
