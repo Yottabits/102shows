@@ -30,9 +30,6 @@ class Lightshow(metaclass=ABCMeta):
         # MQTT listener
         self.mqtt = self.MQTTListener(self)
 
-        # attach stop() to SIGSTOP
-        signal.signal(signal.SIGINT, self.stop)
-
         # Parameters
         self.p = {}  # dict: parameter_name => value
         self.p_verifier = {}  # dict: parameter_name => (verifier_function, args, kwargs)
@@ -53,6 +50,7 @@ class Lightshow(metaclass=ABCMeta):
     def start(self):
         """ invokes the run() method and after that synchronizes the shared buffer """
         # before
+        signal.signal(signal.SIGINT, self.stop)  # attach stop() to SIGSTOP
         self.strip.sync_down()
         self.mqtt.start_listening()
 

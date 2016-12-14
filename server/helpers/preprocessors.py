@@ -7,3 +7,4 @@ Preprocessors for 102shows parameters
 def list_to_tuple(value):
     if type(value) is list:
         value = tuple(value)
+    return value
