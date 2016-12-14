@@ -11,7 +11,7 @@ import paho.mqtt.client
 import paho.mqtt.publish
 
 import helpers.mqtt
-from DefaultConfig import Configuration
+from defaultconfig import Configuration
 from helpers.mqtt import TopicAspect
 from lightshows.templates.base import *
 
