@@ -4,7 +4,7 @@ Two Color Blend
 """
 
 from helpers.color import SmoothBlend, linear_dim, add_tuples
-from helpers.exceptions import InvalidParameters
+from helpers.preprocessors import list_to_tuple
 from lightshows.templates.base import *
 
 
@@ -19,37 +19,25 @@ class TwoColorBlend(Lightshow):
        || color2:             ||   3x1 tuple   ||       3x1 array         ||
        =====================================================================
     """
+
+    def init_parameters(self):
+        self.register('color1', None, verify.rgb_color_tuple, preprocessor=list_to_tuple)
+        self.register('color2', None, verify.rgb_color_tuple, preprocessor=list_to_tuple)
+
+    def check_runnable(self):
+        # do we have all parameters
+        if self.p['color1'] is None:
+            raise InvalidParameters.missing("color1")
+        if self.p['color2'] is None:
+            raise InvalidParameters.missing("color2")
+
     def run(self):
         transition = SmoothBlend(self.strip)
 
         for led in range(self.strip.num_leds):
             normal_distance = led / (self.strip.num_leds - 1)
-            component1 = linear_dim(self.color1, 1 - normal_distance)
-            component2 = linear_dim(self.color2, normal_distance)
+            component1 = linear_dim(self.p['color1'], 1 - normal_distance)
+            component2 = linear_dim(self.p['color2'], normal_distance)
             led_color = add_tuples(component1, component2)
             transition.set_pixel(led, *led_color)
         transition.blend()
-
-    def init_parameters(self):
-        self.color1 = None
-        self.color2 = None
-
-    def set_parameter(self, param_name: str, value):
-        if type(value) is list:
-            value = tuple(value)
-
-        if param_name == "color1":
-            verify.rgb_color_tuple(value, param_name)
-            self.color1 = value
-        elif param_name == "color2":
-            verify.rgb_color_tuple(value, param_name)
-            self.color2 = value
-        else:
-            raise InvalidParameters.unknown(param_name)
-
-    def check_runnable(self):
-        # do we have all parameters
-        if self.color1 is None:
-            raise InvalidParameters.missing("color1")
-        if self.color2 is None:
-            raise InvalidParameters.missing("color2")

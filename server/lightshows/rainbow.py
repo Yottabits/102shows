@@ -16,7 +16,7 @@ class Rainbow(ColorCycle):
     """
     def init_parameters(self):
         super().init_parameters()
-        self.num_steps_per_cycle = 255
+        self.set_parameter('num_steps_per_cycle', 255)
 
     def before_start(self):
         pass
@@ -29,7 +29,7 @@ class Rainbow(ColorCycle):
         # -> The other LEDs go up to 254, then wrap around to zero and go up again until the last one is just
         #     below LED 0. This way, the strip always shows one full rainbow, regardless of the number of LEDs
         scale_factor = 255 / self.strip.num_leds  # Value for the index change between two neighboring LEDs
-        start_index = 255 / self.num_steps_per_cycle * current_step  # Value of LED 0
+        start_index = 255 / self.p['num_steps_per_cycle'] * current_step  # Value of LED 0
         for i in range(self.strip.num_leds):
             led_index = start_index + i * scale_factor  # Index of LED i, not rounded and not wrapped at 255
             led_index_rounded_and_wrapped_around = int(round(led_index, 0)) % 255  # Now rounded and wrapped

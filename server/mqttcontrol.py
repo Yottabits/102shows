@@ -13,7 +13,6 @@ import paho.mqtt.publish
 import helpers.mqtt
 from DefaultConfig import Configuration
 from helpers.mqtt import TopicAspect
-from helpers.exceptions import InvalidStrip, InvalidConf, InvalidParameters
 from lightshows.templates.base import *
 
 
