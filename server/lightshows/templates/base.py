@@ -50,11 +50,6 @@ class Lightshow(metaclass=ABCMeta):
         subclass_name = type(self).__name__
         return subclass_name.lower()
 
-    @abstractmethod
-    def check_runnable(self):
-        """ Raise an exception (InvalidStrip, InvalidConf or InvalidParameters) if the show is not runnable"""
-        raise NotImplementedError
-
     def start(self):
         """ invokes the run() method and after that synchronizes the shared buffer """
         # before
@@ -76,15 +71,6 @@ class Lightshow(metaclass=ABCMeta):
     def suicide(self) -> None:
         """ terminates its own process """
         os.kill(os.getpid(), signal.SIGKILL)
-
-    @abstractmethod
-    def run(self):
-        """ run the show (obviously this must be inherited) """
-        pass
-
-    def cleanup(self):
-        """ called before the show is terminated """
-        pass
 
     def register(self, parameter_name: str, default_val, verifier: callable, args: list = None, kwargs: dict = None,
                  preprocessor: callable = None) -> None:
@@ -146,11 +132,28 @@ class Lightshow(metaclass=ABCMeta):
         else:
             self.p[param_name] = value
 
+    # next we have the abstract methods that classes MUST implement:
+
+    @abstractmethod
     def init_parameters(self):
         """
         functions can inherit this to set their default parameters
         this function is called at initialization of a show object
         """
+        pass
+
+    @abstractmethod
+    def check_runnable(self):
+        """ Raise an exception (InvalidStrip, InvalidConf or InvalidParameters) if the show is not runnable"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def run(self):
+        """ run the show (obviously this must be inherited) """
+        pass
+
+    def cleanup(self):
+        """ called before the show is terminated """
         pass
 
     class MQTTListener:
