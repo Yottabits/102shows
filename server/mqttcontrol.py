@@ -118,6 +118,7 @@ class MQTTControl:
             show.check_runnable()
         except (InvalidStrip, InvalidConf, InvalidParameters) as error_message:
             log.error(error_message)
+            self.start_show('idle', {})
             return
 
         # start the show
