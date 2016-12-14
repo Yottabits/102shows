@@ -36,8 +36,11 @@ class Lightshow(metaclass=ABCMeta):
         # Parameters
         self.p = {}  # dict: parameter_name => value
         self.p_verifier = {}  # dict: parameter_name => (verifier_function, args, kwargs)
+        self.p_preprocessor = {}  # dict: parameter_name => preprocessor_function
         self.init_parameters()  # let the child class set its own default parameters
-        parameters_valid = type(parameters) is dict  # then overwrite with any directly given parameters
+
+        # override with any directly given parameters
+        parameters_valid = type(parameters) is dict
         if parameters_valid:
             for param_name in parameters:
                 self.set_parameter(param_name, parameters[param_name])
@@ -83,7 +86,8 @@ class Lightshow(metaclass=ABCMeta):
         """ called before the show is terminated """
         pass
 
-    def register(self, parameter_name: str, default_val, verifier: callable, args: list, kwargs: dict) -> None:
+    def register(self, parameter_name: str, default_val, verifier: callable, args: list = None, kwargs: dict = None,
+                 preprocessor: callable = None) -> None:
         """
         MQTT-settable parameters are stored in self.p
         Calling this function will register a new parameter and his verifier in p and p_verifier,
@@ -93,9 +97,23 @@ class Lightshow(metaclass=ABCMeta):
         :param default_val: initializer value of the parameter. Note that this value will not be checked!
         :param verifier: a function that is called before the parameter is set via MQTT. If it raises an
                          InvalidParameters exception, the new value will not be set
-        :param args: the verifier function will be called via verifier(new_value, *args, **kwargs)
-        :param kwargs: the verifier function will be called via verifier(new_value, *args, **kwargs)
+        :param args: the verifier function will be called via verifier(new_value, param_name, *args, **kwargs)
+        :param kwargs: the verifier function will be called via verifier(new_value, param_name, *args, **kwargs)
+        :param preprocessor: before the validation in set_parameter value = preprocessor(value) will be called
         """
+
+        # cast None to empty iterables
+        if args is None:
+            args = []
+        if kwargs is None:
+            kwargs = {}
+
+        # standard preprocessor
+        def empty_preprocessor(val):
+            return val
+
+        if preprocessor is None:
+            preprocessor = empty_preprocessor
 
         # check if already registered
         if parameter_name in self.p:
@@ -103,7 +121,8 @@ class Lightshow(metaclass=ABCMeta):
 
         # store parameter
         self.p[parameter_name] = default_val
-        self.p_verifier = (verifier, args, kwargs)
+        self.p_verifier[parameter_name] = (verifier, args, kwargs)
+        self.p_preprocessor[parameter_name] = preprocessor
 
     def set_parameter(self, param_name: str, value) -> None:
         """
@@ -113,17 +132,19 @@ class Lightshow(metaclass=ABCMeta):
         :param value: new value of the parameter to be stored
         """
 
+        # pre-process the value
+        preprocessor = self.p_preprocessor[param_name]
+        value = preprocessor(value)
+
         try:
             verifier, args, kwargs = self.p_verifier[param_name]
-            verifier(value, *args, **kwargs)  # run verifier
+            verifier(value, param_name, *args, **kwargs)  # run verifier
         except KeyError:  # param_name not found in p_verifier => unknown
             log.warning("Parameter {} is unknown!".format_map(param_name))
         except InvalidParameters as error_message:  # verifier raised an exception
             log.warning(error_message)
         else:
             self.p[param_name] = value
-
-
 
     def init_parameters(self):
         """

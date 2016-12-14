@@ -5,4 +5,4 @@ Helpers for 102shows
 Helpful functions that are used throughout 102shows
 """
 
-__all__ = ['color', 'exceptions', 'mqtt', 'verify']
+__all__ = ['color', 'exceptions', 'mqtt', 'preprocessors', 'verify']
