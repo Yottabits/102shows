@@ -5,6 +5,7 @@
 This module contains the drivers for the LED strips
 """
 from abc import ABCMeta, abstractmethod
+from multiprocessing import Array as SyncedArray
 
 __all__ = ['apa102', 'dummy']
 __drivers__ = ['Dummy', 'APA102']
@@ -32,12 +33,21 @@ class LEDStrip(metaclass=ABCMeta):
         self.num_leds = num_leds
         self.max_clock_speed_hz = max_clock_speed_hz
 
+        # buffers
+        self.color_buffer = [(0, 0, 0)] * self.num_leds
+        self.brightness_buffer = [initial_brightness] * self.num_leds
+
+        self.synced_red_buffer = SyncedArray('i', [0] * self.num_leds)
+        self.synced_green_buffer = SyncedArray('i', [0] * self.num_leds)
+        self.synced_blue_buffer = SyncedArray('i', [0] * self.num_leds)
+        self.synced_brightness_buffer = SyncedArray('i', self.brightness_buffer)
+
         # private variables
         self.__frozen = False
 
     def freeze(self):
         """
-        freezes the strip. All state-changing methods (_set_pixel() and _set_brightness())
+        freezes the strip. All state-changing methods (on_color_change() and on_brightness_change())
         will not do anything anymore and leave the buffer unchanged
         """
         self.__frozen = True
@@ -46,7 +56,6 @@ class LEDStrip(metaclass=ABCMeta):
         """ revokes all effects of freeze() """
         self.__frozen = False
 
-    @abstractmethod
     def get_pixel(self, led_num):
         """
         gets the pixel at index led_num
@@ -55,28 +64,30 @@ class LEDStrip(metaclass=ABCMeta):
         :return: (red, green, blue) tuple
         """
 
-        pass
+        return self.color_buffer[led_num]
 
     def set_pixel(self, led_num, red, green, blue) -> None:
         """
         subclasses should not inherit this method!
-        calls _set_pixel() if not frozen
+        writes the color buffer and calls on_color_change() if not frozen
         """
+
+        if led_num < 0:
+            return  # Pixel is invisible, so ignore
+        if led_num >= self.num_leds:
+            return  # again, invsible
 
         if not self.__frozen:
-            self._set_pixel(led_num, red, green, blue)
+            self.color_buffer[led_num] = (red, green, blue)
+            self.on_color_change(led_num)
 
     @abstractmethod
-    def _set_pixel(self, led_num, red, green, blue) -> None:
+    def on_color_change(self, led_num) -> None:
         """
-        Changes the pixel led_num to red, green, blue IN THE BUFFER!
+        changes the message buffer after a pixel was changed in the global color buffer
         To send the buffer to the strip and show the changes, invoke strip.show()
 
         :param led_num: index of the RGB pixel to be changed
-        :param red: red component of the pixel
-        :param green: green component of the pixel
-        :param blue: blue component of the pixel
-        :return: none
         """
 
     def set_pixel_bytes(self, led_num: int, rgb_color):
@@ -127,33 +138,34 @@ class LEDStrip(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
     def rotate(self, positions=1):
         """
         Treating the internal leds array as a circular buffer, rotate it by the specified number of positions.
         The number could be negative, which means rotating in the opposite direction.
 
         :param positions: rotate by how many steps
-        :return: none
         """
-        pass
+        self.color_buffer = self.color_buffer[positions:] + self.color_buffer[:positions]
+        for led_num in range(self.num_leds):
+            self.on_color_change(led_num)
 
     def set_brightness(self, led_num: int, brightness: int) -> None:
-        """
-        subclasses should not inherit this method!
-        calls _set_brightness() if not frozen
-        """
-        if not self.__frozen:
-            self._set_brightness(led_num, brightness)
-
-    @abstractmethod
-    def _set_brightness(self, led_num: int, brightness: int) -> None:
         """
         sets the brightness for a single LED in the strip
 
         :param led_num: the target LED index
         :param brightness: the desired brightness (0 - 100)
-        :return: none
+        """
+        if not self.__frozen:
+            self.brightness_buffer[led_num] = brightness
+            self.on_brightness_change(led_num)
+
+    @abstractmethod
+    def on_brightness_change(self, led_num: int) -> None:
+        """
+        reacts to a brightness change at led_num by modifying the message buffer
+
+        :param led_num: number of the LED whose brightness was modified
         """
         pass
 
@@ -162,35 +174,39 @@ class LEDStrip(metaclass=ABCMeta):
         calls set_brightness() for all LEDs in the strip
 
         :param brightness: the brightness (0 - 100) to be set all over the strip
-        :return:
         """
         for led_num in range(self.num_leds):
             self.set_brightness(led_num, brightness)
 
     def clear_buffer(self) -> None:
-        """
-        sets all pixels in the color buffer to (0,0,0)
-
-        :return: none
-        """
+        """ sets all pixels in the color buffer to (0,0,0) """
         for led_num in range(self.num_leds):
             self.set_pixel(led_num, 0, 0, 0)
 
     def clear_strip(self) -> None:
-        """
-        clears the color buffer, then invokes a blackout on the strip by calling show()
-
-        :return: none
-        """
+        """ clears the color buffer, then invokes a blackout on the strip by calling show() """
         self.clear_buffer()
         self.show()
 
-    @abstractmethod
     def sync_up(self) -> None:
-        """ copies the local SPI buffer to a shared object so other processes can see the current strip state """
-        pass
+        """ copies the local message buffer to a shared object so other processes can see the current strip state """
+        for led_num, (red, green, blue) in enumerate(self.color_buffer):
+            # colors
+            self.synced_red_buffer[led_num] = red
+            self.synced_green_buffer[led_num] = green
+            self.synced_blue_buffer[led_num] = blue
 
-    @abstractmethod
+            # brightness
+            self.synced_brightness_buffer[led_num] = self.brightness_buffer[led_num]
+
     def sync_down(self) -> None:
-        """ applies the shared buffer to the local SPI buffer """
-        pass
+        """ applies the shared buffer to the local message buffer """
+        for led_num, _ in enumerate(self.color_buffer):
+            # colors
+            red = self.synced_red_buffer[led_num]
+            green = self.synced_green_buffer[led_num]
+            blue = self.synced_blue_buffer[led_num]
+            self.color_buffer[led_num] = (red, green, blue)
+
+            # brightness
+            self.synced_brightness_buffer[led_num] = self.brightness_buffer[led_num]
