@@ -27,7 +27,6 @@ class MQTTControl:
         # global handles
         self.conf = config  # the user config
         self.show_process = Process()  # for the process in which the lightshows run in
-        self.scheduled_show_name = None
         self.strip = None  # for the LED strip
 
     def notify_user(self, message, qos=0) -> None:
@@ -90,12 +89,8 @@ class MQTTControl:
                            command=command,
                            parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
                            ))
-
-            # set scheduled_show_name so that the idle show does not get started after the old show was quit:
-            self.scheduled_show_name = show_name
             self.stop_running_show()  # stop any running show
             self.start_show(show_name, parameters)
-            self.scheduled_show_name = None  # delete flag so idle show gets started if the show terminates by itself
         elif command == "stop":
             self.stop_show(show_name)
         else:
@@ -104,7 +99,6 @@ class MQTTControl:
     def start_show(self, show_name: str, parameters: dict) -> None:
         """
         looks for a show, checks if it can run and if so, starts it in an own process
-        the method waits for the process to terminate and then gets the buffer of the ended show
 
         :param show_name: name of the show to be started
         :param parameters: these are passed to the show
@@ -127,25 +121,6 @@ class MQTTControl:
         logger.info("Starting the show " + show_name)
         self.show_process = Process(target=show.start, name=show_name)
         self.show_process.start()
-
-        # spawn thread that gets the final buffer state of the lightshow
-        def wait_for_show_end():
-            self.show_process.join()  # wait for the process to terminate
-            logger.info("Show {} ended".format(show_name))
-            self.after_show_end()
-        if show_name not in ["idle"]:
-            pass
-            #Thread(target=wait_for_show_end, name="wait for " + show_name, daemon=True).start()
-
-    def after_show_end(self) -> None:
-        """
-        clean up after a show ended:
-          - synchronize the strip state
-          - start idle show (not if we just got out of 'idle')
-        """
-        self.strip.sync_down()  # get the buffer of the stopped lightshow
-        if self.scheduled_show_name is None:  # run idle show if no other show is scheduled
-            self.start_show("idle", {})
 
     def stop_show(self, show_name: str) -> None:
         """
@@ -192,7 +167,7 @@ class MQTTControl:
         client.connect(self.conf.MQTT.Broker.host, self.conf.MQTT.Broker.port, self.conf.MQTT.Broker.keepalive)
         logger.info("{name} is ready".format(name=self.conf.sys_name))
 
-        # start Idle show to listen for brightness changes and refresh the strip regularly
+        # start a show show to listen for brightness changes and refresh the strip regularly
         self.start_show("clear", {})
 
         client.loop_forever()
