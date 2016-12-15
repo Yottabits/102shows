@@ -21,6 +21,6 @@ class Idle(Lightshow):
 
     def run(self):
         while True:
-            log.debug("refreshing strip")
+            self.logger.debug("refreshing strip")
             self.strip.show()
             sleep(self.p['pause_sec'])

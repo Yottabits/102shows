@@ -4,7 +4,6 @@ Driver for APA102 LED strips (aka "DotStar")
 """
 
 import spidev
-import logging as log
 from multiprocessing import Array as SyncedArray
 
 from drivers import LEDStrip

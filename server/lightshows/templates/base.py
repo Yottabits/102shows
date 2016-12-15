@@ -3,7 +3,7 @@ Lightshow base template
 (c) 2016 Simon Leiner
 """
 
-import logging as log
+import logging
 import os
 import signal
 from abc import ABCMeta, abstractmethod
@@ -23,6 +23,9 @@ class Lightshow(metaclass=ABCMeta):
     """
 
     def __init__(self, strip: LEDStrip, conf, parameters: dict):
+        # logger
+        self.logger = logging.getLogger('102shows.server.lightshows.' + self.name)
+
         # store parameters
         self.strip = strip
         self.conf = conf
@@ -124,9 +127,9 @@ class Lightshow(metaclass=ABCMeta):
             verifier, args, kwargs = self.p_verifier[param_name]
             verifier(value, param_name, *args, **kwargs)  # run verifier
         except KeyError:  # param_name not found in p_verifier => unknown
-            log.warning("Parameter {} is unknown!".format_map(param_name))
+            self.logger.warning("Parameter {} is unknown!".format_map(param_name))
         except InvalidParameters as error_message:  # verifier raised an exception
-            log.warning(error_message)
+            self.logger.warning(error_message)
         else:
             self.p[param_name] = value
 
@@ -158,6 +161,7 @@ class Lightshow(metaclass=ABCMeta):
         """ Helper class for handling MQTT parameter changes"""
 
         def __init__(self, lightshow):
+            self.logger = logging.getLogger('102shows.server.lightshows.{}.MQTTListener'.format(lightshow.name))
             self.lightshow = lightshow
             self.client = paho.mqtt.client.Client()
             self.client.on_connect = self.subscribe
@@ -184,9 +188,9 @@ class Lightshow(metaclass=ABCMeta):
                 command="+")
 
             client.subscribe(brightness_path)
-            log.debug("show subscribed to {}".format(brightness_path))
+            self.logger.debug("show subscribed to {}".format(brightness_path))
             client.subscribe(parameter_path)
-            log.debug("show subscribed to {}".format(parameter_path))
+            self.logger.debug("show subscribed to {}".format(parameter_path))
 
         def parse_message(self, client, userdata, msg):
             command = helpers.mqtt.get_from_topic(helpers.mqtt.TopicAspect.command, str(msg.topic))
@@ -213,20 +217,20 @@ class Lightshow(metaclass=ABCMeta):
             try:
                 brightness = int(payload)
             except ValueError:
-                log.error("Could not parse set brightness as integer!")
+                self.logger.error("Could not parse set brightness as integer!")
                 return
             try:
                 verify.integer(brightness, "brightness", minimum=0, maximum=100)
             except helpers.exceptions.InvalidParameters as error_msg:
-                log.error(error_msg)
+                self.logger.error(error_msg)
                 return
 
             # confine brightness to configured value
             max_brightness = self.lightshow.conf.Strip.max_brightness
             if brightness > max_brightness:
-                log.info("tried to set brightness {set} but maximum brightness is {max}.".format(
+                self.logger.info("tried to set brightness {set} but maximum brightness is {max}.".format(
                     set=brightness, max=max_brightness))
-                log.info("setting {max} as brightness instead...".format(max=max_brightness))
+                self.logger.info("setting {max} as brightness instead...".format(max=max_brightness))
                 brightness = max_brightness
 
             # finally: set brightness

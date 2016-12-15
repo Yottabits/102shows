@@ -12,7 +12,7 @@ This class provides helper functions and classes for the lightshows:
     - SmoothBlend
 """
 import types
-import logging as log
+import logging
 import time
 
 from drivers import LEDStrip
@@ -88,6 +88,8 @@ class SmoothBlend:
 
     """
 
+    logger = logging.getLogger('102shows.server.helpers.color.SmoothBlend')
+
     def __init__(self, strip: LEDStrip):
         self.strip = strip
         self.target_colors = [(0.0, 0.0, 0.0)] * self.strip.num_leds  # an array of float tuples
@@ -98,7 +100,7 @@ class SmoothBlend:
         try:
             verify.rgb_color_tuple((red, green, blue))
         except exceptions.InvalidParameters as error_message:
-            log.error(error_message)
+            self.logger.error(error_message)
 
         # store in buffer
         self.target_colors[led_num] = (red, green, blue)

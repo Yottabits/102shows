@@ -1,8 +1,6 @@
 # THIS IS THE DEFAULT CONFIGURATION FILE, DO NOT CHANGE THIS!
 # COPY config.example.py TO config.py AND ADJUST THE CONFIGURATION THERE!
 
-import logging as log
-
 from lightshows import *
 
 # all drivers:
@@ -12,7 +10,7 @@ from drivers.dummy import DummyDriver as Dummy
 
 class Configuration:
     sys_name = None  # string
-    log_level = log.INFO  # standard log level
+    log_level = 'INFO'  # standard logger level
 
     shows = {'christmas': christmas.Christmas,
              'clear': clear.Clear,  # A list of available shows
