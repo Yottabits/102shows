@@ -15,6 +15,8 @@ from defaultconfig import Configuration
 from helpers.mqtt import TopicAspect
 from lightshows.templates.base import *
 
+logger = logging.getLogger('102shows.server.mqttcontrol')
+
 
 class MQTTControl:
     """
@@ -59,7 +61,7 @@ class MQTTControl:
 
         client.subscribe(start_path)
         client.subscribe(stop_path)
-        log.info("subscription on Broker {host} for {start_path} and {stop_path}".format(
+        logger.info("subscription on Broker {host} for {start_path} and {stop_path}".format(
             host=self.conf.MQTT.Broker.host, start_path=start_path, stop_path=stop_path))
 
     def on_message(self, client, userdata, msg):
@@ -79,7 +81,7 @@ class MQTTControl:
         if command == "start":
             # parse parameters
             parameters = helpers.mqtt.parse_json_safely(payload)
-            log.debug(
+            logger.debug(
                 """for show: \"{show}\":
                    received command: \"{command}\"
                    with:
@@ -97,7 +99,7 @@ class MQTTControl:
         elif command == "stop":
             self.stop_show(show_name)
         else:
-            log.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
+            logger.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
 
     def start_show(self, show_name: str, parameters: dict) -> None:
         """
@@ -109,7 +111,7 @@ class MQTTControl:
         """
         # search for show module
         if show_name not in self.conf.shows:
-            log.error("Show \"{name}\" was not found!".format(name=show_name))
+            logger.error("Show \"{name}\" was not found!".format(name=show_name))
             return
 
         # initialize show object
@@ -117,12 +119,12 @@ class MQTTControl:
             show = self.conf.shows[show_name](self.strip, self.conf, parameters)
             show.check_runnable()
         except (InvalidStrip, InvalidConf, InvalidParameters) as error_message:
-            log.error(error_message)
+            logger.error(error_message)
             self.start_show('idle', {})
             return
 
         # start the show
-        log.info("Starting the show " + show_name)
+        logger.info("Starting the show " + show_name)
         self.show_process = Process(target=show.start, name=show_name)
         self.show_process.start()
 
@@ -162,33 +164,33 @@ class MQTTControl:
             os.kill(self.show_process.pid, signal.SIGINT)  # the stop signal has a handle attached to it
             self.show_process.join(timeout_sec)
             if self.show_process.is_alive():
-                log.info("{show_name} is running. Terminating...".format(show_name=self.show_process.name))
+                logger.info("{show_name} is running. Terminating...".format(show_name=self.show_process.name))
                 self.show_process.terminate()
         else:
-            log.info("no show running; all good")
+            logger.info("no show running; all good")
 
     def run(self) -> None:
         """ start the listener """
-        log.info("Starting {name}".format(name=self.conf.sys_name))
+        logger.info("Starting {name}".format(name=self.conf.sys_name))
 
-        log.info("Initializing LED strip...")
+        logger.info("Initializing LED strip...")
         self.strip = self.conf.Strip.Driver(num_leds=self.conf.Strip.num_leds,
                                             max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz)
         self.strip.set_global_brightness(self.conf.Strip.initial_brightness)  # set initial brightness from config
         self.strip.sync_up()  # to store brightness
         self.strip.show()
 
-        log.info("Connecting to the MQTT Broker")
+        logger.info("Connecting to the MQTT Broker")
         client = paho.mqtt.client.Client()
         client.on_connect = self.on_connect
         client.on_message = self.on_message
         if self.conf.MQTT.username is not None:
             client.username_pw_set(self.conf.MQTT.username, self.conf.MQTT.password)
         client.connect(self.conf.MQTT.Broker.host, self.conf.MQTT.Broker.port, self.conf.MQTT.Broker.keepalive)
-        log.info("{name} is ready".format(name=self.conf.sys_name))
+        logger.info("{name} is ready".format(name=self.conf.sys_name))
 
         # start Idle show to listen for brightness changes and refresh the strip regularly
         self.start_show("idle", {})
 
         client.loop_forever()
-        log.critical("MQTTControl.py has exited")
+        logger.critical("MQTTControl.py has exited")

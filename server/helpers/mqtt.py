@@ -6,7 +6,9 @@ A couple of helper functions (big surprise!) for MQTTControl
 """
 
 import json
-import logging as log
+import logging
+
+logger = logging.getLogger('102shows.server.helpers.mqtt')
 
 
 class TopicAspect:
@@ -53,13 +55,13 @@ def parse_json_safely(payload: str) -> dict:
         try:
             unpacked = json.loads(payload)
         except Exception as error:
-            log.debug("Could not parse this payload: {}".format(error))
+            logger.debug("Could not parse this payload: {}".format(error))
             return {}
         else:
             if type(unpacked) is not dict:
-                log.debug("This payload is not a JSON object!")
+                logger.debug("This payload is not a JSON object!")
                 return {}
         return unpacked
     else:
-        log.debug("Payload is empty!")
+        logger.debug("Payload is empty!")
         return {}
