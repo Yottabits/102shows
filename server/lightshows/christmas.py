@@ -21,7 +21,7 @@ class Christmas(Lightshow):
 
     def set_parameter(self, param_name: str, value):
         if param_name == "merry_go_round":
-            verify.not_negative_integer(value,"merry_go_round")
+            verify.not_negative_integer(value, "merry_go_round")
             self.num_cycles["merry_go_round"] = value
         elif param_name == "chunk_blendover":
             verify.not_negative_integer(value, "chunk_blendover")
