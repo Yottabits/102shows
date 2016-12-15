@@ -227,8 +227,8 @@ class LEDStrip(metaclass=ABCMeta):
         :param max_out: maximum output value
         :return: array. at the index of uncorrected_value lies the gamma-corrected value
         """
-        gamma_table = [] * max_in
-        for uncorrected in range(max_in + 1):  # range(n) delivers from 0 to n-1. but we want 0 to max_in
+        gamma_table = [0] * (max_in + 1)  # if the input ranges from 0 to max_in, that gives us max_in + 1 values
+        for uncorrected in range(max_in + 1):
             corrected = ((uncorrected / max_in) ** gamma) * max_out
             gamma_table[uncorrected] = corrected
         return gamma_table
