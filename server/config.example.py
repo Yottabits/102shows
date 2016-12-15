@@ -1,4 +1,4 @@
-from DefaultConfig import *
+from defaultconfig import *
 
 # load default configuration
 configuration = Configuration()
@@ -8,7 +8,7 @@ configuration = Configuration()
 #  - Lines that begin with # are comments. Like this one
 #  - You write your configuration like:
 #           configuration.Group.Subgroups.setting = value
-#  - To see all categories and possible settings, look at DefaultConfig.py
+#  - To see all categories and possible settings, look at defaultconfig.py
 #  - Strings are enclosed in " ", for example:
 #           configuration.sys_name = "MySuperCoolName"
 #  - Each preset has a trailing # and whitespace. Remove them them

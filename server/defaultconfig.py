@@ -2,9 +2,12 @@
 # COPY config.example.py TO config.py AND ADJUST THE CONFIGURATION THERE!
 
 import logging as log
+
+from lightshows import *
+
+# all drivers:
 from drivers.apa102 import APA102
 from drivers.dummy import DummyDriver as Dummy
-from lightshows import *
 
 
 class Configuration:

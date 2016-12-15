@@ -14,7 +14,7 @@ class StrandTest(ColorCycle):
     """
     def init_parameters(self):
         super().init_parameters()
-        self.num_steps_per_cycle = self.strip.num_leds
+        self.set_parameter('num_steps_per_cycle', self.strip.num_leds)
 
     def before_start(self):
         self.color = 0x000000  # Initialize with black
@@ -26,9 +26,9 @@ class StrandTest(ColorCycle):
         if self.color == 0:
             self.color = 0xFF0000  # If black, reset to red
 
-        head = (current_step + 9) % self.num_steps_per_cycle  # The head pixel that will be turned on in this cycle
+        head = (current_step + 9) % self.p['num_steps_per_cycle']  # The head pixel that will be turned on in this cycle
         tail = current_step  # The tail pixel that will be turned off
         self.strip.set_pixel_bytes(head, self.color)  # Paint head
         self.strip.set_pixel_bytes(tail, 0)  # Clear tail
 
-        return 1  # Repaint is necessary
+        return True  # Repaint is necessary

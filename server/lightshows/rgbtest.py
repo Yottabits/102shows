@@ -5,9 +5,8 @@ RGBTest
 """
 import time
 
+from helpers.color import blend_whole_strip_to_color
 from lightshows.templates.base import *
-from lightshows.utilities.general import blend_whole_strip_to_color
-from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class RGBTest(Lightshow):
@@ -16,8 +15,8 @@ class RGBTest(Lightshow):
 
     No parameters necessary
     """
-    def set_parameter(self, param_name: str, value):
-        raise InvalidParameters.unknown(param_name)
+    def init_parameters(self):
+        pass
 
     def check_runnable(self):
         return True

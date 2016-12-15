@@ -1,5 +1,5 @@
 """
-Helpers for MQTT
+MQTT Helpers
 (c) 2016 Simon Leiner
 
 A couple of helper functions (big surprise!) for MQTTControl

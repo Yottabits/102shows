@@ -3,10 +3,9 @@ SolidColor
 (c) 2016 Simon Leiner
 """
 
+from helpers.color import blend_whole_strip_to_color
+from helpers.preprocessors import list_to_tuple
 from lightshows.templates.base import *
-from lightshows.utilities import verifyparameters as verify
-from lightshows.utilities.general import blend_whole_strip_to_color
-from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class SolidColor(Lightshow):
@@ -19,21 +18,13 @@ class SolidColor(Lightshow):
        ||       color:        ||   3x1 tuple   ||       3x1 array         ||
        =====================================================================
     """
-    def run(self):
-        blend_whole_strip_to_color(self.strip, self.color)
 
     def init_parameters(self):
-        self.color = None
-
-    def set_parameter(self, param_name: str, value):
-        if param_name == "color":
-            if type(value) is list:
-                value = tuple(value)
-            verify.rgb_color_tuple(value, param_name)
-            self.color = value
-        else:
-            InvalidParameters.unknown(param_name)
+        self.register('color', None, verify.rgb_color_tuple, preprocessor=list_to_tuple)
 
     def check_runnable(self):
-        if not self.color:
-            raise InvalidParameters.missing("color")
+        if self.p['color'] is None:
+            raise InvalidParameters.missing('color')
+
+    def run(self):
+        blend_whole_strip_to_color(self.strip, self.p['color'])

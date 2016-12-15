@@ -16,12 +16,8 @@ if the input does not fit the requirements. These are at the moment:
  - boolean
 
  - rgb_color_tuple
-
-The module defines some own exception classes:
- - InvalidParameters (as used by the functions above)
- - InvalidConf
- - InvalidStrip
 """
+from helpers.exceptions import InvalidParameters
 
 
 def numeric(candidate, param_name: str = None, minimum: float = None, maximum: float = None):
@@ -180,44 +176,7 @@ def rgb_color_tuple(candidate, param_name: str = None):
         raise InvalidParameters(debug_str)
 
     for component in candidate:
-        if type(component) is not int:
+        try:
+            numeric(component, minimum=0, maximum=255)
+        except InvalidParameters:
             raise InvalidParameters(debug_str)
-        if not (0 <= component <= 255):
-            raise InvalidParameters(debug_str)
-
-
-class InvalidStrip(Exception):
-    """
-    use if something is wrong with the strip
-    for example: not enough LEDs to run the selected lightshow
-    """
-    pass
-
-
-class InvalidConf(Exception):
-    """
-    use if something in the configuration will not work
-    for what the user has chosen
-    """
-    pass
-
-
-class InvalidParameters(Exception):
-    """
-    use when given parameters are not valid
-    """
-    @staticmethod
-    def unknown(param_name: str = None):
-        if param_name:
-            debug_str = "Parameter \"{name}\" is unknown!".format(name=param_name)
-        else:
-            debug_str = "Parameter is unknown!"
-        return InvalidParameters(debug_str)
-
-    @staticmethod
-    def missing(param_name: str = None):
-        if param_name:
-            debug_str = "Parameter \"{name}\" is missing!".format(name=param_name)
-        else:
-            debug_str = "Parameter is missing!"
-        return InvalidParameters(debug_str)

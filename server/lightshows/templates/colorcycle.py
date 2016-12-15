@@ -3,12 +3,9 @@ Color Cycle Template
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
 """
 
-import logging as log
 import time
 
 from lightshows.templates.base import *
-from lightshows.utilities import verifyparameters as verify
-from lightshows.utilities.verifyparameters import InvalidParameters
 
 
 class ColorCycle(Lightshow):
@@ -22,31 +19,17 @@ class ColorCycle(Lightshow):
 
     def init_parameters(self):
         """ default parameters"""
-        self.pause_sec = 0
-        self.num_steps_per_cycle = None
-        self.num_cycles = float("inf")  # loop forever
-        self.order = 'rgb'  # this should not be changed!
-
-    def set_parameter(self, param_name: str, value):
-        if param_name == "pause_sec":
-            verify.not_negative_numeric(value, param_name)
-            self.pause_sec = value
-        elif param_name == "num_steps_per_cycle":
-            verify.positive_integer(value, param_name)
-            self.num_steps_per_cycle = value
-        elif param_name == "num_cycles":
-            verify.positive_integer(value, param_name)
-            self.num_cycles = value
-        else:
-            raise InvalidParameters.unknown(param_name)
+        self.register('pause_sec', 0, verify.not_negative_numeric)
+        self.register('num_steps_per_cycle', None, verify.positive_integer)
+        self.register('num_cycles', float("inf"), verify.positive_integer)
 
     def check_runnable(self):
         """ checks if all necessary parameters are set """
-        if self.pause_sec is None:
+        if self.p['pause_sec'] is None:
             raise InvalidParameters("Missing parameter \"pause_sec\"!")
-        if self.num_steps_per_cycle is None:
+        if self.p['num_steps_per_cycle'] is None:
             raise InvalidParameters("Missing parameter \"num_steps_per_cycle\"!")
-        if self.num_cycles is None:
+        if self.p['num_cycles'] is None:
             raise InvalidParameters("Missing parameter \"num_cycles\"!")
 
     @abstractmethod
@@ -85,13 +68,13 @@ class ColorCycle(Lightshow):
         self.strip.show()
         current_cycle = 0
         while True:  # Loop forever (for would not work for num_cycles = infinity)
-            for currentStep in range(self.num_steps_per_cycle):
+            for currentStep in range(self.p['num_steps_per_cycle']):
                 need_repaint = self.update(currentStep, current_cycle)  # Call the subclasses update method
                 if need_repaint:
                     self.strip.show()  # Display, only if required
-                time.sleep(self.pause_sec)  # Pause until the next step
+                time.sleep(self.p['pause_sec'])  # Pause until the next step
             current_cycle += 1
-            if current_cycle >= self.num_cycles:
+            if current_cycle >= self.p['num_cycles']:
                 break
         # Finished, cleanup everything
         self.cleanup()
