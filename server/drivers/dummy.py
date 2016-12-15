@@ -14,7 +14,7 @@ class DummyDriver(LEDStrip):
     This can be useful for developing without having a real LED strip at hand.
     """
 
-    def on_color_change(self, led_num) -> None:
+    def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
         pass
 
     def on_brightness_change(self, led_num: int) -> None:
@@ -25,8 +25,8 @@ class DummyDriver(LEDStrip):
         for led_num in range(self.num_leds):
             red, green, blue = self.get_pixel(led_num)
             brightness = self.brightness_buffer[led_num]
-            log.debug("{led:03d} => ({r:03d},{g:03d},{b:03d}) @ {brightness:.2f}".format(led=led_num,
-                                                                                         r=red,
-                                                                                         g=green,
-                                                                                         b=blue,
-                                                                                         brightness=brightness))
+            log.debug("{led:03d} => ({r:03.1f},{g:03.1f},{b:03.1f}) @ {brightness:.2f}".format(led=led_num,
+                                                                                               r=red,
+                                                                                               g=green,
+                                                                                               b=blue,
+                                                                                               brightness=brightness))

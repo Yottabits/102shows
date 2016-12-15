@@ -16,13 +16,14 @@ import logging as log
 import time
 
 from drivers import LEDStrip
+from helpers import verify, exceptions
 
 
-def wheel(wheel_pos: int):
+def wheel(wheel_pos: float):
     """
     Get a color from a color wheel: Green -> Red -> Blue -> Green
 
-    :param wheel_pos: integer from 0 to 254
+    :param wheel_pos: numeric from 0 to 254
     :return: RGB color tuple
     """
 
@@ -50,8 +51,8 @@ def linear_dim(undimmed: tuple, factor: float) -> tuple:
     """
     dimmed = ()
     for i in undimmed:
-        i = int(factor * i)  # brightness needs to be an integer
-        dimmed = dimmed + (i,)  # merge tuples
+        i *= factor
+        dimmed += i,  # merge tuples
     return dimmed
 
 
@@ -89,23 +90,20 @@ class SmoothBlend:
 
     def __init__(self, strip: LEDStrip):
         self.strip = strip
-        self.target_colors = [(0, 0, 0)] * self.strip.num_leds  # an array of tuples
+        self.target_colors = [(0.0, 0.0, 0.0)] * self.strip.num_leds  # an array of float tuples
 
-    def set_pixel(self, led_num: int, red: int, green: int, blue: int):
+    def set_pixel(self, led_num: int, red: float, green: float, blue: float):
         """ set the desired state of a given pixel after the blending is finished """
         # check if the given color values are valid
-        for component in (red, green, blue):
-            if type(component) is not int:
-                log.warning("RGB value for pixel {num} is not an integer!".format(num=led_num))
-                return
-            if component < 0 or component > 255:
-                log.warning("RGB value for pixel {num} is out of bounds! (0-255)".format(num=led_num))
-                return
+        try:
+            verify.rgb_color_tuple((red, green, blue))
+        except exceptions.InvalidParameters as error_message:
+            log.error(error_message)
 
         # store in buffer
         self.target_colors[led_num] = (red, green, blue)
 
-    def set_color_for_whole_strip(self, red: int, green: int, blue: int):
+    def set_color_for_whole_strip(self, red: float, green: float, blue: float):
         """ set the same color for all LEDs in the strip """
         for led_num in range(self.strip.num_leds):
             self.set_pixel(led_num, red, green, blue)
@@ -164,7 +162,7 @@ class SmoothBlend:
         self.strip.show()
 
 
-def blend_whole_strip_to_color(strip: LEDStrip, color: tuple, fadetime_sec: int = 2) -> None:
+def blend_whole_strip_to_color(strip: LEDStrip, color: tuple, fadetime_sec: float = 2) -> None:
     """
     this name is pretty self-explanatory ;-)
 

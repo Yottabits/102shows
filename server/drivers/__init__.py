@@ -33,18 +33,16 @@ class LEDStrip(metaclass=ABCMeta):
         # store the given parameters
         self.num_leds = num_leds
         self.max_clock_speed_hz = max_clock_speed_hz
+        self.gamma = gamma
 
         # buffers
-        self.color_buffer = [(0, 0, 0)] * self.num_leds
+        self.color_buffer = [(0.0, 0.0, 0.0)] * self.num_leds
         self.brightness_buffer = [initial_brightness] * self.num_leds
 
-        self.synced_red_buffer = SyncedArray('i', [0] * self.num_leds)
-        self.synced_green_buffer = SyncedArray('i', [0] * self.num_leds)
-        self.synced_blue_buffer = SyncedArray('i', [0] * self.num_leds)
+        self.synced_red_buffer = SyncedArray('f', [0.0] * self.num_leds)
+        self.synced_green_buffer = SyncedArray('f', [0.0] * self.num_leds)
+        self.synced_blue_buffer = SyncedArray('f', [0.0] * self.num_leds)
         self.synced_brightness_buffer = SyncedArray('i', self.brightness_buffer)
-
-        # gamma correction
-        self.gamma_table = self.get_gamma_table(gamma)
 
         # private variables
         self.__frozen = False
@@ -70,7 +68,7 @@ class LEDStrip(metaclass=ABCMeta):
 
         return self.color_buffer[led_num]
 
-    def set_pixel(self, led_num, red, green, blue) -> None:
+    def set_pixel(self, led_num: int, red: float, green: float, blue: float) -> None:
         """
         subclasses should not inherit this method!
         writes the color buffer and calls on_color_change() if not frozen
@@ -83,15 +81,18 @@ class LEDStrip(metaclass=ABCMeta):
 
         if not self.__frozen:
             self.color_buffer[led_num] = (red, green, blue)
-            self.on_color_change(led_num)
+            self.on_color_change(led_num, red, green, blue)
 
     @abstractmethod
-    def on_color_change(self, led_num) -> None:
+    def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
         """
         changes the message buffer after a pixel was changed in the global color buffer
         To send the buffer to the strip and show the changes, invoke strip.show()
 
         :param led_num: index of the RGB pixel to be changed
+        :param red: new red component
+        :param green: new green component
+        :param blue: new blue component
         """
 
     def set_pixel_bytes(self, led_num: int, rgb_color):
@@ -108,7 +109,7 @@ class LEDStrip(metaclass=ABCMeta):
         self.set_pixel(led_num, red, green, blue)
 
     @staticmethod
-    def color_tuple_to_bytes(red: int, green: int, blue: int) -> int:
+    def color_tuple_to_bytes(red: float, green: float, blue: float) -> int:
         """
         converts an RGB color tuple into a 3-byte color value
 
@@ -117,6 +118,12 @@ class LEDStrip(metaclass=ABCMeta):
         :param blue: blue component of the tuple
         :return: the tuple components are joined into a 3-byte value with each byte representing a color component
         """
+
+        # round to integers
+        red = round(red)
+        green = round(green)
+        blue = round(blue)
+
         return (red << 16) + (green << 8) + blue
 
     @staticmethod
@@ -151,7 +158,8 @@ class LEDStrip(metaclass=ABCMeta):
         """
         self.color_buffer = self.color_buffer[positions:] + self.color_buffer[:positions]
         for led_num in range(self.num_leds):
-            self.on_color_change(led_num)
+            r, g, b = self.get_pixel(led_num)
+            self.on_color_change(led_num, r, g, b)
 
     def set_brightness(self, led_num: int, brightness: int) -> None:
         """
@@ -232,3 +240,19 @@ class LEDStrip(metaclass=ABCMeta):
             corrected = ((uncorrected / max_in) ** gamma) * max_out
             gamma_table[uncorrected] = corrected
         return gamma_table
+
+    @staticmethod
+    def gamma_correction(tone: float, gamma: float, max_in: float = 255.0, max_out: int = 255):
+        """
+        gamma-correct a given tone
+        The formula comes from Phillip Burgess.
+        For more information about gamma correction, see https://learn.adafruit.com/led-tricks-gamma-correction/
+
+        :param tone: input grayscale tone (can be float)
+        :param gamma: gamma - if you do not know, what this is, read https://goo.gl/0AGhaK
+        :param max_in: input ranges from 0 to max_in
+        :param max_out: integer output ranges from 0 to max_out
+        :return:
+        """
+        corrected_tone = ((tone / max_in) ** gamma) * max_out
+        return round(corrected_tone)
