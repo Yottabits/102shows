@@ -176,7 +176,7 @@ def rgb_color_tuple(candidate, param_name: str = None):
         raise InvalidParameters(debug_str)
 
     for component in candidate:
-        if type(component) is not int:
-            raise InvalidParameters(debug_str)
-        if not (0 <= component <= 255):
+        try:
+            numeric(component, minimum=0, maximum=255)
+        except InvalidParameters:
             raise InvalidParameters(debug_str)
