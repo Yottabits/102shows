@@ -7,9 +7,9 @@ at this point more or less a quick hack
 import time
 
 from lightshows.templates.base import *
-from lightshows.utilities.general import SmoothBlend, blend_whole_strip_to_color
-from lightshows.utilities import verifyparameters as verify
-from lightshows.utilities.verifyparameters import InvalidParameters
+from helpers.color import SmoothBlend, blend_whole_strip_to_color
+from helpers import verify
+from helpers.exceptions import InvalidParameters
 
 
 class Christmas(Lightshow):
@@ -38,8 +38,7 @@ class Christmas(Lightshow):
         pass
 
     def run(self):
-        self.strip.set_global_brightness(40)
-        self.mqtt_listener.start()
+        self.mqtt.parse_parameter_changes = True
 
         while True:
             self.merry_go_round(self.num_cycles["merry_go_round"])

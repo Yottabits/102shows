@@ -5,10 +5,13 @@
 This module contains the drivers for the LED strips
 """
 from abc import ABCMeta, abstractmethod
+import logging
 from multiprocessing import Array as SyncedArray
 
 __all__ = ['apa102', 'dummy']
 __drivers__ = ['Dummy', 'APA102']
+
+logger = logging.getLogger('102shows.drivers')
 
 
 class LEDStrip(metaclass=ABCMeta):
@@ -202,6 +205,7 @@ class LEDStrip(metaclass=ABCMeta):
 
     def sync_up(self) -> None:
         """ copies the local message buffer to a shared object so other processes can see the current strip state """
+        logger.info("sync-up")
         for led_num, (red, green, blue) in enumerate(self.color_buffer):
             # colors
             self.synced_red_buffer[led_num] = red
@@ -213,15 +217,18 @@ class LEDStrip(metaclass=ABCMeta):
 
     def sync_down(self) -> None:
         """ applies the shared buffer to the local message buffer """
+        logger.info("sync-down")
         for led_num, _ in enumerate(self.color_buffer):
             # colors
             red = self.synced_red_buffer[led_num]
             green = self.synced_green_buffer[led_num]
             blue = self.synced_blue_buffer[led_num]
             self.color_buffer[led_num] = (red, green, blue)
+            self.on_color_change(led_num, red, green, blue)
 
             # brightness
-            self.synced_brightness_buffer[led_num] = self.brightness_buffer[led_num]
+            self.brightness_buffer[led_num] = self.synced_brightness_buffer[led_num]
+            self.on_brightness_change(led_num)
 
     @staticmethod
     def get_gamma_table(gamma, max_in: int = 255, max_out: int = 255):
@@ -254,5 +261,10 @@ class LEDStrip(metaclass=ABCMeta):
         :param max_out: integer output ranges from 0 to max_out
         :return:
         """
+
+        # floor values at 0 to prevent complex numbers as results
+        if tone < 0:
+            tone = 0
+
         corrected_tone = ((tone / max_in) ** gamma) * max_out
         return round(corrected_tone)

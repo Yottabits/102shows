@@ -131,8 +131,11 @@ class MQTTControl:
         # spawn thread that gets the final buffer state of the lightshow
         def wait_for_show_end():
             self.show_process.join()  # wait for the process to terminate
+            logger.info("Show {} ended".format(show_name))
             self.after_show_end()
-        Thread(target=wait_for_show_end, name="wait for " + show_name, daemon=True).start()
+        if show_name not in ["idle"]:
+            pass
+            #Thread(target=wait_for_show_end, name="wait for " + show_name, daemon=True).start()
 
     def after_show_end(self) -> None:
         """
@@ -154,7 +157,7 @@ class MQTTControl:
         if show_name == self.show_process.name or show_name == "all":
             self.stop_running_show()
 
-    def stop_running_show(self, timeout_sec: int = 5) -> None:
+    def stop_running_show(self, timeout_sec: float = 5) -> None:
         """
         stops any running show
 
@@ -190,7 +193,7 @@ class MQTTControl:
         logger.info("{name} is ready".format(name=self.conf.sys_name))
 
         # start Idle show to listen for brightness changes and refresh the strip regularly
-        self.start_show("idle", {})
+        self.start_show("clear", {})
 
         client.loop_forever()
         logger.critical("MQTTControl.py has exited")

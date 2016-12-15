@@ -6,6 +6,7 @@ Lightshow base template
 import logging
 import os
 import signal
+from time import sleep
 from abc import ABCMeta, abstractmethod
 
 import paho.mqtt.client
@@ -59,9 +60,14 @@ class Lightshow(metaclass=ABCMeta):
 
         self.run()  # run the show
 
-        self.cleanup()
-        self.strip.freeze()
-        self.strip.sync_up()
+        # loop and listen to brightness changes until the end
+        self.idle_forever()
+
+    def idle_forever(self, delay_sec: float = 1):
+        """ just idling and invoking strip.show() every now and then"""
+        while True:
+            self.strip.show()
+            sleep(delay_sec)
 
     def stop(self, signum, frame) -> None:
         self.strip.freeze()

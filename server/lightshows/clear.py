@@ -18,7 +18,7 @@ class Clear(Lightshow):
        =====================================================================
     """
     def init_parameters(self):
-        self.register('fadetime_sec', None, verify.not_negative_numeric)
+        self.register('fadetime_sec', 1, verify.not_negative_numeric)
 
     def run(self):
         blend_whole_strip_to_color(self.strip, (0, 0, 0), self.p['fadetime_sec'])  # fadeout
