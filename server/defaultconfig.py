@@ -14,7 +14,6 @@ class Configuration:
 
     shows = {'christmas': christmas.Christmas,
              'clear': clear.Clear,  # A list of available shows
-             'idle': idle.Idle,
              'rainbow': rainbow.Rainbow,
              'rgbtest': rgbtest.RGBTest,
              'spinthebottle': spinthebottle.SpinTheBottle,
