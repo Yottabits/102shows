@@ -3,8 +3,6 @@ Color Cycle Template
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
 """
 
-import time
-
 from lightshows.templates.base import *
 
 
@@ -72,7 +70,7 @@ class ColorCycle(Lightshow):
                 need_repaint = self.update(currentStep, current_cycle)  # Call the subclasses update method
                 if need_repaint:
                     self.strip.show()  # Display, only if required
-                time.sleep(self.p['pause_sec'])  # Pause until the next step
+                self.sleep(self.p['pause_sec'])  # Pause until the next step
             current_cycle += 1
             if current_cycle >= self.p['num_cycles']:
                 break

@@ -4,7 +4,6 @@ Christmas Show
 
 at this point more or less a quick hack
 """
-import time
 
 from lightshows.templates.base import *
 from helpers.color import SmoothBlend, blend_whole_strip_to_color
@@ -61,7 +60,7 @@ class Christmas(Lightshow):
                 else:
                     transition.set_pixel(led_num, *green)
             transition.blend(blendtime_sec())
-            time.sleep(pause_sec())
+            self.sleep(pause_sec())
 
             for led_num in range(self.strip.num_leds):
                 if led_num % (2 * chunk_size) < 0.5 * chunk_size:
@@ -69,7 +68,7 @@ class Christmas(Lightshow):
                 else:
                     transition.set_pixel(led_num, *red)
             transition.blend(blendtime_sec())
-            time.sleep(pause_sec())
+            self.sleep(pause_sec())
 
     def whole_blendover(self, num_cycles: int = 1):
         blendtime_sec = lambda: self.velocity
@@ -77,9 +76,9 @@ class Christmas(Lightshow):
 
         for _ in range(num_cycles):
             blend_whole_strip_to_color(self.strip, (255, 20, 10), fadetime_sec=blendtime_sec())
-            time.sleep(pause_sec())
+            self.sleep(pause_sec())
             blend_whole_strip_to_color(self.strip, (30, 255, 0), fadetime_sec=blendtime_sec())
-            time.sleep(pause_sec())
+            self.sleep(pause_sec())
 
     def static_red_green(self, strip):
         red_green_segment = [(255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10),
@@ -107,4 +106,4 @@ class Christmas(Lightshow):
             self.strip.rotate(1)
             self.strip.show()
             self.strip.show()
-            time.sleep(pause_sec())
+            self.sleep(pause_sec())

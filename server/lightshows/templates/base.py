@@ -6,7 +6,7 @@ Lightshow base template
 import logging
 import os
 import signal
-from time import sleep
+import time
 from abc import ABCMeta, abstractmethod
 
 import paho.mqtt.client
@@ -63,11 +63,26 @@ class Lightshow(metaclass=ABCMeta):
         # loop and listen to brightness changes until the end
         self.idle_forever()
 
-    def idle_forever(self, delay_sec: float = 1):
+    def idle_forever(self, delay_sec: float = 0.1):
         """ just idling and invoking strip.show() every now and then"""
         while True:
             self.strip.show()
-            sleep(delay_sec)
+            time.sleep(delay_sec)  # do not refresh in this time
+
+    def sleep(self, time_sec: float) -> None:
+        """
+        does nothing (but refreshing the strip a few times) for time_sec seconds
+
+        :param time_sec: duration of the break
+        """
+        stop_time = time.perf_counter() + time_sec  # when the delay should be over
+        final_refresh = stop_time - self.strip.max_refresh_time  # when strip.show() should be invoked for the last time
+
+        while final_refresh > time.perf_counter():  # spend (hopefully most of) the time refreshing the strip
+            self.strip.show()
+
+        while stop_time > time.perf_counter():  # wait until the end
+            pass
 
     def stop(self, signum, frame) -> None:
         self.strip.freeze()

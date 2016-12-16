@@ -3,7 +3,6 @@ SpinTheBottle
 (c) 2016 Simon Leiner
 """
 import random
-from time import sleep
 
 from helpers.color import blend_whole_strip_to_color, linear_dim
 from helpers.preprocessors import list_to_tuple
@@ -80,18 +79,18 @@ class SpinTheBottle(Lightshow):
         # go round the strip one time
         for led in range(self.lower_border, self.upper_border + 1, section_width):
             self.highlight(led, highlight_radius=section_width // 2)
-            sleep(frame_time)
+            self.sleep(frame_time)
         for led in range(self.upper_border + 1, self.lower_border, -section_width):
             self.highlight(led, highlight_radius=section_width // 2)
-            sleep(frame_time)
+            self.sleep(frame_time)
 
         # focus on target
         for led in range(self.lower_border, target_led, section_width):
             self.highlight(led)
             relative_distance = abs(led - target_led) / self.strip.num_leds
-            sleep(0.0006 * self.p['time_sec'] / relative_distance)  # slow down a little
+            self.sleep(0.0006 * self.p['time_sec'] / relative_distance)  # slow down a little
         self.highlight(target_led, highlight_radius=section_width // 2)
 
         if self.p['fadeout']:
-            sleep(10)
+            self.sleep(10)
             blend_whole_strip_to_color(self.strip, self.p['background_color'])  # fadeout the spot
