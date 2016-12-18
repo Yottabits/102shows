@@ -46,9 +46,9 @@ class APA102(LEDStrip):
         - strips cannot have more than 1024 LEDs
     """
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, initial_brightness: int = 100):
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, gamma: float = 2.8):
         """ initializes the strip connection via SPI """
-        super().__init__(num_leds, max_clock_speed_hz, initial_brightness)
+        super().__init__(num_leds, max_clock_speed_hz, gamma)
 
         # check if we do not have too much LEDs in the strip
         if self.num_leds > 1024:
@@ -59,8 +59,9 @@ class APA102(LEDStrip):
         self.spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
         self.spi.max_speed_hz = self.max_clock_speed_hz  # should not be higher than 8000000
         self.leds = [0, 0, 0, 0] * self.num_leds  # 4 bytes per LED
-        self.set_global_brightness(initial_brightness)
         self.synced_buffer = SyncedArray('i', self.leds)
+
+        self.max_refresh_time_sec = 25E-6 * self.num_leds
 
     def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
         # gamma correction

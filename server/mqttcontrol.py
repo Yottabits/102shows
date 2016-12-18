@@ -153,10 +153,9 @@ class MQTTControl:
 
         logger.info("Initializing LED strip...")
         self.strip = self.conf.Strip.Driver(num_leds=self.conf.Strip.num_leds,
-                                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz)
-        self.strip.set_global_brightness(self.conf.Strip.initial_brightness)  # set initial brightness from config
-        self.strip.sync_up()  # to store brightness
-        self.strip.show()
+                                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
+                                            gamma=self.conf.Strip.gamma)
+        self.strip.set_global_brightness(self.conf.Strip.initial_brightness)
 
         logger.info("Connecting to the MQTT Broker")
         client = paho.mqtt.client.Client()

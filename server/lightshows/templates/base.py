@@ -76,7 +76,7 @@ class Lightshow(metaclass=ABCMeta):
         :param time_sec: duration of the break
         """
         stop_time = time.perf_counter() + time_sec  # when the delay should be over
-        final_refresh = stop_time - self.strip.max_refresh_time  # when strip.show() should be invoked for the last time
+        final_refresh = stop_time - self.strip.max_refresh_time_sec  # when strip.show() should be invoked for the last time
 
         while final_refresh > time.perf_counter():  # spend (hopefully most of) the time refreshing the strip
             self.strip.show()

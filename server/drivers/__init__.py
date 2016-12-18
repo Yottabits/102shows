@@ -23,32 +23,33 @@ class LEDStrip(metaclass=ABCMeta):
         - pixel resolution (number of dim-steps per color component) is 8-bit, so 0 - 255
     """
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000,
-                 initial_brightness: int = 100, gamma: float = 2.8):
+    max_refresh_time_sec = 1  #: this is used for optimizations of sleep()
+
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, gamma: float = 2.8):
         """
         stores the given parameters and initializes the color and brightness buffers
         drivers should extend this method
 
         :param num_leds: number of LEDs in the strip
         :param max_clock_speed_hz: maximum clock speed (Hz) of the bus
-        :param initial_brightness: initial brightness for the whole strip (to be used in child classes)
+        :param gamma:for LED gamma correction
         """
         # store the given parameters
         self.num_leds = num_leds
         self.max_clock_speed_hz = max_clock_speed_hz
         self.gamma = gamma
 
+        # private variables
+        self.__frozen = False
+
         # buffers
         self.color_buffer = [(0.0, 0.0, 0.0)] * self.num_leds
-        self.brightness_buffer = [initial_brightness] * self.num_leds
+        self.brightness_buffer = [0] * self.num_leds
 
         self.synced_red_buffer = SyncedArray('f', [0.0] * self.num_leds)
         self.synced_green_buffer = SyncedArray('f', [0.0] * self.num_leds)
         self.synced_blue_buffer = SyncedArray('f', [0.0] * self.num_leds)
         self.synced_brightness_buffer = SyncedArray('i', self.brightness_buffer)
-
-        # private variables
-        self.__frozen = False
 
     def freeze(self):
         """
