@@ -3,14 +3,18 @@
 (c) 2016 Simon Leiner
 """
 
-import yaml
 from copy import deepcopy
+import logging
+
 from orderedattrdict.yamlutils import from_yaml
 from orderedattrdict import AttrDict as ConfigTree
+import yaml
 
 # Load YAML always as AttrDict (aka ConfigTree)
 yaml.add_constructor(u'tag:yaml.org,2002:map', from_yaml)
 yaml.add_constructor(u'tag:yaml.org,2002:omap', from_yaml)
+
+logger = logging.getLogger('102shows.server.helpers.configparser')
 
 
 def update_settings_tree(base: ConfigTree, update: ConfigTree) -> ConfigTree:
@@ -46,9 +50,11 @@ def get_configuration(default_filename: str = 'defaults.yml', user_filename: str
     # read defaults
     with open(default_filename, 'r') as file:
         defaults = yaml.load(file)
+        logger.info("Successfully parsed {} as default configuration".format(default_filename))
 
     with open(user_filename, 'r') as file:
         user_config = yaml.load(file)
+        logger.info("Successfully parsed {} as user configuration".format(user_filename))
 
     # apply user config over Defaults
     configuration = update_settings_tree(base=defaults, update=user_config)
