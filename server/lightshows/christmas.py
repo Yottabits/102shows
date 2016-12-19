@@ -81,7 +81,7 @@ class Christmas(Lightshow):
             blend_whole_strip_to_color(self.strip, (30, 255, 0), fadetime_sec=blendtime_sec())
             self.sleep(pause_sec())
 
-    def static_red_green(self, strip):
+    def static_red_green(self):
         red_green_segment = [(255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10),
                              (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10),
                              (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10), (255, 20, 10),
@@ -101,7 +101,7 @@ class Christmas(Lightshow):
     def merry_go_round(self, num_cycles: int = 1):
         pause_sec = lambda: 0.5 / self.velocity
 
-        self.static_red_green(self.strip)
+        self.static_red_green()
         self.strip.show()
         for _ in range(num_cycles * self.strip.num_leds):
             self.strip.rotate(1)
