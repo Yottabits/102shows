@@ -26,7 +26,7 @@ import coloredlogs
 from helpers.configparser import get_configuration
 from mqttcontrol import MQTTControl
 
-__version__ = '0.2pre-dev'
+__version__ = '0.2rc1'
 
 logo = """
    _______ ___        __
