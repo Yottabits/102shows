@@ -4,17 +4,20 @@ MQTT Control
 """
 
 import json
+import logging
 from multiprocessing import Process
+import os
+import signal
 
 import paho.mqtt.client
 import paho.mqtt.publish
 
 import helpers.mqtt
 from drivers.__active__ import get_driver
+from helpers.exceptions import *
 from helpers.configparser import ConfigTree
 from helpers.mqtt import TopicAspect
 from lightshows.__active__ import shows
-from lightshows.templates.base import *
 
 logger = logging.getLogger('102shows.server.mqttcontrol')
 
