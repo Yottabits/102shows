@@ -1,6 +1,7 @@
 """
 Exceptions for 102shows
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 
 The module defines some own exception classes:
  - InvalidParameters (as used by the functions above)

@@ -1,3 +1,8 @@
+"""
+(c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
+"""
+
 from drivers import *
 
 drivers = {'apa102': apa102.APA102,

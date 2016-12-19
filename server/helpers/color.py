@@ -1,6 +1,7 @@
 """
 Color Helpers
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 
 This class provides helper functions and classes for the lightshows:
     - linear_dim(undimmed, factor)
@@ -11,6 +12,7 @@ This class provides helper functions and classes for the lightshows:
 
     - SmoothBlend
 """
+
 import types
 import logging
 import time

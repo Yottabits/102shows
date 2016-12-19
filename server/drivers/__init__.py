@@ -1,9 +1,11 @@
 """
 102shows.Drivers
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 
 This module contains the drivers for the LED strips
 """
+
 import logging
 from abc import ABCMeta, abstractmethod
 from multiprocessing import Array as SyncedArray

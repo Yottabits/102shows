@@ -1,6 +1,7 @@
 """
 Two Color Blend
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 """
 
 from helpers.color import SmoothBlend, linear_dim, add_tuples

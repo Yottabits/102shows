@@ -1,6 +1,7 @@
 """
 Driver for APA102 LED strips (aka "DotStar")
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 """
 
 import spidev

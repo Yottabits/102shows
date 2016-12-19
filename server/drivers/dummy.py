@@ -1,6 +1,7 @@
 """
 Dummy Driver
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 """
 
 import logging

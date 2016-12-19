@@ -1,6 +1,7 @@
 """
 MQTT Helpers
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 
 A couple of helper functions (big surprise!) for MQTTControl
 """

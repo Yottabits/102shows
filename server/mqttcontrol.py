@@ -1,6 +1,9 @@
 """
 MQTT Control
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
+
+See the class description for a description of what this module does.
 """
 
 import json

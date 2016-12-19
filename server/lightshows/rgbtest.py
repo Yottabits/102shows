@@ -1,8 +1,9 @@
 """
 RGBTest
-
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 """
+
 from helpers.color import blend_whole_strip_to_color
 from lightshows.templates.base import *
 

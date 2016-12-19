@@ -1,6 +1,7 @@
 """
 Christmas Show
 (c) 2016 Simon Leiner, Jenny Schinkel
+licensed under the GNU Public License, version 2
 
 at this point more or less a quick hack
 """

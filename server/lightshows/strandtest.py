@@ -1,6 +1,7 @@
 """
 Strand Test
 (c) 2015 Martin Erzberger, 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 """
 
 from lightshows.templates.colorcycle import *

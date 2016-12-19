@@ -1,6 +1,7 @@
 """
 Verify Parameters
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 
 functions that validate input parameters and exceptions with error messages
 if the input does not fit the requirements. These are at the moment:
@@ -17,6 +18,7 @@ if the input does not fit the requirements. These are at the moment:
 
  - rgb_color_tuple
 """
+
 from helpers.exceptions import InvalidParameters
 
 

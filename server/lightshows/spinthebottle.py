@@ -1,7 +1,9 @@
 """
 SpinTheBottle
 (c) 2016 Simon Leiner
+licensed under the GNU Public License, version 2
 """
+
 import random
 
 from helpers.color import blend_whole_strip_to_color, linear_dim
