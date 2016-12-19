@@ -11,10 +11,11 @@ from abc import ABCMeta, abstractmethod
 
 import paho.mqtt.client
 
-from helpers.exceptions import *
 import helpers.mqtt
 import helpers.verify as verify
 from drivers import LEDStrip
+from helpers.configparser import get_configuration
+from helpers.exceptions import *
 
 
 class Lightshow(metaclass=ABCMeta):
@@ -23,18 +24,15 @@ class Lightshow(metaclass=ABCMeta):
     It is highly recommended to use it as your base class when writing your own show.
     """
 
-    def __init__(self, strip: LEDStrip, conf, parameters: dict):
+    def __init__(self, strip: LEDStrip, parameters: dict):
         # logger
         self.logger = logging.getLogger('102shows.server.lightshows.' + self.name)
-
-        # store parameters
-        self.strip = strip
-        self.conf = conf
 
         # MQTT listener
         self.mqtt = self.MQTTListener(self)
 
         # Parameters
+        self.strip = strip
         self.p = {}  # dict: parameter_name => value
         self.p_verifier = {}  # dict: parameter_name => (verifier_function, args, kwargs)
         self.p_preprocessor = {}  # dict: parameter_name => preprocessor_function
@@ -76,7 +74,7 @@ class Lightshow(metaclass=ABCMeta):
         :param time_sec: duration of the break
         """
         stop_time = time.perf_counter() + time_sec  # when the delay should be over
-        final_refresh = stop_time - self.strip.max_refresh_time_sec  # when strip.show() should be invoked for the last time
+        final_refresh = stop_time - self.strip.max_refresh_time_sec  # when show() should be invoked for the last time
 
         while final_refresh > time.perf_counter():  # spend (hopefully most of) the time refreshing the strip
             self.strip.show()
@@ -184,27 +182,28 @@ class Lightshow(metaclass=ABCMeta):
         def __init__(self, lightshow):
             self.logger = logging.getLogger('102shows.server.lightshows.{}.MQTTListener'.format(lightshow.name))
             self.lightshow = lightshow
+            self.global_conf = get_configuration()
             self.client = paho.mqtt.client.Client()
             self.client.on_connect = self.subscribe
             self.client.on_message = self.parse_message
             self.parse_parameter_changes = False
 
             # connect
-            if self.lightshow.conf.MQTT.username is not None:
-                self.client.username_pw_set(self.lightshow.conf.MQTT.username, self.lightshow.conf.MQTT.password)
-            self.client.connect(self.lightshow.conf.MQTT.Broker.host,
-                                self.lightshow.conf.MQTT.Broker.port,
-                                self.lightshow.conf.MQTT.Broker.keepalive)
+            if self.global_conf.MQTT.username is not None:
+                self.client.username_pw_set(self.global_conf.MQTT.username, self.global_conf.MQTT.password)
+            self.client.connect(self.global_conf.MQTT.Broker.host,
+                                self.global_conf.MQTT.Broker.port,
+                                self.global_conf.MQTT.Broker.keepalive)
 
         def subscribe(self, client, userdata, flags, rc):
-            brightness_path = self.lightshow.conf.MQTT.general_path.format(
-                prefix=self.lightshow.conf.MQTT.prefix,
-                sys_name=self.lightshow.conf.sys_name,
+            brightness_path = self.global_conf.MQTT.general_path.format(
+                prefix=self.global_conf.MQTT.prefix,
+                sys_name=self.global_conf.sys_name,
                 show_name="+",
                 command="brightness")
-            parameter_path = self.lightshow.conf.MQTT.general_path.format(
-                prefix=self.lightshow.conf.MQTT.prefix,
-                sys_name=self.lightshow.conf.sys_name,
+            parameter_path = self.global_conf.MQTT.general_path.format(
+                prefix=self.global_conf.MQTT.prefix,
+                sys_name=self.global_conf.sys_name,
                 show_name=self.lightshow.name,
                 command="+")
 
@@ -247,7 +246,7 @@ class Lightshow(metaclass=ABCMeta):
                 return
 
             # confine brightness to configured value
-            max_brightness = self.lightshow.conf.Strip.max_brightness
+            max_brightness = self.global_conf.Strip.max_brightness
             if brightness > max_brightness:
                 self.logger.info("tried to set brightness {set} but maximum brightness is {max}.".format(
                     set=brightness, max=max_brightness))

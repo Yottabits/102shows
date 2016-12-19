@@ -5,14 +5,15 @@ MQTT Control
 
 import json
 from multiprocessing import Process
-from threading import Thread
 
 import paho.mqtt.client
 import paho.mqtt.publish
 
 import helpers.mqtt
-from defaultconfig import Configuration
+from drivers.__active__ import get_driver
+from helpers.configparser import ConfigTree
 from helpers.mqtt import TopicAspect
+from lightshows.__active__ import shows
 from lightshows.templates.base import *
 
 logger = logging.getLogger('102shows.server.mqttcontrol')
@@ -23,7 +24,8 @@ class MQTTControl:
     This class provides function to start/stop the shows under lightshows/
     according to the commands it receives via MQTT
     """
-    def __init__(self, config: Configuration):
+
+    def __init__(self, config: ConfigTree):
         # global handles
         self.conf = config  # the user config
         self.show_process = Process()  # for the process in which the lightshows run in
@@ -104,13 +106,13 @@ class MQTTControl:
         :param parameters: these are passed to the show
         """
         # search for show module
-        if show_name not in self.conf.shows:
+        if show_name not in shows:
             logger.error("Show \"{name}\" was not found!".format(name=show_name))
             return
 
         # initialize show object
         try:
-            show = self.conf.shows[show_name](self.strip, self.conf, parameters)
+            show = shows[show_name](self.strip, parameters)
             show.check_runnable()
         except (InvalidStrip, InvalidConf, InvalidParameters) as error_message:
             logger.error(error_message)
@@ -152,9 +154,10 @@ class MQTTControl:
         logger.info("Starting {name}".format(name=self.conf.sys_name))
 
         logger.info("Initializing LED strip...")
-        self.strip = self.conf.Strip.Driver(num_leds=self.conf.Strip.num_leds,
-                                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
-                                            gamma=self.conf.Strip.gamma)
+        driver = get_driver(self.conf.Strip.driver)
+        self.strip = driver(num_leds=self.conf.Strip.num_leds,
+                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
+                            gamma=self.conf.Strip.gamma)
         self.strip.set_global_brightness(self.conf.Strip.initial_brightness)
 
         logger.info("Connecting to the MQTT Broker")

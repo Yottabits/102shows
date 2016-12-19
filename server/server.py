@@ -7,13 +7,14 @@ The real magic does not happen here, though.
 """
 
 import logging
+
 import coloredlogs
 
-import config
+from helpers.configparser import get_configuration
 from mqttcontrol import MQTTControl
 
 # configuration
-user_config = config.configuration
+user_config = get_configuration()
 
 # logger
 logger = logging.getLogger('102shows.server')

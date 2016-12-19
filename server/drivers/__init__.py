@@ -4,12 +4,11 @@
 
 This module contains the drivers for the LED strips
 """
-from abc import ABCMeta, abstractmethod
 import logging
+from abc import ABCMeta, abstractmethod
 from multiprocessing import Array as SyncedArray
 
-__all__ = ['apa102', 'dummy']
-__drivers__ = ['Dummy', 'APA102']
+__all__ = ['apa102', 'dummy', 'LEDStrip']
 
 logger = logging.getLogger('102shows.drivers')
 
