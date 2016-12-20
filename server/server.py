@@ -28,12 +28,17 @@ from mqttcontrol import MQTTControl
 
 __version__ = '0.2pre-dev'
 
-logo = """
+greeting = """
    _______ ___        __
   <  / __ \__ \ _____/ /_  ____ _      _______
   / / / / /_/ // ___/ __ \/ __ \ | /| / / ___/
  / / /_/ / __/(__  ) / / / /_/ / |/ |/ (__  )
-/_/\____/____/____/_/ /_/\____/|__/|__/____/  v{}"""
+/_/\____/____/____/_/ /_/\____/|__/|__/____/   version: {version}
+
+This is free software. You are welcome to redistribute
+it under the conditions of the GNU Public License v2.
+For details, see https://www.gnu.org/licenses/gpl-2.0.html
+"""
 
 # configuration
 user_config = get_configuration()
@@ -42,14 +47,8 @@ user_config = get_configuration()
 logger = logging.getLogger('102shows.server')
 coloredlogs.install(level=user_config.log_level)
 
-# friendly greetings
-print(logo.format(__version__))
-print()
-print("This is free software. You are welcome to redistribute")
-print("it under the conditions of the GNU Public License v2.")
-print("For details, see https://www.gnu.org/licenses/gpl-2.0.html")
-print()
-print()
+# friendly greeting
+print(greeting.format(version=__version__), end='\n\n\n')
 
 # start the server!
 server = MQTTControl(user_config)  # initialize the server...
