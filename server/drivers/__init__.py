@@ -52,6 +52,18 @@ class LEDStrip(metaclass=ABCMeta):
         self.synced_blue_buffer = SyncedArray('f', [0.0] * self.num_leds)
         self.synced_brightness_buffer = SyncedArray('i', self.brightness_buffer)
 
+    def __del__(self):
+        """ invokes self.close() and deletes all the buffers"""
+        self.close()
+
+        del self.color_buffer, self.synced_red_buffer, self.synced_green_buffer, self.synced_blue_buffer
+        del self.brightness_buffer, self.synced_brightness_buffer
+
+    @abstractmethod
+    def close(self):
+        """ close the bus connection and clean up remains"""
+        pass
+
     def freeze(self):
         """
         freezes the strip. All state-changing methods (on_color_change() and on_brightness_change())

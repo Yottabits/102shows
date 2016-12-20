@@ -34,3 +34,6 @@ class DummyDriver(LEDStrip):
                                  g=green,
                                  b=blue,
                                  brightness=brightness))
+
+    def close(self):
+        pass
