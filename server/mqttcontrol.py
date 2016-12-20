@@ -178,5 +178,14 @@ class MQTTControl:
         # start a show show to listen for brightness changes and refresh the strip regularly
         self.start_show("clear", {})
 
-        client.loop_forever()
-        logger.critical("MQTTControl.py has exited")
+        try:
+            signal.signal(signal.SIGTERM, self.stop_controller)  # attach stop_controller() to SIGTERM
+            client.loop_forever()
+        except KeyboardInterrupt:
+            self.stop_controller()
+        finally:
+            logger.critical("MQTTControl.py has exited")
+
+    def stop_controller(self, signum=None, frame=None):
+        """ what happens if the controller exits """
+        del self.strip  # close driver connection
