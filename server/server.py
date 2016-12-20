@@ -23,18 +23,15 @@ import logging
 
 import coloredlogs
 
+from helpers import get_logo, get_version
 from helpers.configparser import get_configuration
 from mqttcontrol import MQTTControl
 
 __version__ = '0.2pre-dev'
 
-greeting = """
-   _______ ___        __
-  <  / __ \__ \ _____/ /_  ____ _      _______
-  / / / / /_/ // ___/ __ \/ __ \ | /| / / ___/
- / / /_/ / __/(__  ) / / / /_/ / |/ |/ (__  )
-/_/\____/____/____/_/ /_/\____/|__/|__/____/   version: {version}
-
+logo = get_logo()
+version = get_version()
+license_hint = """
 This is free software. You are welcome to redistribute
 it under the conditions of the GNU Public License v2.
 For details, see https://www.gnu.org/licenses/gpl-2.0.html
@@ -48,7 +45,11 @@ logger = logging.getLogger('102shows.server')
 coloredlogs.install(level=user_config.log_level)
 
 # friendly greeting
-print(greeting.format(version=__version__), end='\n\n\n')
+print(logo + "   version: {}".format(version))
+print(license_hint)
+print()
+print()
+print()
 
 # start the server!
 server = MQTTControl(user_config)  # initialize the server...
