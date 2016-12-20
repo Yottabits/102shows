@@ -59,6 +59,8 @@ class LEDStrip(metaclass=ABCMeta):
         del self.color_buffer, self.synced_red_buffer, self.synced_green_buffer, self.synced_blue_buffer
         del self.brightness_buffer, self.synced_brightness_buffer
 
+        logger.info("Driver successfully closed")
+
     @abstractmethod
     def close(self):
         """ close the bus connection and clean up remains"""
