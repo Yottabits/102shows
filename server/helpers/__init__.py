@@ -12,10 +12,10 @@ __all__ = ['color', 'exceptions', 'mqtt', 'preprocessors', 'verify']
 def get_logo(filename: str ='../logo') -> str:
     with open(filename, encoding='unicode_escape') as file:
         contents = file.read()
-    return contents.rstrip('/n')  # return without newline at the end
+    return contents.rstrip().rstrip()  # return without newline at the end
 
 
 def get_version(filename: str ='../version') -> str:
     with open(filename) as file:
         contents = file.read()
-    return contents.rstrip('/n')  # return without newline at the end
+    return contents.rstrip().rstrip()  # return without newline at the end

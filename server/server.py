@@ -27,8 +27,7 @@ from helpers import get_logo, get_version
 from helpers.configparser import get_configuration
 from mqttcontrol import MQTTControl
 
-__version__ = '0.2pre-dev'
-
+# constants
 logo = get_logo()
 version = get_version()
 license_hint = """
@@ -46,6 +45,7 @@ coloredlogs.install(level=user_config.log_level)
 
 # friendly greeting
 print(logo + "   version: {}".format(version))
+print()
 print(license_hint)
 print()
 print()
