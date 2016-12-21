@@ -27,11 +27,10 @@ function question() {
 }
 
 function check_tty() {
-    if [[ -t 0 ]]; then
+    if ! [[ -t 1 ]]; then
         msg_error " => You need an interactive terminal to run this script!"
         exit
     fi
-    return
 }
 
 function install()
