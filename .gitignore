@@ -5,11 +5,11 @@ Thumbs.db
 .idea/
 
 # any specific configuration
-config.py
+config.yml
 
 # setuptools
 server/dist
 *.egg-info
 
-# tests
-tests/
+# temporary stuff
+playground/

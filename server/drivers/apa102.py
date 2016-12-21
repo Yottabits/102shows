@@ -103,6 +103,9 @@ class APA102(LEDStrip):
 
         return prefix_byte
 
+    def close(self):
+        self.spi.close()
+
     @staticmethod
     def spi_start_frame() -> list:
         """ To start a transmission, one must send 32 empty bits """

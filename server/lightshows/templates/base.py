@@ -53,7 +53,7 @@ class Lightshow(metaclass=ABCMeta):
     def start(self):
         """ invokes the run() method and after that synchronizes the shared buffer """
         # before
-        signal.signal(signal.SIGINT, self.stop)  # attach stop() to SIGSTOP
+        signal.signal(signal.SIGINT, self.stop)  # attach stop() to SIGINT
         self.strip.sync_down()
         self.mqtt.start_listening()
 
