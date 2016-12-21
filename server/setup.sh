@@ -8,7 +8,7 @@ LIGHTBLUE='\033[1;34m'
 LIGHTCYAN='\033[1;36m'
 NOCOLOR='\033[0m' # No Color
 
-BRANCH='master'
+BRANCH='stable'
 
 function status_update() {
     echo -e "\n${LIGHTBLUE}$@${NOCOLOR}"
@@ -41,7 +41,6 @@ function install()
 
     cd 102shows
 
-    rm -rf ./.git  # remove git assets
     rm ./server/setup.sh  # remove this installer
 
     status_update " => Installing requirements..."
@@ -71,10 +70,13 @@ function install()
         msg_error "    in \"102shows/server/config.yml\""
     fi
 
-    msg_success " => We successfully installed the 102shows server :-)"
-    msg_success "     - Note that you need to an MQTT broker in order for the server to work"
-    msg_success "     - If you want to use the included UI, you should install it now"
-    msg_success "       You can find the instructions at https://github.com/Yottabits/102shows/wiki/Installation#web-ui"
+    msg_success "
+ => We successfully installed the 102shows server :-)
+      - Note that you need to an MQTT broker in order for the server to work
+      - If you wan t to use the included UI, you should install it now
+        You can find the instructions at https://git.io/v1x5Os
+      - To run the server, cd in $PWD/server and execute \"python3 server.py\"
+    "
 }
 
 function main()
