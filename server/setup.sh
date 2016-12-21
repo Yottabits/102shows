@@ -26,13 +26,6 @@ function question() {
     echo -en "${LIGHTCYAN}$@${NOCOLOR}"
 }
 
-function check_tty() {
-    if ! [[ -t 1 ]]; then
-        msg_error " => You need an interactive terminal to run this script!"
-        exit
-    fi
-}
-
 function install()
 {
     status_update " => Getting the latest stable release from GitHub"
@@ -66,7 +59,7 @@ function install()
     echo -e "\n\n"
 
     question " => Would you like to configure 102shows now? [Y/n]  "
-    read answer </dev/tty
+    read answer
     if [ "$answer" != "n" ] && [ "$answer" != "N" ]; then
         status_update " => copying config.example.yml to config.yml"
         cp ./server/config.example.yml ./server/config.yml
@@ -88,7 +81,7 @@ function main()
 {
     check_tty
     question " => Would you like to install 102shows to $PWD/102shows? [y/N]  "
-    read answer </dev/tty
+    read answer
     if [ "$answer" == "y" ] || [ "$answer" == "Y" ]
     then
         install
