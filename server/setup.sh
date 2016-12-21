@@ -79,7 +79,6 @@ function install()
 
 function main()
 {
-    check_tty
     question " => Would you like to install 102shows to $PWD/102shows? [y/N]  "
     read answer
     if [ "$answer" == "y" ] || [ "$answer" == "Y" ]
