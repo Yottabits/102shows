@@ -26,7 +26,7 @@ class LEDStrip(metaclass=ABCMeta):
 
     max_refresh_time_sec = 1  #: this is used for optimizations of sleep()
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, gamma: float = 2.8):
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, gamma: float = 2.2):
         """
         stores the given parameters and initializes the color and brightness buffers
         drivers should extend this method
