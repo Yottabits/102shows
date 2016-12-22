@@ -21,12 +21,15 @@ If you already have an MQTT broker in your network, you can use it. Else, instal
 
 ## Server
 
-### the simple way
-_For installing the server on Raspbian, there is a quasi-one-liner which you can run in the folder you want to install 102shows in:_
+### variant A: the simple way
+In the folder you want to install 102shows in, run:
 
     wget -q -O 102s-setup.sh https://git.io/v1x1q; chmod +x 102s-setup.sh; ./102s-setup.sh; rm 102s-setup.sh
+    
+This will launch an assistant that will lead you through the installation process.
 
-### the DIY all-manual way
+### variant B: the DIY all-manual way
+
 #### 1. Prerequisites
 You will need Python 3 with the following packages:
  - [coloredlogs](https://pypi.python.org/pypi/coloredlogs)
