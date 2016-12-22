@@ -26,19 +26,17 @@ class LEDStrip(metaclass=ABCMeta):
 
     max_refresh_time_sec = 1  #: this is used for optimizations of sleep()
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, gamma: float = 2.2):
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000):
         """
         stores the given parameters and initializes the color and brightness buffers
         drivers should extend this method
 
         :param num_leds: number of LEDs in the strip
         :param max_clock_speed_hz: maximum clock speed (Hz) of the bus
-        :param gamma:for LED gamma correction
         """
         # store the given parameters
         self.num_leds = num_leds
         self.max_clock_speed_hz = max_clock_speed_hz
-        self.gamma = gamma
 
         # private variables
         self.__frozen = False
@@ -245,42 +243,3 @@ class LEDStrip(metaclass=ABCMeta):
             # brightness
             self.brightness_buffer[led_num] = self.synced_brightness_buffer[led_num]
             self.on_brightness_change(led_num)
-
-    @staticmethod
-    def get_gamma_table(gamma, max_in: int = 255, max_out: int = 255):
-        """
-        returns a lookup table that can be used for gamma correction.
-        The formula comes from Phillip Burgess.
-        For more information about gamma correction, see https://learn.adafruit.com/led-tricks-gamma-correction/
-
-        :param gamma: gamma factor (mathematically seen an exponent)
-        :param max_in: maximum input value
-        :param max_out: maximum output value
-        :return: array. at the index of uncorrected_value lies the gamma-corrected value
-        """
-        gamma_table = [0] * (max_in + 1)  # if the input ranges from 0 to max_in, that gives us max_in + 1 values
-        for uncorrected in range(max_in + 1):
-            corrected = ((uncorrected / max_in) ** gamma) * max_out
-            gamma_table[uncorrected] = corrected
-        return gamma_table
-
-    @staticmethod
-    def gamma_correction(tone: float, gamma: float, max_in: float = 255.0, max_out: int = 255):
-        """
-        gamma-correct a given tone
-        The formula comes from Phillip Burgess.
-        For more information about gamma correction, see https://learn.adafruit.com/led-tricks-gamma-correction/
-
-        :param tone: input grayscale tone (can be float)
-        :param gamma: gamma - if you do not know, what this is, read https://goo.gl/0AGhaK
-        :param max_in: input ranges from 0 to max_in
-        :param max_out: integer output ranges from 0 to max_out
-        :return:
-        """
-
-        # floor values at 0 to prevent complex numbers as results
-        if tone < 0:
-            tone = 0
-
-        corrected_tone = ((tone / max_in) ** gamma) * max_out
-        return round(corrected_tone)

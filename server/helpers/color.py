@@ -4,6 +4,7 @@ Color Helpers
 licensed under the GNU Public License, version 2
 
 This class provides helper functions and classes for the lightshows:
+    - grayscale_correction(lightness, max_in, max_out)
     - linear_dim(undimmed, factor)
     - is_rgb_color_tuple(to_check)
     - add_tuples(tuple1, tuple2)
@@ -19,6 +20,46 @@ import time
 
 from drivers import LEDStrip
 from helpers import verify, exceptions
+
+
+def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int = 255):
+    """
+    correct the non-linear human perception of the led brightness according to CIE 1931
+    This is commonly mistaken for gamma correction. For more information, read here: https://goo.gl/9Ji129
+
+    :param lightness: linear brightness value between 0 and max_in
+    :param max_in: maximum value for lightness
+    :param max_out: maximum output integer value (255 for 8-bit LED drivers)
+    :return the correct PWM duty cycle for humans to see the desired lightness as integer
+    """
+
+    # safeguard and shortcut
+    if lightness <= 0:
+        return 0
+    elif lightness >= max_in:
+        return max_out
+
+    # lightness correction: https://en.wikipedia.org/wiki/Lab_color_space#Reverse_transformation
+    # the formula is:
+    #                 Y = Y_max * g( ( L* + 16) /  116 ) with L* being the lightness between 0 and 100
+    #
+    #        with  g(t) = > 3 * delta^2 * ( t - 4/29)    for t ≤ delta
+    #                     > t^3                          for t > delta      where delta = 6/29
+    #
+    # this can be simplified to:
+    #                 Y = > (L* / 902.33)          for L* ≤ 8
+    #                     > ((L* + 16) / 116)^3    for L* > 8
+    #
+    # here the ranges are still 0...Y...1 and 0...L*...100
+
+    l_star = lightness / max_in * 100  # map from 0..max_in to 0..100
+
+    if l_star <= 8:
+        duty_cycle = l_star / 902.33
+    else:
+        duty_cycle = ((l_star + 16) / 116) ** 3
+
+    return round(duty_cycle * max_out)  # this will be an integer!
 
 
 def wheel(wheel_pos: float):
