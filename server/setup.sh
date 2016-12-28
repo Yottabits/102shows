@@ -8,7 +8,7 @@ LIGHTBLUE='\033[1;34m'
 LIGHTCYAN='\033[1;36m'
 NOCOLOR='\033[0m' # No Color
 
-BRANCH='master'
+BRANCH='stable'
 
 function check_tty() {
     if ! [[ -t 1 ]]; then
