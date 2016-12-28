@@ -38,7 +38,7 @@ function install()
     status_update " => Getting the latest stable release from GitHub"
     git clone -b ${BRANCH} https://github.com/Yottabits/102shows.git
     rc=$?; if [[ ${rc} == 0 ]]; then   # check for success
-        msg_success " => Download finished! (return code: $rc)"
+        msg_success " => Download finished!"
     else
         msg_error " => Download failed! (return code: $rc)"
         msg_error "    Exiting installation!"
@@ -53,7 +53,7 @@ function install()
     status_update " => Installing requirements..."
     pip3 install -r ./requirements.txt
     rc=$?; if [[ ${rc} == 0 ]]; then   # check for success
-        msg_success " => Requirements are ready! (return code: $rc)"
+        msg_success " => Requirements are ready!"
     else
         msg_error " => Requirements installation failed! (return code: $rc)"
         msg_error "    Maybe You do not have sufficient rights - try running this script with sudo..."
@@ -71,6 +71,7 @@ function install()
         cp ./server/config.example.yml ./server/config.yml
         status_update " => starting editor..."
         editor ./server/config.yml < /dev/tty
+        status_update " => editor stopped"
     else
         msg_error " => Before you can start the 102shows server,"
         msg_error "    you must provide a valid configuration file"
