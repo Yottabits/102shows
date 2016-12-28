@@ -10,6 +10,14 @@ NOCOLOR='\033[0m' # No Color
 
 BRANCH='stable'
 
+function check_tty() {
+    if ! [[ - t 1 ]]; then
+        msg_error " => You need an interactive terminal to run this script!"
+        exit
+    fi
+    return
+}
+
 function status_update() {
     echo -e "\n${LIGHTBLUE}$@${NOCOLOR}"
 }
@@ -58,12 +66,12 @@ function install()
     echo -e "\n\n"
 
     question " => Would you like to configure 102shows now? [Y/n]  "
-    read answer
+    read answer < /dev/tty
     if [ "$answer" != "n" ] && [ "$answer" != "N" ]; then
         status_update " => copying config.example.yml to config.yml"
         cp ./server/config.example.yml ./server/config.yml
         status_update " => starting editor..."
-        editor ./server/config.yml
+        editor ./server/config.yml < /dev/tty
     else
         msg_error " => Before you can start the 102shows server,"
         msg_error "    you must provide a valid configuration file"
@@ -81,8 +89,9 @@ function install()
 
 function main()
 {
+    check_tty
     question " => Would you like to install 102shows to $PWD/102shows? [y/N]  "
-    read answer
+    read answer < /dev/tty
     if [ "$answer" == "y" ] || [ "$answer" == "Y" ]
     then
         install
