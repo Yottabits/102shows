@@ -11,11 +11,10 @@ NOCOLOR='\033[0m' # No Color
 BRANCH='master'
 
 function check_tty() {
-    if ! [[ - t 1 ]]; then
+    if ! [[ -t 1 ]]; then
         msg_error " => You need an interactive terminal to run this script!"
         exit
     fi
-    return
 }
 
 function status_update() {
