@@ -95,7 +95,7 @@ class APA102(LEDStrip):
         """
 
         # map 0 - 100 brightness parameter to 0 - 31 integer as used in the APA102 prefix byte
-        brightness_byte = round(brightness / 100 * 31)
+        brightness_byte = grayscale_correction(brightness, max_in=100, max_out=31)
 
         # structure of the prefix byte: (1 1 1 b4 b3 b2 b1 b0)
         #    - the first three ones are fixed
