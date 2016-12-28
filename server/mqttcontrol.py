@@ -162,8 +162,7 @@ class MQTTControl:
         logger.info("Initializing LED strip...")
         driver = get_driver(self.conf.Strip.driver)
         self.strip = driver(num_leds=self.conf.Strip.num_leds,
-                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
-                            gamma=self.conf.Strip.gamma)
+                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz)
         self.strip.set_global_brightness(self.conf.Strip.initial_brightness)
 
         logger.info("Connecting to the MQTT Broker")
