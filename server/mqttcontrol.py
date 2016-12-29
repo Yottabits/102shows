@@ -140,7 +140,7 @@ class MQTTControl:
         if show_name == self.show_process.name or show_name == "all":
             self.stop_running_show()
 
-    def stop_running_show(self, timeout_sec: float = 5) -> None:
+    def stop_running_show(self, timeout_sec: float = 1) -> None:
         """
         stops any running show
 
@@ -153,7 +153,7 @@ class MQTTControl:
                 logger.info("{show_name} is running. Terminating...".format(show_name=self.show_process.name))
                 self.show_process.terminate()
         else:
-            logger.info("no show running; all good")
+            logger.debug("no show running; nothing to stop")
 
     def run(self) -> None:
         """ start the listener """
