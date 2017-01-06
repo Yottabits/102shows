@@ -76,7 +76,7 @@ class MQTTControl:
         # store parameters as strings
         topic = str(msg.topic)
         if type(msg.payload) is bytes:  # might be a byte encoded string that must be stripped
-            payload = helpers.mqtt.binary_to_string(msg.payload)
+            payload = msg.payload.decode()
         else:
             payload = str(msg.payload)
 

@@ -32,18 +32,6 @@ def get_from_topic(hierarchy_level: int, topic: str) -> str:
     return hierarchy[hierarchy_level]
 
 
-def binary_to_string(payload) -> str:
-    """
-    turn a binary represented string into a python string
-
-    :param payload: binary string
-    :return: python string
-    """
-    string = str(payload)
-    stripped_string = string[2:-1]  # remove first two and last character
-    return stripped_string
-
-
 def parse_json_safely(payload: str) -> dict:
     """
     parse a string as JSON object
