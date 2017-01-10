@@ -36,7 +36,7 @@ Features
 Installation
 ------------
 
-see `INSTALLING.md <INSTALLING.md>`__
+see `INSTALLING.rst <INSTALLING.rst>`__
 
 Questions? 🤔
 ------------
