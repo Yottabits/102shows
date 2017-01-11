@@ -1,7 +1,7 @@
-"""
-102shows.Drivers
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
+"""\
+| *(c) 2016 Simon Leiner*
+| **licensed under the GNU Public License, version 2**
+|
 
 This module contains the drivers for the LED strips
 """
@@ -20,16 +20,17 @@ class LEDStrip(metaclass=ABCMeta):
     This class provides the general interface for LED drivers that the lightshows use.
     All LED drivers for 102shows should inherit this class.
     The following restrictions apply:
-        - pixel order is r,g,b
-        - pixel resolution (number of dim-steps per color component) is 8-bit, so 0 - 255
+    
+        * pixel order is r,g,b
+        * pixel resolution (number of dim-steps per color component) is 8-bit, so 0 - 255
     """
 
     max_refresh_time_sec = 1  #: this is used for optimizations of sleep()
 
     def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000):
         """
-        stores the given parameters and initializes the color and brightness buffers
-        drivers should extend this method
+        The constructor stores the given parameters and initializes the color and brightness buffers.
+        Drivers can and should extend this method.
 
         :param num_leds: number of LEDs in the strip
         :param max_clock_speed_hz: maximum clock speed (Hz) of the bus
