@@ -16,19 +16,18 @@ logger = logging.getLogger('102shows.drivers')
 
 
 class LEDStrip(metaclass=ABCMeta):
-    """
+    """\
     This class provides the general interface for LED drivers that the lightshows use.
     All LED drivers for 102shows should inherit this class.
-    The following restrictions apply:
-    
-        * pixel order is r,g,b
-        * pixel resolution (number of dim-steps per color component) is 8-bit, so 0 - 255
+    Mind the following:
+
+        - Pixel order is ``r,g,b``
+        - Pixel resolution (number of dim-steps per color component) is 8-bit, so minimum brightness is ``0``
+          and maximum brightness is ``255``
     """
 
-    max_refresh_time_sec = 1  #: this is used for optimizations of sleep()
-
     def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000):
-        """
+        """\
         The constructor stores the given parameters and initializes the color and brightness buffers.
         Drivers can and should extend this method.
 
@@ -52,7 +51,7 @@ class LEDStrip(metaclass=ABCMeta):
         self.synced_brightness_buffer = SyncedArray('i', self.brightness_buffer)
 
     def __del__(self):
-        """ invokes self.close() and deletes all the buffers"""
+        """Invokes :py:func': `close` and deletes all the buffers."""
         self.close()
 
         del self.color_buffer, self.synced_red_buffer, self.synced_green_buffer, self.synced_blue_buffer
@@ -60,36 +59,51 @@ class LEDStrip(metaclass=ABCMeta):
 
         logger.info("Driver successfully closed")
 
+    max_refresh_time_sec = 1
+    """\
+    The maximum time (in *seconds*) that a call of :func:`show` needs to execute.
+    Currently only used in :func:`lightshows.templates.base.sleep`
+    """
+
     @abstractmethod
-    def close(self):
-        """ close the bus connection and clean up remains"""
+    def close(self) -> None:
+        """\
+        An abstract method to be inherited by the drivers.
+        It should close the bus connection and clean up any remains.
+        """
         pass
 
-    def freeze(self):
-        """
-        freezes the strip. All state-changing methods (on_color_change() and on_brightness_change())
-        will not do anything anymore and leave the buffer unchanged
+    def freeze(self) -> None:
+        """\
+        Freezes the strip.
+        All state-changing methods (:func:`on_color_change` and :func:`on_brightness_change`)
+        must not do anything anymore and leave the buffer unchanged.
         """
         self.__frozen = True
 
-    def unfreeze(self):
-        """ revokes all effects of freeze() """
+    def unfreeze(self) -> None:
+        """Revokes all effects of :func:`freeze`"""
         self.__frozen = False
 
-    def get_pixel(self, led_num):
-        """
-        gets the pixel at index led_num
+    def get_pixel(self, led_num: int) -> tuple:
+        """\
+        Returns the pixel at index ``led_num``
 
         :param led_num: the index of the pixel you want to get
-        :return: (red, green, blue) tuple
+        :return: ``(red, green, blue)`` as tuple
         """
 
         return self.color_buffer[led_num]
 
     def set_pixel(self, led_num: int, red: float, green: float, blue: float) -> None:
-        """
-        subclasses should not inherit this method!
-        writes the color buffer and calls on_color_change() if not frozen
+        """\
+        **Subclasses should not inherit this method!**
+        The buffer value of pixel ``led_num`` is set to ``(red, green, blue)``
+
+        :param led_num: index of the pixel to be set
+        :param red: red component of the pixel (``0.0 - 255.0``)
+        :param green: green component of the pixel (``0.0 - 255.0``)
+        :param blue: blue component of the pixel (``0.0 - 255.0``)
         """
 
         if led_num < 0:
@@ -103,38 +117,37 @@ class LEDStrip(metaclass=ABCMeta):
 
     @abstractmethod
     def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
-        """
-        changes the message buffer after a pixel was changed in the global color buffer
-        To send the buffer to the strip and show the changes, invoke strip.show()
+        """\
+        Changes the message buffer after a pixel was changed in the global color buffer.
+        To send the buffer to the strip and show the changes, invoke :func:`show`
 
-        :param led_num: index of the RGB pixel to be changed
-        :param red: new red component
-        :param green: new green component
-        :param blue: new blue component
+        :param led_num: index of the pixel to be set
+        :param red: red component of the pixel (``0.0 - 255.0``)
+        :param green: green component of the pixel (``0.0 - 255.0``)
+        :param blue: blue component of the pixel (``0.0 - 255.0``)
         """
 
-    def set_pixel_bytes(self, led_num: int, rgb_color):
-        """
-        Changes the pixel led_num to the given color IN THE BUFFER!
-        To send the buffer to the strip and show the changes, invoke strip.show()
-        If you do not know, how rgb_color works, just use set_pixel()
+    def set_pixel_bytes(self, led_num: int, rgb_color: int) -> None:
+        """\
+        Changes the pixel ``led_num`` to the given color **in the buffer**.
+        To send the buffer to the strip and show the changes, invoke :func:`show`
+        If you do not know, how ``rgb_color`` works, just use :func:`set_pixel`
 
-        :param led_num: index of the RGB pixel to be changed
+        :param led_num: index of the pixel to be set
         :param rgb_color: a 3-byte RGB color value represented as a base-10 integer
-        :return:
         """
         red, green, blue = self.color_bytes_to_tuple(rgb_color)
         self.set_pixel(led_num, red, green, blue)
 
     @staticmethod
     def color_tuple_to_bytes(red: float, green: float, blue: float) -> int:
-        """
-        converts an RGB color tuple into a 3-byte color value
+        """\
+        Converts an RGB color tuple into a 3-byte color value
 
-        :param red: red component of the tuple
-        :param green: green component of the tuple
-        :param blue: blue component of the tuple
-        :return: the tuple components are joined into a 3-byte value with each byte representing a color component
+        :param red: red component of the tuple (``0.0 - 255.0``)
+        :param green: green component of the tuple (``0.0 - 255.0``)
+        :param blue: blue component of the tuple (``0.0 - 255.0``)
+        :return: the tuple components joined into a 3-byte value with each byte representing a color component
         """
 
         # round to integers
@@ -145,12 +158,12 @@ class LEDStrip(metaclass=ABCMeta):
         return (red << 16) + (green << 8) + blue
 
     @staticmethod
-    def color_bytes_to_tuple(rgb_color: int):
-        """
-        converts a 3-byte color value into an RGB color tuple
+    def color_bytes_to_tuple(rgb_color: int) -> tuple:
+        """\
+        Converts a 3-byte color value into an RGB color tuple.
 
         :param rgb_color: a 3-byte RGB color value represented as a base-10 integer
-        :return: color tuple (r,g,b)
+        :return: color tuple ``(red, green, blue)``
         """
         r = (rgb_color & 0xFF0000) >> 16
         g = (rgb_color & 0x00FF00) >> 8
@@ -159,20 +172,19 @@ class LEDStrip(metaclass=ABCMeta):
 
     @abstractmethod
     def show(self) -> None:
-        """
+        """\
+        **Subclasses should overwrite this method**
         This method should show the buffered pixels on the strip,
-        e.g. write the pixel buffer to the port on which the strip is connected.
-
-        :return: none
+        e.g. write the message buffer to the port on which the strip is connected.
         """
         pass
 
-    def rotate(self, positions=1):
-        """
+    def rotate(self, positions: int = 1) -> None:
+        """\
         Treating the internal leds array as a circular buffer, rotate it by the specified number of positions.
-        The number could be negative, which means rotating in the opposite direction.
+        The number can be negative, which means rotating in the opposite direction.
 
-        :param positions: rotate by how many steps
+        :param positions: the number of steps to rotate
         """
         self.color_buffer = self.color_buffer[positions:] + self.color_buffer[:positions]
         for led_num in range(self.num_leds):
@@ -180,11 +192,11 @@ class LEDStrip(metaclass=ABCMeta):
             self.on_color_change(led_num, r, g, b)
 
     def set_brightness(self, led_num: int, brightness: int) -> None:
-        """
-        sets the brightness for a single LED in the strip
+        """\
+        Sets the brightness for a single LED in the strip.
 
         :param led_num: the target LED index
-        :param brightness: the desired brightness (0 - 100)
+        :param brightness: the desired brightness (``0 - 100``)
         """
         if not self.__frozen:
             self.brightness_buffer[led_num] = brightness
@@ -192,34 +204,34 @@ class LEDStrip(metaclass=ABCMeta):
 
     @abstractmethod
     def on_brightness_change(self, led_num: int) -> None:
-        """
-        reacts to a brightness change at led_num by modifying the message buffer
+        """\
+        Reacts to a brightness change at ``led_num`` by modifying the message buffer
 
         :param led_num: number of the LED whose brightness was modified
         """
         pass
 
     def set_global_brightness(self, brightness: int) -> None:
-        """
-        calls set_brightness() for all LEDs in the strip
+        """\
+        calls :func:``set_brightness`` for all LEDs in the strip
 
-        :param brightness: the brightness (0 - 100) to be set all over the strip
+        :param brightness: the brightness (``0 - 100``) to be set all over the strip
         """
         for led_num in range(self.num_leds):
             self.set_brightness(led_num, brightness)
 
     def clear_buffer(self) -> None:
-        """ sets all pixels in the color buffer to (0,0,0) """
+        """Resets all pixels in the color buffer to ``(0,0,0)``."""
         for led_num in range(self.num_leds):
             self.set_pixel(led_num, 0, 0, 0)
 
     def clear_strip(self) -> None:
-        """ clears the color buffer, then invokes a blackout on the strip by calling show() """
+        """Clears the color buffer, then invokes a blackout on the strip by calling :func:`show`"""
         self.clear_buffer()
         self.show()
 
     def sync_up(self) -> None:
-        """ copies the local message buffer to a shared object so other processes can see the current strip state """
+        """ Copies the local message buffer to a shared object so other processes can see the current strip state"""
         logger.info("sync-up")
         for led_num, (red, green, blue) in enumerate(self.color_buffer):
             # colors
@@ -231,7 +243,7 @@ class LEDStrip(metaclass=ABCMeta):
             self.synced_brightness_buffer[led_num] = self.brightness_buffer[led_num]
 
     def sync_down(self) -> None:
-        """ applies the shared buffer to the local message buffer """
+        """Applies the shared buffer to the local message buffer"""
         logger.info("sync-down")
         for led_num, _ in enumerate(self.color_buffer):
             # colors
