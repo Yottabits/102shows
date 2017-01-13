@@ -5,25 +5,25 @@ Reference
 This will give you an overview of all the classes in 102shows.
 
 
-##########
-controller
-##########
+#####################
+:py:mod:`mqttcontrol`
+#####################
 
 
 
-#######
-drivers
-#######
+#################
+:py:mod:`drivers`
+#################
 
 Structure
 =========
 
-TODO: explanation of the structure
+#FIXME: explanation of the structure
 
 Interface
 =========
 
-.. automodule:: drivers
+.. module:: drivers
    :synopsis: LED Strip drivers
 
 .. autoclass:: drivers.LEDStrip
@@ -31,12 +31,12 @@ Interface
 
 
 
-#######
-helpers
-#######
+#################
+:py:mod:`helpers`
+#################
 
 
 
-##########
-lightshows
-##########
+####################
+:py:mod:`lightshows`
+####################
