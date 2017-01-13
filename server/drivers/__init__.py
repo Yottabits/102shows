@@ -68,7 +68,8 @@ class LEDStrip(metaclass=ABCMeta):
     @abstractmethod
     def close(self) -> None:
         """\
-        An abstract method to be inherited by the drivers.
+        **An abstract method to be overwritten by the drivers.**
+
         It should close the bus connection and clean up any remains.
         """
         pass
@@ -97,7 +98,8 @@ class LEDStrip(metaclass=ABCMeta):
 
     def set_pixel(self, led_num: int, red: float, green: float, blue: float) -> None:
         """\
-        **Subclasses should not inherit this method!**
+        **Subclasses should not modify this method!**
+
         The buffer value of pixel ``led_num`` is set to ``(red, green, blue)``
 
         :param led_num: index of the pixel to be set
@@ -119,7 +121,7 @@ class LEDStrip(metaclass=ABCMeta):
     def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
         """\
         Changes the message buffer after a pixel was changed in the global color buffer.
-        To send the buffer to the strip and show the changes, invoke :func:`show`
+        To send the buffer to the strip and show the changes, you must invoke :func:`show`
 
         :param led_num: index of the pixel to be set
         :param red: red component of the pixel (``0.0 - 255.0``)
@@ -131,7 +133,8 @@ class LEDStrip(metaclass=ABCMeta):
         """\
         Changes the pixel ``led_num`` to the given color **in the buffer**.
         To send the buffer to the strip and show the changes, invoke :func:`show`
-        If you do not know, how ``rgb_color`` works, just use :func:`set_pixel`
+
+        *If you do not know, how the 3-byte* ``rgb_color`` *works, just use* :func:`set_pixel` *.*
 
         :param led_num: index of the pixel to be set
         :param rgb_color: a 3-byte RGB color value represented as a base-10 integer
@@ -142,7 +145,7 @@ class LEDStrip(metaclass=ABCMeta):
     @staticmethod
     def color_tuple_to_bytes(red: float, green: float, blue: float) -> int:
         """\
-        Converts an RGB color tuple into a 3-byte color value
+        Converts an RGB color tuple (like ``(255, 0, 26)``) into a 3-byte color value (like ``FF001A``)
 
         :param red: red component of the tuple (``0.0 - 255.0``)
         :param green: green component of the tuple (``0.0 - 255.0``)
@@ -160,7 +163,7 @@ class LEDStrip(metaclass=ABCMeta):
     @staticmethod
     def color_bytes_to_tuple(rgb_color: int) -> tuple:
         """\
-        Converts a 3-byte color value into an RGB color tuple.
+        Converts a 3-byte color value (like ``FF001A``) into an RGB color tuple (like ``(255, 0, 26)``).
 
         :param rgb_color: a 3-byte RGB color value represented as a base-10 integer
         :return: color tuple ``(red, green, blue)``
@@ -174,6 +177,7 @@ class LEDStrip(metaclass=ABCMeta):
     def show(self) -> None:
         """\
         **Subclasses should overwrite this method**
+
         This method should show the buffered pixels on the strip,
         e.g. write the message buffer to the port on which the strip is connected.
         """
@@ -213,7 +217,7 @@ class LEDStrip(metaclass=ABCMeta):
 
     def set_global_brightness(self, brightness: int) -> None:
         """\
-        calls :func:``set_brightness`` for all LEDs in the strip
+        calls :func:`set_brightness` for all LEDs in the strip
 
         :param brightness: the brightness (``0 - 100``) to be set all over the strip
         """
@@ -231,7 +235,10 @@ class LEDStrip(metaclass=ABCMeta):
         self.show()
 
     def sync_up(self) -> None:
-        """ Copies the local message buffer to a shared object so other processes can see the current strip state"""
+        """\
+        Copies the local color and brightness buffers to the shared buffer
+        so other processes can see the current strip state.
+        """
         logger.info("sync-up")
         for led_num, (red, green, blue) in enumerate(self.color_buffer):
             # colors
@@ -243,7 +250,7 @@ class LEDStrip(metaclass=ABCMeta):
             self.synced_brightness_buffer[led_num] = self.brightness_buffer[led_num]
 
     def sync_down(self) -> None:
-        """Applies the shared buffer to the local message buffer"""
+        """Reads the shared color and brightness buffers and copies them to the local buffers"""
         logger.info("sync-down")
         for led_num, _ in enumerate(self.color_buffer):
             # colors
