@@ -36,7 +36,7 @@ Features
 Installation
 ------------
 
-see `INSTALLING.rst <INSTALLING.rst>`__
+Take a look at the `Documentation <https://102shows.readthedocs.io/en/docs/usage.html#installation>`__
 
 Questions? 🤔
 ------------

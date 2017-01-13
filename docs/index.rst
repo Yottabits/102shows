@@ -1,16 +1,21 @@
-.. 102shows documentation master file, created by
-   sphinx-quickstart on Wed Jan 11 01:00:44 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. code::
 
-Welcome to 102shows's documentation!
-====================================
+   .                                _______ ___        __                                                   .
+   ...                             <  / __ \__ \ _____/ /_  ____ _      _______                           ...
+   .....                           / / / / /_/ // ___/ __ \/ __ \ | /| / / ___/                         .....
+   ...                            / / /_/ / __/(__  ) / / / /_/ / |/ |/ (__  )                            ...
+   .                             /_/\____/____/____/_/ /_/\____/|__/|__/____/                               .
+
+
+Welcome to the 102shows documentation!
+======================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    usage
+   developing
    reference
 
 
@@ -21,3 +26,10 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Trouble?
+========
+
+Open an `issue <https://github.com/Yottabits/102shows/issues>`_
+on `GitHub <https://github.com/Yottabits/102shows/issues>`_
+or write an email to me: 102shows@leiner.me
