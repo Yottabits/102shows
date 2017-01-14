@@ -49,6 +49,9 @@ Module members
 Sub-modules
 ===========
 
+.. automodule:: helpers.color
+   :members:
+
 
 
 ####################
