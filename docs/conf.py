@@ -31,12 +31,20 @@ import sphinx_rtd_theme
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-              'sphinx_autodoc_typehints',
-              'sphinx.ext.intersphinx',
-              'sphinx.ext.todo',
-              'sphinx.ext.coverage',
-              'sphinx.ext.viewcode']
+if os.environ['READTHEDOCS']:  # Read the docs is not compatible with some modules
+    extensions = ['sphinx.ext.autodoc',
+                  'sphinx_autodoc_annotation',
+                  'sphinx.ext.intersphinx',
+                  'sphinx.ext.todo',
+                  'sphinx.ext.coverage',
+                  'sphinx.ext.viewcode']
+else:
+    extensions = ['sphinx.ext.autodoc',
+                  'sphinx_autodoc_typehints',
+                  'sphinx.ext.intersphinx',
+                  'sphinx.ext.todo',
+                  'sphinx.ext.coverage',
+                  'sphinx.ext.viewcode']
 
 # include constructor descriptions
 autoclass_content = 'both'
