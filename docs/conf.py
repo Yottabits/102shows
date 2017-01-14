@@ -17,10 +17,10 @@
 # Code source (for autodoc)
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../server'))
 
 import sphinx_rtd_theme
-
 
 # -- General configuration ------------------------------------------------
 
@@ -32,6 +32,7 @@ import sphinx_rtd_theme
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
+              'sphinx_autodoc_typehints',
               'sphinx.ext.intersphinx',
               'sphinx.ext.todo',
               'sphinx.ext.coverage',
