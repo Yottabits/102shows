@@ -72,3 +72,5 @@ Templates
 
 The base template
 -----------------
+.. autoclass:: lightshows.templates.base.Lightshow
+   :members:
