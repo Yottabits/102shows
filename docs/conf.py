@@ -31,15 +31,15 @@ import sphinx_rtd_theme
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-try:
-    if os.environ['READTHEDOCS']:  # Read the docs is not compatible with some modules
-        extensions = ['sphinx.ext.autodoc',
-                      'sphinx_autodoc_annotation',
-                      'sphinx.ext.intersphinx',
-                      'sphinx.ext.todo',
-                      'sphinx.ext.coverage',
-                      'sphinx.ext.viewcode']
-except KeyError:  # we are not on readthedocs
+
+if os.environ.get('READTHEDOCS', None):  # Read the docs is not compatible with some modules
+    extensions = ['sphinx.ext.autodoc',
+                  'sphinx_autodoc_annotation',
+                  'sphinx.ext.intersphinx',
+                  'sphinx.ext.todo',
+                  'sphinx.ext.coverage',
+                  'sphinx.ext.viewcode']
+else:  # we are not on readthedocs
     extensions = ['sphinx.ext.autodoc',
                   'sphinx_autodoc_typehints',
                   'sphinx.ext.intersphinx',
