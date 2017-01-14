@@ -49,9 +49,6 @@ Module members
 Sub-modules
 ===========
 
-.. automodule:: helpers.color
-   :members:
-
 
 
 ####################
@@ -72,5 +69,3 @@ Templates
 
 The base template
 -----------------
-.. autoclass:: lightshows.templates.base.Lightshow
-   :members:
