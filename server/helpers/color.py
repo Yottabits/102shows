@@ -171,7 +171,7 @@ class SmoothBlend:
 
         @classmethod
         def power_blend(cls, power: float, start_color: tuple, end_color: tuple, fade_progress: float) -> tuple:
-            """ blend two colors using a power function, the exponent is set via :param power """
+            """ blend two colors using a power function, the exponent is set via param power """
             start_component = linear_dim(start_color, fade_progress ** power)
             target_component = linear_dim(end_color, (1 - fade_progress) ** power)
             return add_tuples(start_component, target_component)

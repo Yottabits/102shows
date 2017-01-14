@@ -11,7 +11,7 @@ __all__ = ['color', 'exceptions', 'mqtt', 'preprocessors', 'verify']
 
 def get_logo(filename: str ='../logo') -> str:
     """\
-    Returns the colored 102shows logo. It is read from /path/to/102shows/logo
+    Returns the colored 102shows logo. It is read from :file:`/path/to/102shows/logo`
 
     :param filename: You can specify another logo source file, if you want.
 
