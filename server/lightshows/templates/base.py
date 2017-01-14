@@ -1,14 +1,12 @@
-"""
-Lightshow base template
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Lightshow base template
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
+from abc import ABCMeta, abstractmethod
 import logging
 import os
 import signal
 import time
-from abc import ABCMeta, abstractmethod
 
 import paho.mqtt.client
 
@@ -20,10 +18,19 @@ from helpers.exceptions import *
 
 
 class Lightshow(metaclass=ABCMeta):
-    """
+    """\
     This class defines the interfaces and a few helper functions for lightshows.
     It is highly recommended to use it as your base class when writing your own show.
     """
+
+    # Attributes
+    p = {}  #: dict: parameter_name => value  #FIXME
+    p_verifier = {}  #: dict: parameter_name => (verifier_function, args, kwargs)  #FIXME
+    p_preprocessor = {}  #: dict: parameter_name => preprocessor_function  #FIXME
+
+    logger = None  #: #FIXME
+    mqtt = None  #: #FIXME
+    strip = None  #: #FIXME
 
     def __init__(self, strip: LEDStrip, parameters: dict):
         # logger
@@ -34,9 +41,6 @@ class Lightshow(metaclass=ABCMeta):
 
         # Parameters
         self.strip = strip
-        self.p = {}  # dict: parameter_name => value
-        self.p_verifier = {}  # dict: parameter_name => (verifier_function, args, kwargs)
-        self.p_preprocessor = {}  # dict: parameter_name => preprocessor_function
         self.init_parameters()  # let the child class set its own default parameters
 
         # override with any directly given parameters
@@ -93,20 +97,24 @@ class Lightshow(metaclass=ABCMeta):
         """ terminates its own process """
         os.kill(os.getpid(), signal.SIGKILL)
 
-    def register(self, parameter_name: str, default_val, verifier: callable, args: list = None, kwargs: dict = None,
-                 preprocessor: callable = None) -> None:
-        """
-        MQTT-settable parameters are stored in self.p
-        Calling this function will register a new parameter and his verifier in p and p_verifier,
-        so the parameter can be set via MQTT and by the controller.
+    def register(self, parameter_name: str, default_val, verifier, args: list = None, kwargs: dict = None,
+                 preprocessor = None) -> None:
+        """\
+        MQTT-settable parameters are stored in :py:attr:`~lightshows.templates.base.Lightshow.p`.
+        Calling this function will register a new parameter and his verifier in
+        :py:attr:`~lightshows.templates.base.Lightshow.p` and
+        :py:attr:`~lightshows.templates.base.Lightshow.p_verifier`, so the parameter can be
+        set via MQTT and by the controller.
 
-        :param parameter_name: name of the parameter. You access the parameter via self.p[parameter_name]
-        :param default_val: initializer value of the parameter. Note that this value will not be checked!
-        :param verifier: a function that is called before the parameter is set via MQTT. If it raises an
-                         InvalidParameters exception, the new value will not be set
-        :param args: the verifier function will be called via verifier(new_value, param_name, *args, **kwargs)
-        :param kwargs: the verifier function will be called via verifier(new_value, param_name, *args, **kwargs)
-        :param preprocessor: before the validation in set_parameter value = preprocessor(value) will be called
+        :param parameter_name: name of the parameter. You access the parameter via self.p[parameter_name].
+        :param default_val: initializer value of the parameter.
+                            *Note that this value will not be checked by the verifier function!*
+        :param verifier: a function that is called before the parameter is set via MQTT.
+                         If it raises an InvalidParameters exception, the new value will not be set.  #FIXLINK
+        :param args: the verifier function will be called as :samp:`{verifier}(new_value, param_name, *args, **kwargs)`
+        :param kwargs: the verifier function will be called via
+                       :samp:`{verifier}(new_value, param_name, *args, **kwargs)`
+        :param preprocessor: before the validation in set_parameter :samp:`value = {preprocessor}(value)` will be called
         """
 
         # cast None to empty iterables

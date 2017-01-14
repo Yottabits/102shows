@@ -1,18 +1,16 @@
-"""
-Color Helpers
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-
-This class provides helper functions and classes for the lightshows:
-    - grayscale_correction(lightness, max_in, max_out)
-    - linear_dim(undimmed, factor)
-    - is_rgb_color_tuple(to_check)
-    - add_tuples(tuple1, tuple2)
-    - blend_whole_strip_to_color(strip, color, fadetime_sec)
-    - wheel(wheel_pos)
-
-    - SmoothBlend
-"""
+# Color Helpers
+# (c) 2016 Simon Leiner
+# licensed under the GNU Public License, version 2
+#
+# This module provides helper functions and classes for the lightshows:
+#     - grayscale_correction(lightness, max_in, max_out)
+#     - linear_dim(undimmed, factor)
+#     - is_rgb_color_tuple(to_check)
+#     - add_tuples(tuple1, tuple2)
+#     - blend_whole_strip_to_color(strip, color, fadetime_sec)
+#     - wheel(wheel_pos)
+#
+#     - SmoothBlend
 
 import types
 import logging
@@ -23,13 +21,14 @@ from helpers import verify, exceptions
 
 
 def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int = 255):
-    """
+    """\
     correct the non-linear human perception of the led brightness according to CIE 1931
     This is commonly mistaken for gamma correction. For more information, read here: https://goo.gl/9Ji129
 
     :param lightness: linear brightness value between 0 and max_in
     :param max_in: maximum value for lightness
     :param max_out: maximum output integer value (255 for 8-bit LED drivers)
+
     :return the correct PWM duty cycle for humans to see the desired lightness as integer
     """
 
@@ -63,10 +62,11 @@ def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int =
 
 
 def wheel(wheel_pos: float):
-    """
+    """\
     Get a color from a color wheel: Green -> Red -> Blue -> Green
 
     :param wheel_pos: numeric from 0 to 254
+
     :return: RGB color tuple
     """
 
@@ -85,11 +85,12 @@ def wheel(wheel_pos: float):
 
 
 def linear_dim(undimmed: tuple, factor: float) -> tuple:
-    """
-    multiply all components of undimmed with factor
+    """\
+    Multiply all components of undimmed with factor
 
     :param undimmed: the vector
     :param factor: the factor to multiply the components of the vector byy
+
     :return: resulting RGB color vector
     """
     dimmed = ()
@@ -100,11 +101,12 @@ def linear_dim(undimmed: tuple, factor: float) -> tuple:
 
 
 def add_tuples(tuple1: tuple, tuple2: tuple):
-    """
-    add two tuples component-wise
+    """\
+    Add two tuples component-wise
 
     :param tuple1: summand
     :param tuple2: summand
+
     :return: sum
     """
 
@@ -118,17 +120,9 @@ def add_tuples(tuple1: tuple, tuple2: tuple):
 
 
 class SmoothBlend:
-    """
-    SmoothBlend
-
+    """\
     This class lets the user define a specific state of the strip (=> target_colors) and then smoothly blends the
     current state over to the set state.
-
-    It provides the following functions:
-        - set_pixel(led_num, red, green, blue)
-        - set_color_for_whole_strip(red, green, blue)
-        - blend(time_sec, blend_function)
-
     """
 
     logger = logging.getLogger('102shows.server.helpers.color.SmoothBlend')
@@ -154,11 +148,10 @@ class SmoothBlend:
             self.set_pixel(led_num, red, green, blue)
 
     class BlendFunctions:
-        """
-        BlendFunctions
-        an internal class which provides functions to blend between two colors by a parameter fade_progress
-        for fade_progress = 0 the function should return the start_color
-        for fade_progress = 1 the function should return the end_color
+        """\
+        An internal class which provides functions to blend between two colors by a parameter fade_progress
+        for ``fade_progress == 0`` the function should return the start_color
+        for ``fade_progress == 1`` the function should return the end_color
         """
 
         @classmethod

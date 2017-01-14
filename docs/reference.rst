@@ -35,8 +35,42 @@ Interface
 :py:mod:`helpers`
 #################
 
+Overview
+========
+
+Module members
+==============
+
+.. module:: helpers
+
+.. autofunction:: helpers.get_logo
+.. autofunction:: helpers.get_version
+
+Sub-modules
+===========
+
+.. automodule:: helpers.color
+   :members:
+
 
 
 ####################
 :py:mod:`lightshows`
 ####################
+
+Overview
+========
+
+.. todo:: explain lightshows
+.. module:: lightshows
+
+Templates
+=========
+
+.. todo:: explain templates
+.. module:: lightshows.templates
+
+The base template
+-----------------
+.. autoclass:: lightshows.templates.base.Lightshow
+   :members:
