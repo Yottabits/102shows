@@ -16,7 +16,7 @@ Installation
   messages to the server
 
 For the two elements to be able to communicate (via MQTT) you need an
-**MQTT broker**, for example ``mosquitto``
+**MQTT broker**, for example :program:`mosquitto`
 
 All of these can run on the same Raspberry Pi but only the server has
 to.
@@ -25,18 +25,16 @@ MQTT broker
 ===========
 
 If you already have an MQTT broker in your network, you can use it.
-Else, install ``mosquitto`` via ``sudo apt-get install mosquitto``. In
-any case, you will need the host, port (and maybe access credentials) of
-your MQTT broker for later.
+Else, install :program:`mosquitto` via :command:`sudo apt-get install mosquitto`.
+In any case, you will need the host, port (and maybe access credentials)
+of your MQTT broker for later.
 
 Server
 ======
 
 In the folder you want to install 102shows in, run:
 
-::
-
-    wget -q -O 102s-setup.sh https://git.io/v1x1q; chmod +x 102s-setup.sh; ./102s-setup.sh; rm 102s-setup.sh
+    :command:`wget -q -O 102s-setup.sh https://git.io/v1x1q; chmod +x 102s-setup.sh; ./102s-setup.sh; rm 102s-setup.sh`
 
 This will launch an assistant that will lead you through the
 installation process.
@@ -53,25 +51,29 @@ add-on.
 
 -  Install Node-RED: (this is **not necessary** on Raspbian)
 
-   -  Install node.js (including npm): ``sudo apt-get install nodejs``
+   -  Install node.js (including npm): :command:`sudo apt-get install nodejs`
       (not necessary on Raspbian)
-   -  Update npm: ``sudo npm install npm@latest -g``
-   -  Install Node-RED: ``sudo npm install -g node-red``
+   -  Update npm: :command:`sudo npm install npm@latest -g`
+   -  Install Node-RED: :command:`sudo npm install -g node-red`
 
--  Install the Node-RED dashboard add-on (**note that you have to
-   uninstall any previous versions of node-red-contrib-ui etc. first**):
-   ``npm install node-red-dashboard``
+.. warning::
+
+  If you have installed any version of :program:`node-red-contrib-ui`,
+  you have to uninstall it **before** installing :program:`node-red-dashboard`.
+
+-  Install the Node-RED dashboard add-on:
+   :command:`npm install node-red-dashboard`
 
 2. Start Node-RED
 -----------------
 
-Execute ``node-red`` on a console. The Node-RED administration interface
-should now be available on ``http://localhost:1880``
+Execute :command:`node-red` on a console. The Node-RED administration interface
+should now be available on |nodered-admin|
 
 .. topic:: Raspbian Tip
 
    If you want Node-RED to automatically start on boot, execute:
-   ``sudo systemctl enable nodered.service``
+   :command:`sudo systemctl enable nodered.service`
 
 3. Paste the 102shows UI in Node-RED
 ------------------------------------
@@ -79,33 +81,33 @@ should now be available on ``http://localhost:1880``
 Copy the contents of
 `ui/nodered.json <https://raw.githubusercontent.com/Yottabits/102shows/stable/ui/nodered.json>`__
 into the clipboard. Go to the Node-RED admin interface and in the main
-menu (upper right corner) choose *Import* >> *Clipboard* and paste the
-code you copied earlier into the window that is opening. Confirm with
-*Import*
+menu (upper right corner) choose :guilabel:`Import` >> :guilabel:`Clipboard`
+and paste the code you copied earlier into the window that is opening.
+Confirm with :guilabel:`Import`
 
 You should now see the flow **LED control**
 
 4. Configure the 102shows UI
 ----------------------------
 
-In the upper left of **LED control** there is a node named **global
+In the upper left :guilabel:`LED control` there is a node named **global
 settings**. Double-click on it to open it and modify the preferences in
 the code so that they match the settings in your server-side
-*config.py*.
+:file:`config.py`.
 
-Save with *Done* and hit the red *deploy* button on the upper right.
+Save with :guilabel:`Done` and hit the red :guilabel:`Deploy` button on the upper right.
 
 5. Have fun 😄
 --------------
 
-The UI is now available on ``http://localhost:1880/ui`` and you should
+The UI is now available on |nodered-ui| and you should
 be able to control your LED strips from there 👍
 
 #############
 Configuration
 #############
 
-#FIXME
+.. todo:: Give configuration advice
 
 #######
 Running
@@ -115,9 +117,12 @@ Server
 ======
 
 1. Start the MQTT broker
-2. Execute ``/path/to/102shows/server/run.sh``
+2. Execute :command:`/path/to/102shows/server/run.sh`
 
 Web UI
 ======
 
-Just start Node-RED. The panel shold appear on ``yournoderedhost:1880/ui``
+Just start Node-RED. The panel shold appear on |nodered-ui|
+
+.. |nodered-admin| replace:: `<yournoderedhost:1880>`__
+.. |nodered-ui| replace:: `<yournoderedhost:1880/ui>`__

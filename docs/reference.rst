@@ -18,7 +18,7 @@ This will give you an overview of all the classes in 102shows.
 Structure
 =========
 
-#FIXME: explanation of the structure
+.. todo:: explanation of the structure
 
 Interface
 =========

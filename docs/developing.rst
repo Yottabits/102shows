@@ -24,11 +24,13 @@ are up to the individual lightshow.
 
 ``start``
 ^^^^^^^^^
+.. todo:: fix method links
+
 The MQTT controller stops (see below) any running show.
 Then it checks if the given parameters (the JSON payload of the MQTT start message)
-are valid by invoking ``show.check_runnable()``.  # FIXME
+are valid by invoking ``show.check_runnable()``.
 If the show calls the parameters valid, the controller starts a new process
-that runs the method ``show.run(strip, parameters)``.  #FIXME
+that runs the method ``show.run(strip, parameters)``.
 
 ``stop``
 ^^^^^^^^
@@ -88,7 +90,7 @@ Formal interface
 
 class parameters
 ----------------
-#FIXME
+.. todo:: explain class parameters
 
 Example
 -------
@@ -102,8 +104,8 @@ a lightweight example is :py:mod:`lightshows.solidcolor`
 Other templates
 ===============
 
-#FIXME
+.. todo:: explain other templates
 
 ``ColorCycle``
 --------------
-#FIXME
+.. todo:: explain color cycle
