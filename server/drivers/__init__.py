@@ -1,10 +1,9 @@
-"""\
-| *(c) 2016 Simon Leiner*
-| **licensed under the GNU Public License, version 2**
-|
+# 102shows Drivers
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
-This module contains the drivers for the LED strips
-"""
+
+"""This module contains the drivers for the LED strips"""
 
 import logging
 from abc import ABCMeta, abstractmethod
@@ -96,10 +95,9 @@ class LEDStrip(metaclass=ABCMeta):
 
         return self.color_buffer[led_num]
 
+    # do not overwrite this method:
     def set_pixel(self, led_num: int, red: float, green: float, blue: float) -> None:
         """\
-        **Subclasses should not modify this method!**
-
         The buffer value of pixel ``led_num`` is set to ``(red, green, blue)``
 
         :param led_num: index of the pixel to be set

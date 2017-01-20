@@ -1,15 +1,13 @@
-"""
-Theater Chase
-(c) 2015 Martin Erzberger, 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Theater Chase
+# (c) 2015 Martin Erzberger, 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 from helpers.color import wheel
 from lightshows.templates.colorcycle import *
 
 
 class TheaterChase(ColorCycle):
-    """
+    """\
     Theater Chase: https://www.youtube.com/watch?v=rzDw4Yu_S6U
 
     No parameters necessary

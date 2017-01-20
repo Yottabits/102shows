@@ -1,10 +1,8 @@
-"""
-MQTT Helpers
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
+# MQTT Helpers
+# (c) 2016 Simon Leiner
+# licensed under the GNU Public License, version 2
 
-A couple of helper functions (big surprise!) for MQTTControl
-"""
+"""A couple of helper functions (big surprise!) for MQTTControl"""
 
 import json
 import logging
@@ -13,7 +11,7 @@ logger = logging.getLogger('102shows.server.helpers.mqtt')
 
 
 class TopicAspect:
-    """ information you can get out of an MQTT topic (and on which path hierarchy they are) """
+    """information you can get out of an MQTT topic (and on which path hierarchy they are)"""
     prefix = 0
     sys_name = 1
     show_name = 3
@@ -21,7 +19,7 @@ class TopicAspect:
 
 
 def get_from_topic(hierarchy_level: int, topic: str) -> str:
-    """
+    """\
     get the string on a specified hierarchy level
 
     :param hierarchy_level: integer level
@@ -33,7 +31,7 @@ def get_from_topic(hierarchy_level: int, topic: str) -> str:
 
 
 def parse_json_safely(payload: str) -> dict:
-    """
+    """\
     parse a string as JSON object
     logs failures as warnings
 

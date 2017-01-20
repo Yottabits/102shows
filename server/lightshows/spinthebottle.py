@@ -1,8 +1,6 @@
-"""
-SpinTheBottle
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Spin The Bottle
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 import random
 

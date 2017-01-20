@@ -1,10 +1,7 @@
-"""
-MQTT Control
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
+# MQTT Control
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
-See the class description for a description of what this module does.
-"""
 
 import json
 import logging
@@ -26,7 +23,7 @@ logger = logging.getLogger('102shows.server.mqttcontrol')
 
 
 class MQTTControl:
-    """
+    """\
     This class provides function to start/stop the shows under lightshows/
     according to the commands it receives via MQTT
     """
@@ -38,7 +35,7 @@ class MQTTControl:
         self.strip = None  # for the LED strip
 
     def notify_user(self, message, qos=0) -> None:
-        """
+        """\
         send to the MQTT notification channel: Node-RED will display a toast notification
 
         :param message: the text to be displayed
@@ -54,7 +51,7 @@ class MQTTControl:
         )
 
     def on_connect(self, client, userdata, flags, rc):
-        """ subscribe to all messages related to this LED installation """
+        """subscribe to all messages related to this LED installation"""
         start_path = self.conf.MQTT.general_path.format(
             prefix=self.conf.MQTT.prefix,
             sys_name=self.conf.sys_name,
@@ -72,7 +69,7 @@ class MQTTControl:
             host=self.conf.MQTT.Broker.host, start_path=start_path, stop_path=stop_path))
 
     def on_message(self, client, userdata, msg):
-        """ react to a received message and eventually starts/stops a show """
+        """react to a received message and eventually starts/stops a show"""
         # store parameters as strings
         topic = str(msg.topic)
         if type(msg.payload) is bytes:  # might be a byte encoded string that must be stripped
@@ -105,7 +102,7 @@ class MQTTControl:
             logger.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
 
     def start_show(self, show_name: str, parameters: dict) -> None:
-        """
+        """\
         looks for a show, checks if it can run and if so, starts it in an own process
 
         :param show_name: name of the show to be started
@@ -131,7 +128,7 @@ class MQTTControl:
         self.show_process.start()
 
     def stop_show(self, show_name: str) -> None:
-        """
+        """\
         stops a show with a given name.
         If this show is not running, the function does nothing.
 
@@ -141,7 +138,7 @@ class MQTTControl:
             self.stop_running_show()
 
     def stop_running_show(self, timeout_sec: float = 1) -> None:
-        """
+        """\
         stops any running show
 
         :param timeout_sec: time the show process has until it is terminated
@@ -156,7 +153,7 @@ class MQTTControl:
             logger.debug("no show running; nothing to stop")
 
     def run(self) -> None:
-        """ start the listener """
+        """start the listener"""
         logger.info("Starting {name}".format(name=self.conf.sys_name))
 
         logger.info("Initializing LED strip...")
@@ -187,5 +184,5 @@ class MQTTControl:
             logger.critical("MQTTControl.py has exited")
 
     def stop_controller(self, signum=None, frame=None):
-        """ what happens if the controller exits """
+        """what happens if the controller exits"""
         del self.strip  # close driver connection

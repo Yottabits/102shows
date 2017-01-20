@@ -1,8 +1,7 @@
-"""
-Dummy Driver
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Dummy Driver
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
+
 
 import logging
 
@@ -12,7 +11,7 @@ logger = logging.getLogger('102shows.server.drivers.dummy')
 
 
 class DummyDriver(LEDStrip):
-    """
+    """\
     A Dummy Driver that just shows the LED states on the logger.
     This can be useful for developing without having a real LED strip at hand.
     """

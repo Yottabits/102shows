@@ -1,5 +1,5 @@
 # Color Helpers
-# (c) 2016 Simon Leiner
+# (c) 2016-2017 Simon Leiner
 # licensed under the GNU Public License, version 2
 #
 # This module provides helper functions and classes for the lightshows:

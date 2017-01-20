@@ -1,8 +1,6 @@
-"""
-Driver for APA102 LED strips (aka "DotStar")
-(c) 2015 Martin Erzberger, 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Driver for APA102 LED strips (aka "DotStar")
+# (c) 2015 Martin Erzberger, 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 import spidev
 from multiprocessing import Array as SyncedArray

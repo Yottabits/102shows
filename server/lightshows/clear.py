@@ -1,15 +1,13 @@
-"""
-Clear
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Clear
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 from helpers.color import blend_whole_strip_to_color
 from lightshows.templates.base import *
 
 
 class Clear(Lightshow):
-    """
+    """\
     This lightshow just turns the whole strip off.
 
     Parameters:

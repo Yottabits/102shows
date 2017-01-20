@@ -1,8 +1,6 @@
-"""
-SolidColor
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# SolidColor
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 from helpers.color import blend_whole_strip_to_color
 from helpers.preprocessors import list_to_tuple
@@ -10,7 +8,7 @@ from lightshows.templates.base import *
 
 
 class SolidColor(Lightshow):
-    """
+    """\
     The whole strip shines in the same color.
 
     Parameters:

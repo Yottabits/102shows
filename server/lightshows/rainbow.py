@@ -1,15 +1,13 @@
-"""
-Rainbow
-(c) 2015 Martin Erzberger, 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Rainbow
+# (c) 2015 Martin Erzberger, 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 from helpers.color import wheel
 from lightshows.templates.colorcycle import *
 
 
 class Rainbow(ColorCycle):
-    """
+    """\
     Rotates a rainbow color wheel around the strip.
 
     No parameters necessary

@@ -1,8 +1,6 @@
-"""
-Two Color Blend
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Two Color Blend
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 from helpers.color import SmoothBlend, linear_dim, add_tuples
 from helpers.preprocessors import list_to_tuple
@@ -10,7 +8,7 @@ from lightshows.templates.base import *
 
 
 class TwoColorBlend(Lightshow):
-    """
+    """\
     linear transition between two colors across the strip
 
     Parameters:
