@@ -99,7 +99,6 @@ function install()
       - If you wan t to use the included UI, you should install it now
         You can find the instructions at https://git.io/v1x5Os
       - To run the server, start the MQTT broker and then execute $PWD/server/run.sh"
-    "
 }
 
 function main()
