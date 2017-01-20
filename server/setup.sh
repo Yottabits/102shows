@@ -8,6 +8,7 @@ LIGHTBLUE='\033[1;34m'
 LIGHTCYAN='\033[1;36m'
 NOCOLOR='\033[0m' # No Color
 
+GLOBAL_PYTHON3='/usr/bin/python3'
 BRANCH='stable'
 
 function check_tty() {
@@ -47,8 +48,20 @@ function install()
 
 
     cd 102shows
-
     rm ./server/setup.sh  # remove this installer
+    chmod +x ./server/run.sh  # make runner executable
+
+    status_update " => Setting up a Python3 virtual environment..."
+    eval ${GLOBAL_PYTHON3} -m venv venv
+    rc=$?; if [[ ${rc} == 0 ]]; then   # check for success
+        msg_success " => venv successfully created!"
+    else
+        msg_error " => venv creation failed!"
+        msg_error "    Try 'sudo apt-get install python3-venv'"
+        exit ${rc}
+    fi
+    source venv/bin/activate  # set the new interpreter as the default for python3, pip, setuptools,...
+
 
     status_update " => Installing requirements..."
     pip3 install -r ./requirements.txt
@@ -61,8 +74,10 @@ function install()
         exit ${rc}
     fi
 
+
     echo -e  "$(cat logo)  version: $(cat version)"
     echo -e "\n\n"
+
 
     question " => Would you like to configure 102shows now? [Y/n]  "
     read answer < /dev/tty
@@ -83,8 +98,7 @@ function install()
       - Note that you need to an MQTT broker in order for the server to work
       - If you wan t to use the included UI, you should install it now
         You can find the instructions at https://git.io/v1x5Os
-      - To run the server, cd in $PWD/server and execute \"python3 server.py\"
-    "
+      - To run the server, start the MQTT broker and then execute $PWD/server/run.sh"
 }
 
 function main()
