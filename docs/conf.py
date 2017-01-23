@@ -37,7 +37,6 @@ if not on_rtd:
 
 if on_rtd:  # Read the docs is not compatible with some modules
     extensions = ['sphinx.ext.autodoc',
-                  'sphinx_autodoc_annotation',
                   'sphinx.ext.intersphinx',
                   'sphinx.ext.todo',
                   'sphinx.ext.coverage',
