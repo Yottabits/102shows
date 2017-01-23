@@ -100,7 +100,7 @@ class Lightshow(metaclass=ABCMeta):
     def register(self, parameter_name: str, default_val, verifier, args: list = None, kwargs: dict = None,
                  preprocessor = None) -> None:
         """\
-        MQTT-settable parameters are stored in :py:attr:`~lightshows.templates.base.Lightshow.p`.
+        MQTT-settable parameters are stored in :py:attr:`lightshows.templates.base.Lightshow.p`.
         Calling this function will register a new parameter and his verifier in
         :py:attr:`~lightshows.templates.base.Lightshow.p` and
         :py:attr:`~lightshows.templates.base.Lightshow.p_verifier`, so the parameter can be

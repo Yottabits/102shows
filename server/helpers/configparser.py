@@ -19,11 +19,12 @@ logger = logging.getLogger('102shows.server.helpers.configparser')
 
 def update_settings_tree(base: ConfigTree, update: ConfigTree) -> ConfigTree:
     """
-    For all attributes in "update" override the defaults set in "base"
-    or add them to the tree, if they did not exist in "base".
+    For all attributes in ``update`` override the defaults set in ``base``
+    or add them to the tree, if they did not exist in ``base``.
 
     :param base: default config tree
     :param update: "patch" for the default config tree
+
     :return: the updated tree
     """
     updated = deepcopy(base)
@@ -42,8 +43,9 @@ def get_configuration(default_filename: str = 'defaults.yml', user_filename: str
     """
     gets the current configuration, as specified by YAML files
 
-    :param default_filename: name of the default settings file (relative to configparser.py)
-    :param user_filename: name of the user settings file (relative to configparser.py)
+    :param default_filename: name of the default settings file (relative to :file:`configparser.py`)
+    :param user_filename: name of the user settings file (relative to :file:`configparser.py`)
+
     :return: settings tree
     """
 

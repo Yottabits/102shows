@@ -228,7 +228,7 @@ class LEDStrip(metaclass=ABCMeta):
             self.set_pixel(led_num, 0, 0, 0)
 
     def clear_strip(self) -> None:
-        """Clears the color buffer, then invokes a blackout on the strip by calling :func:`show`"""
+        """Clears the color buffer, then invokes a blackout on the strip by calling :py:func:`show`"""
         self.clear_buffer()
         self.show()
 

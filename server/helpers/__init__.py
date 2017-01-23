@@ -2,7 +2,23 @@
 # (c) 2016-2017 Simon Leiner
 # licensed under the GNU Public License, version 2
 
-"""Helpful functions that are used throughout 102shows"""
+"""\
+This module includes several helpful functions for 102shows to use.
+Any functionality that could be used in multiple parts of the program should be defined here.
+
+For example:
+    - checking if color tuples are valid: :py:func:`helpers.verify.rgb_color_tuple`
+    - add two color tuples: :py:func:`helpers.color.add_tuples`
+    - interpreting an incoming MQTT message: :py:mod:`helpers.mqtt`
+    - parsing the :file:`config.yml` file: :py:mod:`helpers.configparser`
+
+The module also includes some functions that are just too generic to include them in the one
+place where they are used.
+
+For example:
+    - getting the 102shows version: :py:func:`helpers.get_logo`
+    - getting the colored 102shows logo: :py:func:`helpers.get_version`
+"""
 
 __all__ = ['color', 'exceptions', 'mqtt', 'preprocessors', 'verify']
 

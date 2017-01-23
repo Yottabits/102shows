@@ -7,6 +7,13 @@
    .    /_/\____/____/____/_/ /_/\____/|__/|__/____/
 
 
+.. note::
+   This documentation is still being built!
+
+    .. todo::
+      - Write module summaries
+
+
 Welcome to the 102shows documentation!
 ======================================
 
@@ -14,9 +21,10 @@ Welcome to the 102shows documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   usage
-   developing
-   reference
+   1-usage
+   2-supported
+   3-developing
+   4-reference
 
 
 

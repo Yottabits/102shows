@@ -25,6 +25,8 @@ def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int =
     correct the non-linear human perception of the led brightness according to CIE 1931
     This is commonly mistaken for gamma correction. For more information, read here: https://goo.gl/9Ji129
 
+    .. todo:: include the mathematical explanation
+
     :param lightness: linear brightness value between 0 and max_in
     :param max_in: maximum value for lightness
     :param max_out: maximum output integer value (255 for 8-bit LED drivers)
@@ -121,15 +123,15 @@ def add_tuples(tuple1: tuple, tuple2: tuple):
 
 class SmoothBlend:
     """\
-    This class lets the user define a specific state of the strip (=> target_colors) and then smoothly blends the
-    current state over to the set state.
+    This class lets the user define a specific state of the strip (:py:attr:`target_colors`)
+    and then smoothly blends the current state over to the set state.
     """
 
     logger = logging.getLogger('102shows.server.helpers.color.SmoothBlend')
 
     def __init__(self, strip: LEDStrip):
         self.strip = strip
-        self.target_colors = [(0.0, 0.0, 0.0)] * self.strip.num_leds  # an array of float tuples
+        self.target_colors = [(0.0, 0.0, 0.0)] * self.strip.num_leds  #: an array of float tuples
 
     def set_pixel(self, led_num: int, red: float, green: float, blue: float):
         """ set the desired state of a given pixel after the blending is finished """
@@ -149,6 +151,8 @@ class SmoothBlend:
 
     class BlendFunctions:
         """\
+        .. todo:: Include blend pictures directly in documentation
+
         An internal class which provides functions to blend between two colors by a parameter fade_progress
         for ``fade_progress == 0`` the function should return the start_color
         for ``fade_progress == 1`` the function should return the end_color

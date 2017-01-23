@@ -2,12 +2,7 @@
 # (c) 2016-2017 Simon Leiner
 # licensed under the GNU Public License, version 2
 
-"""\
-The module defines some own exception classes:
- - InvalidParameters (as used by the functions above)
- - InvalidConf
- - InvalidStrip
-"""
+"""This module defines some exception classes specific to 102shows:"""
 
 
 class InvalidStrip(Exception):
@@ -33,7 +28,10 @@ class InvalidParameters(Exception):
     """
 
     @staticmethod
-    def unknown(param_name: str = None):  # fixme: docstring!
+    def unknown(param_name: str = None):
+        """\
+        .. todo:: document!
+        """
         if param_name:
             debug_str = "Parameter \"{name}\" is unknown!".format(name=param_name)
         else:
@@ -41,7 +39,10 @@ class InvalidParameters(Exception):
         return InvalidParameters(debug_str)
 
     @staticmethod
-    def missing(param_name: str = None):  # fixme: docstring!
+    def missing(param_name: str = None):
+        """\
+        .. todo:: document!
+        """
         if param_name:
             debug_str = "Parameter \"{name}\" is missing!".format(name=param_name)
         else:

@@ -122,7 +122,7 @@ Server
 Web UI
 ======
 
-Just start Node-RED. The panel shold appear on |nodered-ui|
+Just start Node-RED. The panel should appear on |nodered-ui|
 
 .. |nodered-admin| replace:: `<yournoderedhost:1880>`__
 .. |nodered-ui| replace:: `<yournoderedhost:1880/ui>`__
