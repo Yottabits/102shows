@@ -22,8 +22,6 @@ sys.path.insert(0, os.path.abspath('../server'))
 
 on_rtd = os.environ.get('READTHEDOCS', None) is not None  # are we building on readthedocs.io?
 
-print(on_rtd)
-
 if not on_rtd:
     import sphinx_rtd_theme
 
@@ -39,6 +37,7 @@ needs_sphinx = '1.5.1'
 
 if on_rtd:  # Read the docs is not compatible with some modules
     extensions = ['sphinx.ext.autodoc',
+                  'sphinx_autodoc_annotation',
                   'sphinx.ext.intersphinx',
                   'sphinx.ext.todo',
                   'sphinx.ext.coverage',
