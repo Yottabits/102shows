@@ -20,7 +20,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../server'))
 
-on_rtd = os.environ.get('READTHEDOCS', None) == True  # are we building on readthedocs.io?
+on_rtd = os.environ.get('READTHEDOCS', None) is not None  # are we building on readthedocs.io?
 
 print(on_rtd)
 
