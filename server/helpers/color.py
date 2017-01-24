@@ -25,13 +25,49 @@ def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int =
     correct the non-linear human perception of the led brightness according to CIE 1931
     This is commonly mistaken for gamma correction. For more information, read here: https://goo.gl/9Ji129
 
-    .. todo:: include the mathematical explanation
+    .. admonition::  CIE 1931 Color correction
+
+        .. todo:: explain the background
+
+        The conversion formula is:
+
+        .. math::
+
+            Y = Y_{max} \cdot g( ( L^* + 16) /  116 )
+
+        with :math:`L^*` being the lightness between 0 and 100 and:
+
+        .. math::
+            :nowrap:
+
+            \\begin{align}
+                g(t) =
+                \\begin{cases}
+                    3 \cdot \\delta^2 * ( t - \\frac{4}{29}) & t \\le \\delta  \\\\
+                    t^3                                      & t   >  \\delta
+                \\end{cases}
+                \\quad , \\quad \\delta = \\frac{6}{29}
+            \\end{align}
+
+        For more efficient computation, these two formulas can be simplified to:
+
+        .. math::
+
+            Y =
+            \\begin{cases}
+                L^* / 902.33           & L^* \le 8 \\\\
+                ((L^* + 16) / 116)^3   & L^*  >  8
+            \\end{cases} \\\\
+            \\\\
+            0 \\le Y \\le 1, 0 \\le L^* \\le 100
+
+        source: `Wikipedia <https://en.wikipedia.org/wiki/Lab_color_space#Reverse_transformation>`_
 
     :param lightness: linear brightness value between 0 and max_in
     :param max_in: maximum value for lightness
     :param max_out: maximum output integer value (255 for 8-bit LED drivers)
 
-    :return the correct PWM duty cycle for humans to see the desired lightness as integer
+    :return: the correct PWM duty cycle for humans to see the desired lightness as integer
     """
 
     # safeguard and shortcut
@@ -40,19 +76,7 @@ def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int =
     elif lightness >= max_in:
         return max_out
 
-    # lightness correction: https://en.wikipedia.org/wiki/Lab_color_space#Reverse_transformation
-    # the formula is:
-    #                 Y = Y_max * g( ( L* + 16) /  116 ) with L* being the lightness between 0 and 100
-    #
-    #        with  g(t) = > 3 * delta^2 * ( t - 4/29)    for t ≤ delta
-    #                     > t^3                          for t > delta      where delta = 6/29
-    #
-    # this can be simplified to:
-    #                 Y = > (L* / 902.33)          for L* ≤ 8
-    #                     > ((L* + 16) / 116)^3    for L* > 8
-    #
-    # here the ranges are still 0...Y...1 and 0...L*...100
-
+    # apply the formula from aboce
     l_star = lightness / max_in * 100  # map from 0..max_in to 0..100
 
     if l_star <= 8:

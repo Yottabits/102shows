@@ -41,14 +41,16 @@ if on_rtd:  # Read the docs is not compatible with some modules
                   'sphinx.ext.intersphinx',
                   'sphinx.ext.todo',
                   'sphinx.ext.coverage',
-                  'sphinx.ext.viewcode']
+                  'sphinx.ext.viewcode',
+                  'sphinx.ext.imgmath']
 else:  # we are not on readthedocs
     extensions = ['sphinx.ext.autodoc',
                   'sphinx_autodoc_typehints',
                   'sphinx.ext.intersphinx',
                   'sphinx.ext.todo',
                   'sphinx.ext.coverage',
-                  'sphinx.ext.viewcode']
+                  'sphinx.ext.viewcode',
+                  'sphinx.ext.mathjax']
 
 # include constructor descriptions
 autoclass_content = 'both'
@@ -171,3 +173,5 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/3.4/': None}
+
+# mathjax_path = 'js/MathJax/MathJax.js'
