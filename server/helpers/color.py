@@ -42,10 +42,10 @@ def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int =
 
             \\begin{align*}
                 g(t) =
-                \\begin{cases*}
+                \\begin{cases}
                     3 \cdot \\delta^2 * ( t - \\frac{4}{29}) & t \\le \\delta  \\\\
                     t^3                                      & t   >  \\delta
-                \\end{cases*}
+                \\end{cases}
                 \\quad , \\quad \\delta = \\frac{6}{29}
             \\end{align*}
 
