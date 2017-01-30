@@ -30,25 +30,21 @@ def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int =
         The human perception of brightness is not linear to the duty cycle of an LED.
         The relation between the (perceived) lightness :math:`Y`
         and the (technical) lightness :math:`L^*` was described by the CIE:
+
         .. math::
-        :nowrap:
+            :nowrap:
 
             \\begin{align}
-
                 Y & = Y_{max} \cdot g( ( L^* + 16) /  116 ) \\\\
                 \\\\
                 0 \\le L^* \\le 100
-
                 g(t) & =
                 \\begin{cases}
-
                     3 \cdot \\delta^2 \cdot ( t - \\frac{4}{29}) & t \\le \\delta  \\\\
                     t^3                                          & t   >  \\delta
-
                 \\end{cases}
                 \\quad , \\quad \\delta = \\frac{6}{29}
-
-        \\end{align}
+            \\end{align}
 
         For more efficient computation, these two formulas can be simplified to:
 
