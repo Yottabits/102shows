@@ -22,29 +22,26 @@ from helpers import verify, exceptions
 
 def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int = 255):
     """\
-    correct the non-linear human perception of the led brightness according to CIE 1931
-    This is commonly mistaken for gamma correction. For more information, read here: https://goo.gl/9Ji129
+    Corrects the non-linear human perception of the led brightness according to the CIE 1931 standard.
+    This is commonly mistaken for gamma correction. [#gamma-vs-lightness]_
 
-    .. admonition::  CIE 1931 Color correction
+    .. admonition::  CIE 1931 Lightness correction [#cie1931-source]_
 
-        .. todo:: explain the background
-
-        The conversion formula is:
-
-        .. math::
-
-            Y = Y_{max} \cdot g( ( L^* + 16) /  116 )
-
-        with :math:`L^*` being the lightness between 0 and 100 and:
-
+        The human perception of brightness is not linear to the duty cycle of an LED.
+        The relation between the (perceived) lightness :math:`Y`
+         and the (technical) lightness :math:`L^*` was described by the CIE:
         .. math::
             :nowrap:
+                \\begin{align}
 
-            \\begin{align}
-                g(t) =
+                Y & = Y_{max} \cdot g( ( L^* + 16) /  116 ) \\\\
+                \\\\
+                0 \\le L^* \\le 100
+
+                g(t) & =
                 \\begin{cases}
-                    3 \cdot \\delta^2 * ( t - \\frac{4}{29}) & t \\le \\delta  \\\\
-                    t^3                                      & t   >  \\delta
+                    3 \cdot \\delta^2 \cdot ( t - \\frac{4}{29}) & t \\le \\delta  \\\\
+                    t^3                                          & t   >  \\delta
                 \\end{cases}
                 \\quad , \\quad \\delta = \\frac{6}{29}
             \\end{align}
@@ -59,9 +56,11 @@ def grayscale_correction(lightness: float, max_in: float = 255.0, max_out: int =
                 ((L^* + 16) / 116)^3   & L^*  >  8
             \\end{cases} \\\\
             \\\\
-            0 \\le Y \\le 1, 0 \\le L^* \\le 100
+            0 \\le Y \\le 1 \\qquad 0 \\le L^* \\le 100
 
-        source: `Wikipedia <https://en.wikipedia.org/wiki/Lab_color_space#Reverse_transformation>`_
+    .. [#gamma-vs-lightness] For more information, read here: https://goo.gl/9Ji129
+    .. [#cie1931-source] formula from
+        `Wikipedia <https://en.wikipedia.org/wiki/Lab_color_space#Reverse_transformation>`_
 
     :param lightness: linear brightness value between 0 and max_in
     :param max_in: maximum value for lightness
