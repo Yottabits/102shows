@@ -125,17 +125,44 @@ Tests
 Overview
 ========
 
-.. todo:: explain lightshows
 .. module:: lightshows
+   .. synopsis:: LED animations
+
+   102shows offers a framework for writing and displaying lightshows.
+   :py:mod:`lightshows` includes the code that actually relies on this
+   and displays animations on an LED strip.
 
 Templates
 =========
 
-.. todo:: explain templates
+.. todo:: include link to controller
+
 .. module:: lightshows.templates
+   .. synopsis:: useful templates for writing specific lightshows
+
+   To make writing lightshows easy and convenient we introduced templates.
+   These provide the interfaces for the controller and generic functionalities.
+
+   *Basically: The templates are there so that lightshow modules just have to
+   worry about the LED animations, and not about the backgrounds of 102shows*
 
 The base template
 -----------------
+
+As the name says, this is the most basic template.
+All lightshows (and all other templates) rely on this template.
+It offers quite a lot:
+
+   - The interface to the controller:
+      - :py:func:`lightshows.base.Lightshow.name` returns the name of the lightshow
+      - :py:func:`lightshows.base.Lightshow.start` initializes the show process,
+         starts the built-in MQTT client and then triggers the start of the animation
+      - :py:func:`lightshows.base.Lightshow.stop` can be called to gracefully end the show
+      - :py:func:`lightshows.base.Lightshow.name`
+
+
+
+
 .. autoclass:: lightshows.templates.base.Lightshow
    :members:
 

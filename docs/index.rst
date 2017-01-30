@@ -10,8 +10,11 @@
 .. note::
    This documentation is still being built!
 
-    .. todo::
+   .. todo::
       - Write module summaries
+      - include links to:
+          - tinue APA102 driver
+          - required python libs
 
 
 Welcome to the 102shows documentation!

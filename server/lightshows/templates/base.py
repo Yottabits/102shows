@@ -24,13 +24,13 @@ class Lightshow(metaclass=ABCMeta):
     """
 
     # Attributes
-    p = {}  #: dict: parameter_name => value  #FIXME
-    p_verifier = {}  #: dict: parameter_name => (verifier_function, args, kwargs)  #FIXME
-    p_preprocessor = {}  #: dict: parameter_name => preprocessor_function  #FIXME
+    p = {}  #: maps the show parameter names to their current values
+    p_verifier = {}  #: maps the show parameter names to their verifier functions
+    p_preprocessor = {}  #: maps the show parameter names to their preprocessor functions
 
-    logger = None  #: #FIXME
-    mqtt = None  #: #FIXME
-    strip = None  #: #FIXME
+    logger = None  #: The logger object this show will use for debug output
+    mqtt = None  #: represents the MQTT connection for parsing parameter changes #FIXME: type annotation
+    strip = None  #: the object representing the LED strip (driver) #FIXME: type annotation
 
     def __init__(self, strip: LEDStrip, parameters: dict):
         # logger
@@ -51,11 +51,12 @@ class Lightshow(metaclass=ABCMeta):
 
     @property
     def name(self) -> str:
+        """The name of the lightshow in lower-cases"""
         subclass_name = type(self).__name__
         return subclass_name.lower()
 
-    def start(self):
-        """ invokes the run() method and after that synchronizes the shared buffer """
+    def start(self) -> None:
+        """invokes the :py:func:`run` method and after that synchronizes the shared buffer"""
         # before
         signal.signal(signal.SIGINT, self.stop)  # attach stop() to SIGINT
         self.strip.sync_down()
@@ -66,15 +67,20 @@ class Lightshow(metaclass=ABCMeta):
         # loop and listen to brightness changes until the end
         self.idle_forever()
 
-    def idle_forever(self, delay_sec: float = 0.1):
-        """ just idling and invoking strip.show() every now and then"""
+    def idle_forever(self, delay_sec: float = 0.1) -> None:
+        """\
+        Just does nothing and invokes :py:func:`drivers.LEDStrip.show` until the end of time
+        (or a call of :py:func:`stop`)
+
+        :param delay_sec: Time between two calls of :py:func:`drivers.LEDStrip.show`
+        """
         while True:
             self.strip.show()
             time.sleep(delay_sec)  # do not refresh in this time
 
     def sleep(self, time_sec: float) -> None:
-        """
-        does nothing (but refreshing the strip a few times) for time_sec seconds
+        """\
+        Does nothing (but refreshing the strip a few times) for ``time_sec`` seconds
 
         :param time_sec: duration of the break
         """
@@ -87,14 +93,26 @@ class Lightshow(metaclass=ABCMeta):
         while stop_time > time.perf_counter():  # wait until the end
             pass
 
-    def stop(self, signum, frame) -> None:
+    def stop(self, signum=None, frame=None) -> None:
+        """\
+        .. todo:: include link for SIGINT
+
+        This should be called to stop the show with a graceful ending.
+        It guarantees that the last strip state is uploaded to the global inter-process buffer.
+        This method is called when SIGINT is sent to the show process.
+        The arguments have no influence on the function.
+
+        :param signum: The integer-code of the signal sent to the show process.
+            This has no influence on how the function works.
+        :param frame: #fixme
+        """
         self.strip.freeze()
         self.cleanup()  # give the show a chance to clean up (but without changing the buffer)
         self.strip.sync_up()
         self.suicide()  # then kill all running threads in this process
 
     def suicide(self) -> None:
-        """ terminates its own process """
+        """terminates its own process"""
         os.kill(os.getpid(), signal.SIGKILL)
 
     def register(self, parameter_name: str, default_val, verifier, args: list = None, kwargs: dict = None,
@@ -164,29 +182,42 @@ class Lightshow(metaclass=ABCMeta):
     # next we have the abstract methods that classes MUST implement:
 
     @abstractmethod
-    def init_parameters(self):
-        """
-        functions can inherit this to set their default parameters
-        this function is called at initialization of a show object
+    def init_parameters(self) -> None:
+        """\
+        Lightshows can inherit this to set their default parameters.
+        This function is called at initialization of a new show object.
         """
         pass
 
     @abstractmethod
     def check_runnable(self):
-        """ Raise an exception (InvalidStrip, InvalidConf or InvalidParameters) if the show is not runnable"""
+        """\
+        .. todo:: include official exception raise notice
+
+        Raise an exception (InvalidStrip, InvalidConf or InvalidParameters) if the show is not runnable
+        """
         raise NotImplementedError
 
     @abstractmethod
-    def run(self):
-        """ run the show (obviously this must be inherited) """
+    def run(self) -> None:
+        """
+        The "main" function of the show
+        (obviously this must be re-implemented in child classes)
+        """
         pass
 
-    def cleanup(self):
-        """ called before the show is terminated """
+    def cleanup(self) -> None:
+        """\
+        This is called before the show gets terminated.
+        Lightshows can use it to clean up resources before their process is killed.
+        """
         pass
 
     class MQTTListener:
-        """ Helper class for handling MQTT parameter changes"""
+        """\
+        This class collects the functions that receive incoming MQTT messages
+        and parse them as parameter changes.
+        """
 
         def __init__(self, lightshow):
             self.logger = logging.getLogger('102shows.server.lightshows.{}.MQTTListener'.format(lightshow.name))
@@ -204,7 +235,23 @@ class Lightshow(metaclass=ABCMeta):
                                 self.global_conf.MQTT.Broker.port,
                                 self.global_conf.MQTT.Broker.keepalive)
 
-        def subscribe(self, client, userdata, flags, rc):
+        def subscribe(self, client, userdata, flags, rc) -> None:
+            """\
+            Function to be executed as ``on_connect`` hook of the Paho MQTT client.
+            It subscribes to the MQTT paths for brightness changes and parameter changes for the show.
+
+            .. todo::
+                - include link to the paho mqtt lib
+                - explain currently unknown parameters
+
+            :param client: the calling client object
+            :param userdata: no idea what this does.
+                This is a necessary argument but is not handled in any way in the function.
+            :param flags: no idea what this does.
+                This is a necessary argument but is not handled in any way in the function.
+            :param rc: no idea what this does.
+                This is a necessary argument but is not handled in any way in the function.
+            """
             brightness_path = self.global_conf.MQTT.general_path.format(
                 prefix=self.global_conf.MQTT.prefix,
                 sys_name=self.global_conf.sys_name,
@@ -221,10 +268,24 @@ class Lightshow(metaclass=ABCMeta):
             client.subscribe(parameter_path)
             self.logger.debug("show subscribed to {}".format(parameter_path))
 
-        def parse_message(self, client, userdata, msg):
+        def parse_message(self, client, userdata, msg) -> None:
+            """\
+            Function to be executed as ``on_message`` hook of the Paho MQTT client.
+            If the message commands a brightness or parameter change the corresponding
+            hook (:py:func:`set_brightness` or :py:func:`set_parameter`) is called.
+
+            .. todo::
+                - include link to the paho mqtt lib
+                - explain currently unknown parameters
+
+            :param client: the calling client object
+            :param userdata: no idea what this does.
+                This is a necessary argument but is not handled in any way in the function.
+            :param msg: The object representing the incoming MQTT message
+            """
             command = helpers.mqtt.get_from_topic(helpers.mqtt.TopicAspect.command, str(msg.topic))
             if type(msg.payload) is bytes:  # might be a byte encoded string that must be stripped
-                payload = helpers.mqtt.binary_to_string(msg.payload)
+                payload = msg.payload.decode()
             else:
                 payload = str(msg.payload)
 
@@ -235,9 +296,10 @@ class Lightshow(metaclass=ABCMeta):
                     self.lightshow.set_parameter(command, payload)
 
         def set_brightness(self, payload: str) -> None:
-            """
-            try to cast the payload as an integer between 0 and 100,
-            then invoke the strip's set_global_brightness()
+            """\
+            Tries to cast the payload as an integer between 0 and 100,
+            then invokes the strip's :py:func:`drivers.LEDStrip.set_global_brightness`
+            function.
 
             :param payload: string containing the brightness as integer
             """
@@ -266,16 +328,17 @@ class Lightshow(metaclass=ABCMeta):
             self.lightshow.strip.set_global_brightness(brightness)
 
         def start_listening(self) -> None:
-            """
-            if this method is called by the show object, incoming MQTT messages will be parsed,
-            given they have the path: $prefix/$sys_name/$show_name/$parameter
-            $parameter and the $payload will be given to show.set_parameter($parameter, $payload)
+            """\
+            If this method is called (e.g. by the show object), incoming MQTT messages will be parsed,
+            given they have the path ``$prefix/$sys_name/$show_name/$parameter``
+            ``$parameter`` and the ``$payload`` will be given to
+            :py:func:`lightshow.templates.base.Lightshow.set_parameter`
             """
             self.client.loop_start()
 
         def stop_listening(self) -> None:
-            """
-            ends the connection to the MQTT broker
-            the subscribed topics are not parsed anymore
+            """\
+            Ends the connection to the MQTT broker.
+            Messages from the subscribed topics are not parsed anymore.
             """
             self.client.loop_stop()
