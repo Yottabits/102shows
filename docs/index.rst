@@ -7,18 +7,17 @@
    .    /_/\____/____/____/_/ /_/\____/|__/|__/____/
 
 
+Welcome to the 102shows documentation!
+======================================
+
 .. note::
    This documentation is still being built!
 
    .. todo::
-      - Write module summaries
-      - include links to:
-          - tinue APA102 driver
-          - required python libs
-
-
-Welcome to the 102shows documentation!
-======================================
+      #. Write module summaries
+      #. include links to:
+          #. tinue APA102 driver
+          #. required python libs
 
 .. toctree::
    :maxdepth: 2
