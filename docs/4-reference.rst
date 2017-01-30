@@ -125,26 +125,18 @@ Tests
 Overview
 ========
 
-.. module:: lightshows
-   .. synopsis:: LED animations
+.. automodule:: lightshows
+   :synopsis: LED animations
 
-   102shows offers a framework for writing and displaying lightshows.
-   :py:mod:`lightshows` includes the code that actually relies on this
-   and displays animations on an LED strip.
+
 
 Templates
 =========
 
 .. todo:: include link to controller
 
-.. module:: lightshows.templates
-   .. synopsis:: useful templates for writing specific lightshows
-
-   To make writing lightshows easy and convenient we introduced templates.
-   These provide the interfaces for the controller and generic functionalities.
-
-   *Basically: The templates are there so that lightshow modules just have to
-   worry about the LED animations, and not about the backgrounds of 102shows*
+.. automodule:: lightshows.templates
+   :synopsis: useful templates for writing specific lightshows
 
 The base template
 -----------------
