@@ -1,7 +1,7 @@
 Welcome to the 102shows documentation!
 ======================================
 
-.. image:: _static/img/logo.svg
+.. image:: _static/img/logo.*
    :alt: 102shows logo
    :width: 400 px
    :align: center
