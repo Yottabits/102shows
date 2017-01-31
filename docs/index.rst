@@ -1,14 +1,11 @@
-.. code::
-
-   .        _______ ___        __
-   ...     <  / __ \__ \ _____/ /_  ____ _      _______
-   ....   / / / / /_/ // ___/ __ \/ __ \ | /| / / ___/
-   ...   / / /_/ / __/(__  ) / / / /_/ / |/ |/ (__  )
-   .    /_/\____/____/____/_/ /_/\____/|__/|__/____/
-
-
 Welcome to the 102shows documentation!
 ======================================
+
+.. image:: _static/img/logo.svg
+   :alt: 102shows logo
+   :width: 400 px
+   :align: center
+
 
 .. note::
    This documentation is still being built!
