@@ -1,10 +1,7 @@
 Welcome to the 102shows documentation!
 ======================================
 
-.. image:: _static/img/logo.*
-   :alt: 102shows logo
-   :width: 400 px
-   :align: center
+|102shows_logo|
 
 
 .. note::
@@ -67,3 +64,8 @@ or write an email to me: 102shows@leiner.me
 .. _sphinx-autodoc-typehints: https://github.com/agronholm/sphinx-autodoc-typehints
 .. _sphinx_rtd_theme: https://github.com/snide/sphinx_rtd_theme
 .. _tinue: https://github.com/tinue
+
+.. |102shows_logo| image:: _static/img/logo.*
+   :alt: 102shows logo
+   :width: 400 px
+   :align: middle
