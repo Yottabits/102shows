@@ -33,6 +33,14 @@ class Lightshow(metaclass=ABCMeta):
     strip = None  #: the object representing the LED strip (driver) #FIXME: type annotation
 
     def __init__(self, strip: LEDStrip, parameters: dict):
+        """
+        :param strip: A :py:class:`drivers.LEDStrip` object representing your strip
+        :param parameters: A :py:class:`dict` mapping parameter names (of the lightshow) to the parameter values,
+                           for example: ::
+
+                               parameters = {'example_rgb_color': (255,127,8),
+                                             'an_arbitrary_fade_time_sec': 1.5}
+        """
         # logger
         self.logger = logging.getLogger('102shows.server.lightshows.' + self.name)
 

@@ -88,9 +88,25 @@ Formal interface
 
       configuration.shows('MyShow') = myshow.MyShow
 
-class parameters
-----------------
-.. todo:: explain class parameters
+creating a ``lightshows`` object
+--------------------------------
+It is really simple: ::
+
+   my_show_object = lightshows.__active__.shows['commonnameofthelightshow'](strip, parameters)
+
+You could access the lightshow class directly, but the 102shows convention is to access the class
+by its common name in the ``shows`` array under :py:mod:`lightshows.active`
+
+There are two arguments that you have to pass to the constructor:
+
+* ``strip``: A :py:class:`drivers.LEDStrip` object representing your strip
+* ``parameters``: A :py:class:`dict` mapping parameter names (of the lightshow) to the parameter values,
+  for example: ::
+
+      parameters = {'example_rgb_color': (255,127,8),
+                    'an_arbitrary_fade_time_sec': 1.5}
+
+**See also:** The documentation of :py:class:`lightshows.templates.base.Lightshow`
 
 Example
 -------
