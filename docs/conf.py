@@ -35,25 +35,16 @@ needs_sphinx = '1.5.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-if on_rtd:  # Read the docs is not compatible with some modules
-    extensions = ['sphinx.ext.autodoc',
-                  'sphinx_autodoc_annotation',
-                  'sphinx.ext.intersphinx',
-                  'sphinx.ext.todo',
-                  'sphinx.ext.coverage',
-                  'sphinx.ext.viewcode',
-                  'sphinx.ext.mathjax']
-else:  # we are not on readthedocs
-    extensions = ['sphinx.ext.autodoc',
-                  'sphinx_autodoc_typehints',
-                  'sphinx.ext.intersphinx',
-                  'sphinx.ext.todo',
-                  'sphinx.ext.coverage',
-                  'sphinx.ext.viewcode',
-                  'sphinx.ext.mathjax']
+extensions = ['sphinx.ext.autodoc',
+              'sphinx_autodoc_typehints',
+              'sphinx.ext.intersphinx',
+              'sphinx.ext.todo',
+              'sphinx.ext.coverage',
+              'sphinx.ext.viewcode',
+              'sphinx.ext.mathjax']
 
 # include constructor descriptions
-autoclass_content = 'both'
+autoclass_content = 'class'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

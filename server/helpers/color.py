@@ -180,6 +180,9 @@ class SmoothBlend:
         for ``fade_progress == 1`` the function should return the end_color
         """
 
+        def __init__(self):
+            pass
+
         @classmethod
         def linear_blend(cls, start_color: tuple, end_color: tuple, fade_progress: float) -> tuple:
             """ linear blend => see https://goo.gl/lG8RIW """

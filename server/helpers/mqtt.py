@@ -17,6 +17,9 @@ class TopicAspect:
     show_name = 3
     command = 4
 
+    def __init__(self):
+        pass
+
 
 def get_from_topic(hierarchy_level: int, topic: str) -> str:
     """\

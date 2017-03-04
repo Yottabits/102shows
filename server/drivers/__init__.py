@@ -23,16 +23,15 @@ class LEDStrip(metaclass=ABCMeta):
         - Pixel order is ``r,g,b``
         - Pixel resolution (number of dim-steps per color component) is 8-bit, so minimum brightness is ``0``
           and maximum brightness is ``255``
+
+    The constructor stores the given parameters and initializes the color and brightness buffers.
+    Drivers can and should extend this method.
+
+    :param num_leds: number of LEDs in the strip
+    :param max_clock_speed_hz: maximum clock speed (Hz) of the bus
     """
 
     def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000):
-        """\
-        The constructor stores the given parameters and initializes the color and brightness buffers.
-        Drivers can and should extend this method.
-
-        :param num_leds: number of LEDs in the strip
-        :param max_clock_speed_hz: maximum clock speed (Hz) of the bus
-        """
         # store the given parameters
         self.num_leds = num_leds
         self.max_clock_speed_hz = max_clock_speed_hz

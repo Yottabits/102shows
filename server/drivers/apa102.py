@@ -10,7 +10,7 @@ from helpers.color import grayscale_correction
 
 
 class APA102(LEDStrip):
-    """
+    """\
     .. note::
         **A very brief overview of the APA102**
 
@@ -49,10 +49,11 @@ class APA102(LEDStrip):
 
     Restrictions of this driver:
         - strips cannot have more than 1024 LEDs
+
+    The constructor initializes the strip connection via SPI
     """
 
     def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000):
-        """The constructor initializes the strip connection via SPI"""
         super().__init__(num_leds, max_clock_speed_hz)
 
         # check if we do not have too much LEDs in the strip
@@ -69,7 +70,7 @@ class APA102(LEDStrip):
         self.max_refresh_time_sec = 25E-6 * self.num_leds
 
     def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
-        """
+        """\
         .. todo:: explain
 
         :param led_num:

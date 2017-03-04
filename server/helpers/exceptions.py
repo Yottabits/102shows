@@ -11,7 +11,9 @@ class InvalidStrip(Exception):
 
     **For example:** not enough LEDs to run the selected lightshow
     """
-    pass
+
+    def __init__(self):
+        pass
 
 
 class InvalidConf(Exception):
@@ -19,13 +21,18 @@ class InvalidConf(Exception):
     Use if something in the configuration will not work
     for what the user has chosen in the config file.
     """
-    pass
+
+    def __init__(self):
+        pass
 
 
 class InvalidParameters(Exception):
     """\
     Use when given parameters (for a lightshow) are not valid
     """
+
+    def __init__(self):
+        pass
 
     @staticmethod
     def unknown(param_name: str = None):
