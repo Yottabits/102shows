@@ -2,6 +2,9 @@
 # (c) 2016-2017 Simon Leiner
 # licensed under the GNU Public License, version 2
 
+"""\
+This module starts the central MQTT listener and manages all the lightshows.
+"""
 
 import json
 import logging

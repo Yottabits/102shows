@@ -2,7 +2,6 @@
 # (c) 2016-2017 Simon Leiner
 # licensed under the GNU Public License, version 2
 
-
 """This module contains the drivers for the LED strips"""
 
 import logging

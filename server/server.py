@@ -15,7 +15,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """\
-This script just starts the server.
+This module starts the 102shows server.
 The real magic does not happen here, though.
 """
 
