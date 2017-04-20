@@ -5,11 +5,8 @@ Welcome to the 102shows documentation!
 
 
 .. note::
-   This documentation is still being built!
-
-   .. todo::
-      #. Write module summaries
-      #. fix thankyou links
+   This documentation is still not completely finished.
+   If you are missing something, please `open an issue <https://github.com/Yottabits/102shows/issues/new>`_.
 
 .. toctree::
    :maxdepth: 2
@@ -54,13 +51,13 @@ on `GitHub <https://github.com/Yottabits/102shows/issues>`_
 or write an email to me: 102shows@leiner.me
 
 
-.. _APA102_Pi: https://github.com/tinue/APA102_Pi>`_
-.. _coloredlogs: #FIXME
-.. _orderedattrdict: #FIXME
-.. _paho_mqtt: #FIXME
-.. _PyYAML: #FIMXE
-.. _spidev: #FIXME
-.. _Sphinx: #FIXME
+.. _APA102_Pi: https://github.com/tinue/APA102_Pi
+.. _coloredlogs: https://coloredlogs.readthedocs.io/
+.. _orderedattrdict: https://github.com/sanand0/orderedattrdict
+.. _paho_mqtt: https://pypi.python.org/pypi/paho-mqtt
+.. _PyYAML: http://pyyaml.org/
+.. _spidev: https://github.com/doceme/py-spidev
+.. _Sphinx: https://sphinx.readthedocs.io/
 .. _sphinx-autodoc-typehints: https://github.com/agronholm/sphinx-autodoc-typehints
 .. _sphinx_rtd_theme: https://github.com/snide/sphinx_rtd_theme
 .. _tinue: https://github.com/tinue
