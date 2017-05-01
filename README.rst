@@ -4,9 +4,7 @@
 
 *Raspberry Pi + APA102 + MQTT + 102shows = LED awesomeness!*
 
-|Code Climate|
-
-|Documentation Status|
+|Code Climate|  |Documentation Status|
 
 102shows is an
 `APA102 <https://www.aliexpress.com/item//32322326979.html>`__ (a.k.a
@@ -47,7 +45,8 @@ Write an e-mail to me: 102shows@leiner.me
 
 .. |Code Climate| image:: https://codeclimate.com/github/Yottabits/102shows/badges/gpa.svg
    :target: https://codeclimate.com/github/Yottabits/102shows
+   :alt: Code Climate
 
-.. |Documentation Status| image:: https://readthedocs.org/projects/102shows/badge/?version=latest
+.. |Documentation Status| image:: https://readthedocs.org/projects/102shows/badge
    :target: http://102shows.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
