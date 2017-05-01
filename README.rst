@@ -6,6 +6,8 @@
 
 |Code Climate|
 
+|Documentation Status|
+
 102shows is an
 `APA102 <https://www.aliexpress.com/item//32322326979.html>`__ (a.k.a
 `DotStar <https://www.adafruit.com/products/2240>`__) LED strip for the
@@ -45,3 +47,7 @@ Write an e-mail to me: 102shows@leiner.me
 
 .. |Code Climate| image:: https://codeclimate.com/github/Yottabits/102shows/badges/gpa.svg
    :target: https://codeclimate.com/github/Yottabits/102shows
+
+.. |Documentation Status| image:: https://readthedocs.org/projects/102shows/badge/?version=latest
+   :target: http://102shows.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
