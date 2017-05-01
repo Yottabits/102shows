@@ -17,6 +17,18 @@ from helpers.configparser import get_configuration
 from helpers.exceptions import *
 
 
+class LightshowParameters:
+    """\
+    A collection of maps for the parameters which store their:
+      - current values
+      - preprocessor method references
+      - verifier method references
+    """
+    value = {}  #: maps the show parameter names to their current values
+    verifier = {}  #: maps the show parameter names to their verifier functions
+    preprocessor = {}  #: maps the show parameter names to their preprocessor functions
+
+
 class Lightshow(metaclass=ABCMeta):
     """\
     This class defines the interfaces and a few helper functions for lightshows.
@@ -31,9 +43,7 @@ class Lightshow(metaclass=ABCMeta):
     """
 
     # Attributes
-    p = {}  #: maps the show parameter names to their current values
-    p_verifier = {}  #: maps the show parameter names to their verifier functions
-    p_preprocessor = {}  #: maps the show parameter names to their preprocessor functions
+    p = LightshowParameters()
 
     logger = None  #: The logger object this show will use for debug output
     mqtt = None  #: represents the MQTT connection for parsing parameter changes #FIXME: type annotation
@@ -123,15 +133,15 @@ class Lightshow(metaclass=ABCMeta):
         os.kill(os.getpid(), signal.SIGKILL)
 
     def register(self, parameter_name: str, default_val, verifier, args: list = None, kwargs: dict = None,
-                 preprocessor = None) -> None:
+                 preprocessor=None) -> None:
         """\
-        MQTT-settable parameters are stored in :py:attr:`lightshows.templates.base.Lightshow.p`.
+        MQTT-settable parameters are stored in :py:attr:`lightshows.templates.base.Lightshow.p.value`.
         Calling this function will register a new parameter and his verifier in
-        :py:attr:`~lightshows.templates.base.Lightshow.p` and
-        :py:attr:`~lightshows.templates.base.Lightshow.p_verifier`, so the parameter can be
+        :py:attr:`~lightshows.templates.base.Lightshow.p.value` and
+        :py:attr:`~lightshows.templates.base.Lightshow.p.verifier`, so the parameter can be
         set via MQTT and by the controller.
 
-        :param parameter_name: name of the parameter. You access the parameter via self.p[parameter_name].
+        :param parameter_name: name of the parameter. You access the parameter via self.p.value[parameter_name].
         :param default_val: initializer value of the parameter.
                             *Note that this value will not be checked by the verifier function!*
         :param verifier: a function that is called before the parameter is set via MQTT.
@@ -156,35 +166,35 @@ class Lightshow(metaclass=ABCMeta):
             preprocessor = empty_preprocessor
 
         # check if already registered
-        if parameter_name in self.p:
+        if parameter_name in self.p.value:
             raise InvalidParameters("Parameter {} was already registered".format(parameter_name))
 
         # store parameter
-        self.p[parameter_name] = default_val
-        self.p_verifier[parameter_name] = (verifier, args, kwargs)
-        self.p_preprocessor[parameter_name] = preprocessor
+        self.p.value[parameter_name] = default_val
+        self.p.verifier[parameter_name] = (verifier, args, kwargs)
+        self.p.preprocessor[parameter_name] = preprocessor
 
     def set_parameter(self, param_name: str, value) -> None:
         """
-        Take a parameter by name and new value and store it to p.
+        Take a parameter by name and new value and store it to p.value.
 
         :param param_name: name of the parameter to be stored
         :param value: new value of the parameter to be stored
         """
 
         # pre-process the value
-        preprocessor = self.p_preprocessor[param_name]
+        preprocessor = self.p.preprocessor[param_name]
         value = preprocessor(value)
 
         try:
-            verifier, args, kwargs = self.p_verifier[param_name]
+            verifier, args, kwargs = self.p.verifier[param_name]
             verifier(value, param_name, *args, **kwargs)  # run verifier
-        except KeyError:  # param_name not found in p_verifier => unknown
+        except KeyError:  # param_name not found in p.verifier => unknown
             self.logger.warning("Parameter {} is unknown!".format_map(param_name))
         except InvalidParameters as error_message:  # verifier raised an exception
             self.logger.warning(error_message)
         else:
-            self.p[param_name] = value
+            self.p.value[param_name] = value
 
     # next we have the abstract methods that classes MUST implement:
 

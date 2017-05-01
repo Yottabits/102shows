@@ -20,7 +20,7 @@ class Clear(Lightshow):
         self.register('fadetime_sec', 1, verify.not_negative_numeric)
 
     def run(self):
-        blend_whole_strip_to_color(self.strip, (0, 0, 0), self.p['fadetime_sec'])  # fadeout
+        blend_whole_strip_to_color(self.strip, (0, 0, 0), self.p.value['fadetime_sec'])  # fade out
         self.strip.clear_strip()
         self.strip.clear_strip()  # just to be sure
 

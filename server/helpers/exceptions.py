@@ -10,7 +10,7 @@ class DescriptiveException(Exception):
     This type of exception must contain a value (usually a string)
     that is used as the string representation of the exception
     """
-    
+
     def __init__(self, value):
         self.value = value
         pass
