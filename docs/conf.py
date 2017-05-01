@@ -44,7 +44,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax']
 
 # include constructor descriptions
-autoclass_content = 'class'
+autoclass_content = 'both'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -158,8 +158,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, '102shows', '102shows Documentation',
-     author, '102shows', 'One line description of project.',
-     'Miscellaneous'),
+     author, '102shows', 'Raspberry Pi + APA102 + MQTT + 102shows = LED awesomeness!',
+     'Home Automation'),
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.
