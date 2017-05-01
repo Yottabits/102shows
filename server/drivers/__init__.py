@@ -37,6 +37,7 @@ class LEDStrip(metaclass=ABCMeta):
 
         # private variables
         self.__frozen = False
+        self._global_brightness = 1.0  #: global brightness multiplicator (0-1)
 
         # buffers
         self.color_buffer = [(0.0, 0.0, 0.0)] * self.num_leds
@@ -107,7 +108,7 @@ class LEDStrip(metaclass=ABCMeta):
         if led_num < 0:
             return  # Pixel is invisible, so ignore
         if led_num >= self.num_leds:
-            return  # again, invsible
+            return  # again, invisible
 
         if not self.__frozen:
             self.color_buffer[led_num] = (red, green, blue)
@@ -191,16 +192,26 @@ class LEDStrip(metaclass=ABCMeta):
             r, g, b = self.get_pixel(led_num)
             self.on_color_change(led_num, r, g, b)
 
-    def set_brightness(self, led_num: int, brightness: int) -> None:
+    def set_brightness(self, led_num: int, brightness: float) -> None:
         """\
         Sets the brightness for a single LED in the strip.
+        A global multiplier is applied.
 
         :param led_num: the target LED index
-        :param brightness: the desired brightness (``0 - 100``)
+        :param brightness: the desired brightness (``0.0 - 1.0``)
         """
-        if not self.__frozen:
-            self.brightness_buffer[led_num] = brightness
-            self.on_brightness_change(led_num)
+
+        if self.__frozen:  # skip if show is frozen
+            return
+
+        # limit brightness to the area between (and including) 0.0 and 1.0
+        if brightness < 0.0:
+            brightness = 0.0
+        elif brightness > 1.0:
+            brightness = 1.0
+
+        self.brightness_buffer[led_num] = self._global_brightness * brightness
+        self.on_brightness_change(led_num)
 
     @abstractmethod
     def on_brightness_change(self, led_num: int) -> None:
@@ -211,14 +222,26 @@ class LEDStrip(metaclass=ABCMeta):
         """
         pass
 
-    def set_global_brightness(self, brightness: int) -> None:
+    def set_global_brightness(self, brightness: float) -> None:
         """\
-        calls :func:`set_brightness` for all LEDs in the strip
+        Sets a global brightness multiplicator which applies to every single LED's brightness.
 
-        :param brightness: the brightness (``0 - 100``) to be set all over the strip
+        :param brightness: the global brightness (``0.0 - 1.0``) multiplicator to be set
         """
-        for led_num in range(self.num_leds):
-            self.set_brightness(led_num, brightness)
+        if brightness < 0.0:
+            self._global_brightness = 0.0
+        elif brightness > 1.0:
+            self._global_brightness = 1.0
+        else:
+            self._global_brightness = brightness
+
+    def set_global_brightness_percent(self, brightness: float) -> None:
+        """\
+        Just like :func:`set_global_brightness`, but with a 0-100 percent value.
+        
+        :param brightness: the global brightness (``0.0 - 100.0``) multiplicator to be set
+        """
+        self.set_global_brightness(100 * brightness)
 
     def clear_buffer(self) -> None:
         """Resets all pixels in the color buffer to ``(0,0,0)``."""

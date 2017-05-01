@@ -64,20 +64,21 @@ class APA102(LEDStrip):
         self.spi = spidev.SpiDev()  # Init the SPI device
         self.spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
         self.spi.max_speed_hz = self.max_clock_speed_hz  # should not be higher than 8000000
-        self.leds = [0, 0, 0, 0] * self.num_leds  # 4 bytes per LED
+        self.leds = [self.led_prefix(self._global_brightness), 0, 0, 0] * self.num_leds  # 4 bytes per LED
         self.synced_buffer = SyncedArray('i', self.leds)
 
         self.max_refresh_time_sec = 25E-6 * self.num_leds
 
     def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
         """\
-        .. todo:: explain
+        Changes the message buffer after a pixel was changed in the global color buffer.
+        Also, a grayscale correction is performed.
+        To send the message buffer to the strip and show the changes, you must invoke :func:`show`
 
-        :param led_num:
-        :param red:
-        :param green:
-        :param blue:
-        :return:
+        :param led_num: index of the pixel to be set
+        :param red: red component of the pixel (``0.0 - 255.0``)
+        :param green: green component of the pixel (``0.0 - 255.0``)
+        :param blue: blue component of the pixel (``0.0 - 255.0``)
         """
         # get correct duty cycle for desired lightness
         r_duty = grayscale_correction(red)
@@ -100,20 +101,21 @@ class APA102(LEDStrip):
 
         :param led_num: The index of the LED whose prefix should be regenerated
         """
+
         brightness = self.brightness_buffer[led_num]
         self.leds[4 * led_num] = self.led_prefix(brightness)
 
     @classmethod
-    def led_prefix(cls, brightness: int) -> int:
+    def led_prefix(cls, brightness: float) -> int:
         """
         generates the first byte of a 4-byte SPI message to a single APA102 module
 
-        :param brightness: integer from 0 (off) to 100 (full brightness)
+        :param brightness: float from 0.0 (off) to 1.0 (full brightness)
         :return: the brightness byte
         """
 
-        # map 0 - 100 brightness parameter to 0 - 31 integer as used in the APA102 prefix byte
-        brightness_byte = grayscale_correction(brightness, max_in=100, max_out=31)
+        # map 0 - 1 brightness parameter to 0 - 31 integer as used in the APA102 prefix byte
+        brightness_byte = grayscale_correction(brightness, max_in=1, max_out=31)
 
         # structure of the prefix byte: (1 1 1 b4 b3 b2 b1 b0)
         #    - the first three ones are fixed

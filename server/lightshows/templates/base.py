@@ -332,7 +332,7 @@ class Lightshow(metaclass=ABCMeta):
                 brightness = max_brightness
 
             # finally: set brightness
-            self.lightshow.strip.set_global_brightness(brightness)
+            self.lightshow.strip.set_global_brightness_percent(brightness)
 
         def start_listening(self) -> None:
             """\
