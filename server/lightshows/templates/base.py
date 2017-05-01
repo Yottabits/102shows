@@ -20,9 +20,11 @@ from helpers.exceptions import *
 class LightshowParameters:
     """\
     A collection of maps for the parameters which store their:
-      - current values
-      - preprocessor method references
-      - verifier method references
+    
+       - current values
+       - preprocessor method references
+       - verifier method references
+       
     """
     value = {}  #: maps the show parameter names to their current values
     verifier = {}  #: maps the show parameter names to their verifier functions
