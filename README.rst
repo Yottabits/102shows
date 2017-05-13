@@ -6,14 +6,18 @@
 
 |Code Climate|  |Documentation Status|
 
-102shows is an
-`APA102 <https://www.aliexpress.com/item//32322326979.html>`__ (a.k.a
-`DotStar <https://www.adafruit.com/products/2240>`__) LED strip for the
-Raspberry Pi and also a collection of lightshows. These lightshows can
-be controlled over your home network via MQTT. And for those who do not
-prefer sending raw MQTT messages from the console, there is a
-(`Node-RED <https://nodered.org>`__-based) web interface. Its responsive
-layout makes it ideal for both smart phones, tablets and computers.
+102shows is an LED strip driver for the Raspberry Pi and also a collection of lightshows.
+These lightshows can be controlled over your home network via MQTT.
+And for those who do not prefer sending raw MQTT messages from the console, there is a
+(`Node-RED <https://nodered.org>`__-based) web interface.
+Its responsive layout makes it ideal for smart phones, tablets and computers.
+
+Supported LED chipsets
+----------------------
+
+   -  `APA102 <https://www.aliexpress.com/item//32322326979.html>`__ (a.k.a
+      `DotStar <https://www.adafruit.com/products/2240>`__)
+   -  `SK9822 <https://cpldcpu.com/2016/12/13/sk9822-a-clone-of-the-apa102/>`__
 
 Features
 --------

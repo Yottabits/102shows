@@ -67,7 +67,9 @@ class APA102(LEDStrip):
         self.leds = [self.led_prefix(self._global_brightness), 0, 0, 0] * self.num_leds  # 4 bytes per LED
         self.synced_buffer = SyncedArray('i', self.leds)
 
-        self.max_refresh_time_sec = 25E-6 * self.num_leds
+        # Strip parameters
+        self.max_refresh_time_sec = 25E-6 * self.num_leds  #: the maximum time the whole strip takes to refresh
+        self.__sk9822_compatibility_mode = True  #: be compatible with SK9822 chips? see: https://goo.gl/ePlcaI
 
     def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
         """\
@@ -141,11 +143,13 @@ class APA102(LEDStrip):
         """sends the buffered color and brightness values to the strip"""
         self.spi.xfer2(self.spi_start_frame())
         self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
+        if self.__sk9822_compatibility_mode:
+            self.spi.xfer2(self.spi_start_frame())
         self.spi.xfer2(self.spi_end_frame(self.num_leds))
 
     @staticmethod
     def spi_end_frame(num_leds) -> list:
-        """
+        """\
         As explained above, dummy data must be sent after the last real color information so that all of the data
         can reach its destination down the line.
         The delay is not as bad as with the human example above. It is only 1/2 bit per LED. This is because the
