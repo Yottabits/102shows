@@ -34,7 +34,9 @@ Server
 
 In the folder you want to install 102shows in, run:
 
-    :command:`wget -q -O 102s-setup.sh https://git.io/v1x1q; chmod +x 102s-setup.sh; ./102s-setup.sh; rm 102s-setup.sh`
+   .. code-block:: bash
+
+      wget -q -O 102s-setup.sh https://git.io/v1x1q; chmod +x 102s-setup.sh; ./102s-setup.sh; rm 102s-setup.sh
 
 This will launch an assistant that will lead you through the
 installation process.

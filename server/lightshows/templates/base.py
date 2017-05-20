@@ -185,8 +185,8 @@ class Lightshow(metaclass=ABCMeta):
         """\
         Applies a set of parameters to the show.
         
-        :param parameters: Parameter JSON Object, represented as a Python :py:type:`dict`
-        :return: True if successful, False if not
+        :param parameters: Parameter JSON Object, represented as a Python :py:class:`dict`
+        :return: ``True`` if successful, ``False`` if not
         """
         if type(parameters) is dict:
             for param_name in parameters:
