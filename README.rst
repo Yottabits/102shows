@@ -40,7 +40,7 @@ Features
 Installation
 ------------
 
-Take a look at the `Documentation <https://102shows.readthedocs.io/en/docs/usage.html#installation>`__
+Take a look at the `Documentation <https://102shows.readthedocs.io/en/latest/1-usage.html#installation>`__
 
 Questions? 🤔
 ------------
