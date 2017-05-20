@@ -30,18 +30,20 @@ class LEDStrip(metaclass=ABCMeta):
     :param max_clock_speed_hz: maximum clock speed (Hz) of the bus
     """
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000):
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, max_global_brightness: float = 1.0):
         # store the given parameters
         self.num_leds = num_leds
         self.max_clock_speed_hz = max_clock_speed_hz
 
         # private variables
-        self.__frozen = False
+        self.__is_frozen = False
         self._global_brightness = 1.0  #: global brightness multiplicator (0-1)
+        self.__max_global_brightness = max_global_brightness
 
         # buffers
         self.color_buffer = [(0.0, 0.0, 0.0)] * self.num_leds
-        self.brightness_buffer = [0] * self.num_leds
+        self.brightness_buffer = [1] * self.num_leds
+        #: the individual dim factors for each LED (0-1), EXCLUDING the global dim factor
 
         self.synced_red_buffer = SyncedArray('f', [0.0] * self.num_leds)
         self.synced_green_buffer = SyncedArray('f', [0.0] * self.num_leds)
@@ -56,6 +58,22 @@ class LEDStrip(metaclass=ABCMeta):
         del self.brightness_buffer, self.synced_brightness_buffer
 
         logger.info("Driver successfully closed")
+
+    @property
+    def __frozen(self):
+        """\
+        determines if the strip state can be altered using the :py:func:`set_pixel` function or the brightness setters
+        """
+        return self.__is_frozen
+
+    @__frozen.setter
+    def __frozen(self, value):
+        self.__is_frozen = value
+
+        if self.__is_frozen:
+            logger.debug("Strip is FREEZED")
+        else:
+            logger.debug("Strip is NOT FREEZED")
 
     max_refresh_time_sec = 1
     """\
@@ -210,7 +228,7 @@ class LEDStrip(metaclass=ABCMeta):
         elif brightness > 1.0:
             brightness = 1.0
 
-        self.brightness_buffer[led_num] = self._global_brightness * brightness
+        self.brightness_buffer[led_num] = brightness
         self.on_brightness_change(led_num)
 
     @abstractmethod
@@ -230,10 +248,13 @@ class LEDStrip(metaclass=ABCMeta):
         """
         if brightness < 0.0:
             self._global_brightness = 0.0
-        elif brightness > 1.0:
-            self._global_brightness = 1.0
+        elif brightness > self.__max_global_brightness:
+            self._global_brightness = self.__max_global_brightness
         else:
             self._global_brightness = brightness
+
+        for led_num in range(self.num_leds):
+            self.on_brightness_change(led_num)
 
     def set_global_brightness_percent(self, brightness: float) -> None:
         """\

@@ -37,6 +37,11 @@ class MQTTControl:
         self.show_process = Process()  # for the process in which the lightshows run in
         self.strip = None  # for the LED strip
 
+        # MQTT client
+        self.mqtt = paho.mqtt.client.Client()
+        self.mqtt.on_connect = self.on_connect
+        self.mqtt.on_message = self.on_message
+
     def notify_user(self, message, qos=0) -> None:
         """\
         send to the MQTT notification channel: Node-RED will display a toast notification
@@ -55,16 +60,8 @@ class MQTTControl:
 
     def on_connect(self, client, userdata, flags, rc):
         """subscribe to all messages related to this LED installation"""
-        start_path = self.conf.MQTT.general_path.format(
-            prefix=self.conf.MQTT.prefix,
-            sys_name=self.conf.sys_name,
-            show_name="+",
-            command="start")
-        stop_path = self.conf.MQTT.general_path.format(
-            prefix=self.conf.MQTT.prefix,
-            sys_name=self.conf.sys_name,
-            show_name="+",
-            command="stop")
+        start_path = self.conf.MQTT.Path.show_start
+        stop_path = self.conf.MQTT.Path.show_stop
 
         client.subscribe(start_path)
         client.subscribe(stop_path)
@@ -80,29 +77,35 @@ class MQTTControl:
         else:
             payload = str(msg.payload)
 
-        # extract the essentials
-        show_name = helpers.mqtt.get_from_topic(TopicAspect.show_name, topic)
-        command = helpers.mqtt.get_from_topic(TopicAspect.command, topic)
+        # logging the MQTT message
+        logger.debug(
+            "Incoming MQTT message: \n" +
+            "topic:   {}".format(topic) + ";   " +
+            "payload: {}".format(payload)
+        )
 
-        # execute
-        if command == "start":
-            # parse parameters
-            parameters = helpers.mqtt.parse_json_safely(payload)
-            logger.debug(
-                """for show: \"{show}\":
-                   received command: \"{command}\"
-                   with:
-                   {parameters}
-                """.format(show=show_name,
-                           command=command,
-                           parameters=json.dumps(parameters, sort_keys=True, indent=8, separators=(',', ': '))
-                           ))
+        if topic == self.conf.MQTT.Path.show_start:
+
+            # parse payload
+            payload_tree = helpers.mqtt.parse_json_safely(payload)
+            show_name = payload_tree['name']
+            try:
+                parameters = payload_tree['parameters']
+            except KeyError:
+                parameters = {}
+
+            # logging
+            logger.info("MQTT command interpreted: START the show \"{}\" (with given parameters: {} ).".format(
+                show_name, parameters))
+
             self.stop_running_show()  # stop any running show
-            self.start_show(show_name, parameters)
-        elif command == "stop":
-            self.stop_show(show_name)
-        else:
-            logger.debug("MQTTControl ignored {show}:{command}".format(show=show_name, command=command))
+            self.start_show(show_name, parameters)  # start the new show
+
+        elif topic == self.conf.MQTT.Path.show_stop:
+
+            # logging
+            logger.info("MQTT command interpreted: STOP the running show")
+            self.stop_running_show()
 
     def start_show(self, show_name: str, parameters: dict) -> None:
         """\
@@ -122,13 +125,19 @@ class MQTTControl:
             show.check_runnable()
         except (InvalidStrip, InvalidConf, InvalidParameters) as error_message:
             logger.error(error_message)
-            self.start_show('idle', {})
+            self.start_show('clear', {})
             return
 
         # start the show
         logger.info("Starting the show " + show_name)
         self.show_process = Process(target=show.start, name=show_name)
         self.show_process.start()
+
+        # propagate via MQTT
+        self.mqtt.publish(topic=self.conf.MQTT.Path.show_current,
+                          payload=show_name,
+                          qos=1,
+                          retain=True)
 
     def stop_show(self, show_name: str) -> None:
         """\
@@ -155,6 +164,12 @@ class MQTTControl:
         else:
             logger.debug("no show running; nothing to stop")
 
+        # propagate via MQTT
+        self.mqtt.publish(topic=self.conf.MQTT.Path.show_current,
+                          payload="",
+                          qos=1,
+                          retain=True)
+
     def run(self) -> None:
         """start the listener"""
         logger.info("Starting {name}".format(name=self.conf.sys_name))
@@ -162,17 +177,15 @@ class MQTTControl:
         logger.info("Initializing LED strip...")
         driver = get_driver(self.conf.Strip.driver)
         self.strip = driver(num_leds=self.conf.Strip.num_leds,
-                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz)
-        self.strip.set_global_brightness_percent(self.conf.Strip.initial_brightness)
+                            max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
+                            max_global_brightness=self.conf.Strip.max_brightness_percent)
+        self.strip.set_global_brightness_percent(self.conf.Strip.initial_brightness_percent)
         self.strip.sync_up()
 
         logger.info("Connecting to the MQTT Broker")
-        client = paho.mqtt.client.Client()
-        client.on_connect = self.on_connect
-        client.on_message = self.on_message
         if self.conf.MQTT.username is not None:
-            client.username_pw_set(self.conf.MQTT.username, self.conf.MQTT.password)
-        client.connect(self.conf.MQTT.Broker.host, self.conf.MQTT.Broker.port, self.conf.MQTT.Broker.keepalive)
+            self.mqtt.username_pw_set(self.conf.MQTT.username, self.conf.MQTT.password)
+        self.mqtt.connect(self.conf.MQTT.Broker.host, self.conf.MQTT.Broker.port, self.conf.MQTT.Broker.keepalive)
         logger.info("{name} is ready".format(name=self.conf.sys_name))
 
         # start a show show to listen for brightness changes and refresh the strip regularly
@@ -180,7 +193,7 @@ class MQTTControl:
 
         try:
             signal.signal(signal.SIGTERM, self.stop_controller)  # attach stop_controller() to SIGTERM
-            client.loop_forever()
+            self.mqtt.loop_forever()
         except KeyboardInterrupt:
             self.stop_controller()
         finally:

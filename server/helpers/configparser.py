@@ -61,4 +61,10 @@ def get_configuration(default_filename: str = 'defaults.yml', user_filename: str
     # apply user config over Defaults
     configuration = update_settings_tree(base=defaults, update=user_config)
 
+    # parse MQTT path templates
+    for path_name in configuration.MQTT.Path:
+        path_template = configuration.MQTT.Path[path_name]
+        path = path_template.format(prefix=configuration.MQTT.prefix, sys_name=configuration.sys_name)
+        configuration.MQTT.Path[path_name] = path
+
     return configuration

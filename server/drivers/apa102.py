@@ -53,8 +53,8 @@ class APA102(LEDStrip):
     The constructor initializes the strip connection via SPI
     """
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000):
-        super().__init__(num_leds, max_clock_speed_hz)
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, max_global_brightness: float = 1.0):
+        super().__init__(num_leds, max_clock_speed_hz, max_global_brightness)
 
         # check if we do not have too much LEDs in the strip
         if self.num_leds > 1024:
@@ -104,7 +104,7 @@ class APA102(LEDStrip):
         :param led_num: The index of the LED whose prefix should be regenerated
         """
 
-        brightness = self.brightness_buffer[led_num]
+        brightness = self._global_brightness * self.brightness_buffer[led_num]
         self.leds[4 * led_num] = self.led_prefix(brightness)
 
     @classmethod
