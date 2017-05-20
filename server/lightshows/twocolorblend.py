@@ -25,9 +25,9 @@ class TwoColorBlend(Lightshow):
 
     def check_runnable(self):
         # do we have all parameters
-        if self.p['color1'] is None:
+        if self.p.value['color1'] is None:
             raise InvalidParameters.missing("color1")
-        if self.p['color2'] is None:
+        if self.p.value['color2'] is None:
             raise InvalidParameters.missing("color2")
 
     def run(self):
@@ -35,8 +35,8 @@ class TwoColorBlend(Lightshow):
 
         for led in range(self.strip.num_leds):
             normal_distance = led / (self.strip.num_leds - 1)
-            component1 = linear_dim(self.p['color1'], 1 - normal_distance)
-            component2 = linear_dim(self.p['color2'], normal_distance)
+            component1 = linear_dim(self.p.value['color1'], 1 - normal_distance)
+            component2 = linear_dim(self.p.value['color2'], normal_distance)
             led_color = add_tuples(component1, component2)
             transition.set_pixel(led, *led_color)
         transition.blend()

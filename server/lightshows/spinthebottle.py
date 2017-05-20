@@ -43,10 +43,10 @@ class SpinTheBottle(Lightshow):
                 self.minimal_number_of_leds))
 
         # do we have all necessary parameters?
-        necessary_parameters = [(self.p['highlight_color'], "highlight_color"),
-                                (self.p['background_color'], "background_color"),
-                                (self.p['time_sec'], "time_sec"),
-                                (self.p['fadeout'], "fadeout")]
+        necessary_parameters = [(self.p.value['highlight_color'], "highlight_color"),
+                                (self.p.value['background_color'], "background_color"),
+                                (self.p.value['time_sec'], "time_sec"),
+                                (self.p.value['fadeout'], "fadeout")]
         for parameter, parameter_name in necessary_parameters:
             if parameter is None:
                 raise InvalidParameters.missing(parameter_name)
@@ -65,16 +65,16 @@ class SpinTheBottle(Lightshow):
             distance = abs(led - position)  # distance to highlight center
             if distance <= highlight_radius:
                 dim_factor = (1 - (distance / highlight_radius)) ** 2
-                color = linear_dim(self.p['highlight_color'], dim_factor)
+                color = linear_dim(self.p.value['highlight_color'], dim_factor)
                 self.strip.set_pixel(led, *color)
             else:
-                self.strip.set_pixel(led, *self.p['background_color'])
+                self.strip.set_pixel(led, *self.p.value['background_color'])
         self.strip.show()
 
     def run(self):
         section_width = (self.upper_border - self.lower_border) // self.highlight_sections
         target_led = random.randrange(self.lower_border, self.upper_border, section_width)
-        frame_time = self.p['time_sec'] / (3 * self.highlight_sections)  # 3 for the three roundtrips
+        frame_time = self.p.value['time_sec'] / (3 * self.highlight_sections)  # 3 for the three roundtrips
 
         # go round the strip one time
         for led in range(self.lower_border, self.upper_border + 1, section_width):
@@ -88,9 +88,9 @@ class SpinTheBottle(Lightshow):
         for led in range(self.lower_border, target_led, section_width):
             self.highlight(led)
             relative_distance = abs(led - target_led) / self.strip.num_leds
-            self.sleep(0.0006 * self.p['time_sec'] / relative_distance)  # slow down a little
+            self.sleep(0.0006 * self.p.value['time_sec'] / relative_distance)  # slow down a little
         self.highlight(target_led, highlight_radius=section_width // 2)
 
-        if self.p['fadeout']:
+        if self.p.value['fadeout']:
             self.sleep(10)
-            blend_whole_strip_to_color(self.strip, self.p['background_color'])  # fadeout the spot
+            blend_whole_strip_to_color(self.strip, self.p.value['background_color'])  # fadeout the spot

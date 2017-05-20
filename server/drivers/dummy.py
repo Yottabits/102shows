@@ -26,7 +26,7 @@ class DummyDriver(LEDStrip):
         logger.debug("FAKE LED STRIP SHOWS: ")
         for led_num in range(self.num_leds):
             red, green, blue = self.get_pixel(led_num)
-            brightness = self.brightness_buffer[led_num]
+            brightness = self.brightness_buffer[led_num] * self._global_brightness
             logger.debug("{led:03d} => ({r:05.1f}, {g:05.1f}, {b:05.1f}) @ {brightness:.2f}"
                          .format(led=led_num,
                                  r=red,

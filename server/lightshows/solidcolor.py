@@ -22,8 +22,8 @@ class SolidColor(Lightshow):
         self.register('color', None, verify.rgb_color_tuple, preprocessor=list_to_tuple)
 
     def check_runnable(self):
-        if self.p['color'] is None:
+        if self.p.value['color'] is None:
             raise InvalidParameters.missing('color')
 
     def run(self):
-        blend_whole_strip_to_color(self.strip, self.p['color'])
+        blend_whole_strip_to_color(self.strip, self.p.value['color'])

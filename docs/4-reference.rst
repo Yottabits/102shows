@@ -158,6 +158,9 @@ It offers quite a lot:
 .. autoclass:: lightshows.templates.base.Lightshow
    :members:
 
+.. autoclass:: lightshows.templates.base.LightshowParameters
+   :members:
+
 ##########
 Exceptions
 ##########

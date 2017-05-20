@@ -3,6 +3,7 @@
 # licensed under the GNU Public License, version 2
 
 from abc import ABCMeta, abstractmethod
+import json
 import logging
 import os
 import signal
@@ -15,6 +16,22 @@ import helpers.verify as verify
 from drivers import LEDStrip
 from helpers.configparser import get_configuration
 from helpers.exceptions import *
+
+
+class LightshowParameters:
+    """\
+    A collection of maps for the parameters which store their:
+    
+       - current values
+       - preprocessor method references
+       - verifier method references
+       
+    """
+
+    def __init__(self):
+        self.value = {}  #: maps the show parameter names to their current values
+        self.verifier = {}  #: maps the show parameter names to their verifier functions
+        self.preprocessor = {}  #: maps the show parameter names to their preprocessor functions
 
 
 class Lightshow(metaclass=ABCMeta):
@@ -31,9 +48,7 @@ class Lightshow(metaclass=ABCMeta):
     """
 
     # Attributes
-    p = {}  #: maps the show parameter names to their current values
-    p_verifier = {}  #: maps the show parameter names to their verifier functions
-    p_preprocessor = {}  #: maps the show parameter names to their preprocessor functions
+    p = None  #: The object that stores all show parameters
 
     logger = None  #: The logger object this show will use for debug output
     mqtt = None  #: represents the MQTT connection for parsing parameter changes #FIXME: type annotation
@@ -47,14 +62,12 @@ class Lightshow(metaclass=ABCMeta):
         self.mqtt = self.MQTTListener(self)
 
         # Parameters
+        self.p = LightshowParameters()
         self.strip = strip
         self.init_parameters()  # let the child class set its own default parameters
 
         # override with any directly given parameters
-        parameters_valid = type(parameters) is dict
-        if parameters_valid:
-            for param_name in parameters:
-                self.set_parameter(param_name, parameters[param_name])
+        self.apply_parameter_set(parameters)
 
     @property
     def name(self) -> str:
@@ -74,13 +87,17 @@ class Lightshow(metaclass=ABCMeta):
         # loop and listen to brightness changes until the end
         self.idle_forever()
 
-    def idle_forever(self, delay_sec: float = 0.1) -> None:
+    def idle_forever(self, delay_sec: float = -1) -> None:
         """\
         Just does nothing and invokes :py:func:`drivers.LEDStrip.show` until the end of time
         (or a call of :py:func:`stop`)
 
         :param delay_sec: Time between two calls of :py:func:`drivers.LEDStrip.show`
         """
+
+        if delay_sec < 0:
+            delay_sec = self.mqtt.global_conf.Strip.refresh_time_sec
+
         while True:
             self.strip.show()
             time.sleep(delay_sec)  # do not refresh in this time
@@ -123,15 +140,15 @@ class Lightshow(metaclass=ABCMeta):
         os.kill(os.getpid(), signal.SIGKILL)
 
     def register(self, parameter_name: str, default_val, verifier, args: list = None, kwargs: dict = None,
-                 preprocessor = None) -> None:
+                 preprocessor=None) -> None:
         """\
-        MQTT-settable parameters are stored in :py:attr:`lightshows.templates.base.Lightshow.p`.
+        MQTT-settable parameters are stored in :py:attr:`lightshows.templates.base.Lightshow.p.value`.
         Calling this function will register a new parameter and his verifier in
-        :py:attr:`~lightshows.templates.base.Lightshow.p` and
-        :py:attr:`~lightshows.templates.base.Lightshow.p_verifier`, so the parameter can be
+        :py:attr:`~lightshows.templates.base.Lightshow.p.value` and
+        :py:attr:`~lightshows.templates.base.Lightshow.p.verifier`, so the parameter can be
         set via MQTT and by the controller.
 
-        :param parameter_name: name of the parameter. You access the parameter via self.p[parameter_name].
+        :param parameter_name: name of the parameter. You access the parameter via self.p.value[parameter_name].
         :param default_val: initializer value of the parameter.
                             *Note that this value will not be checked by the verifier function!*
         :param verifier: a function that is called before the parameter is set via MQTT.
@@ -156,35 +173,54 @@ class Lightshow(metaclass=ABCMeta):
             preprocessor = empty_preprocessor
 
         # check if already registered
-        if parameter_name in self.p:
+        if parameter_name in self.p.value:
             raise InvalidParameters("Parameter {} was already registered".format(parameter_name))
 
         # store parameter
-        self.p[parameter_name] = default_val
-        self.p_verifier[parameter_name] = (verifier, args, kwargs)
-        self.p_preprocessor[parameter_name] = preprocessor
+        self.p.value[parameter_name] = default_val
+        self.p.verifier[parameter_name] = (verifier, args, kwargs)
+        self.p.preprocessor[parameter_name] = preprocessor
 
-    def set_parameter(self, param_name: str, value) -> None:
+    def apply_parameter_set(self, parameters: dict) -> None:
+        """\
+        Applies a set of parameters to the show.
+        
+        :param parameters: Parameter JSON Object, represented as a Python :py:type:`dict`
+        :return: True if successful, False if not
         """
-        Take a parameter by name and new value and store it to p.
+        if type(parameters) is dict:
+            for param_name in parameters:
+                self.set_parameter(param_name, value=parameters[param_name], send_mqtt_update=False)
+            self.mqtt.send_current_parameter_state()
+        else:
+            raise InvalidParameters("Parameters payload must be given as JSON like this: " +
+                                    "{\"param_name\": 42, \"param2_name\": [255,125,0]}  " +
+                                    "(instead received: " + str(parameters) + " ).")
+
+    def set_parameter(self, param_name: str, value, send_mqtt_update: bool = True) -> None:
+        """\
+        Take a parameter by name and new value and store it to p.value.
 
         :param param_name: name of the parameter to be stored
         :param value: new value of the parameter to be stored
+        :param send_mqtt_update: Send the updated parameter array to the MQTT current parameter path after update
         """
 
         # pre-process the value
-        preprocessor = self.p_preprocessor[param_name]
+        preprocessor = self.p.preprocessor[param_name]
         value = preprocessor(value)
 
         try:
-            verifier, args, kwargs = self.p_verifier[param_name]
+            verifier, args, kwargs = self.p.verifier[param_name]
             verifier(value, param_name, *args, **kwargs)  # run verifier
-        except KeyError:  # param_name not found in p_verifier => unknown
+        except KeyError:  # param_name not found in p.verifier => unknown
             self.logger.warning("Parameter {} is unknown!".format_map(param_name))
         except InvalidParameters as error_message:  # verifier raised an exception
             self.logger.warning(error_message)
         else:
-            self.p[param_name] = value
+            self.p.value[param_name] = value
+            if send_mqtt_update:
+                self.mqtt.send_current_parameter_state()
 
     # next we have the abstract methods that classes MUST implement:
 
@@ -207,7 +243,7 @@ class Lightshow(metaclass=ABCMeta):
 
     @abstractmethod
     def run(self) -> None:
-        """
+        """\
         The "main" function of the show
         (obviously this must be re-implemented in child classes)
         """
@@ -259,19 +295,11 @@ class Lightshow(metaclass=ABCMeta):
             :param rc: no idea what this does.
                 This is a necessary argument but is not handled in any way in the function.
             """
-            brightness_path = self.global_conf.MQTT.general_path.format(
-                prefix=self.global_conf.MQTT.prefix,
-                sys_name=self.global_conf.sys_name,
-                show_name="+",
-                command="brightness")
-            parameter_path = self.global_conf.MQTT.general_path.format(
-                prefix=self.global_conf.MQTT.prefix,
-                sys_name=self.global_conf.sys_name,
-                show_name=self.lightshow.name,
-                command="+")
+            set_brightness_path = self.global_conf.MQTT.Path.global_brightness_set
+            parameter_path = self.global_conf.MQTT.Path.show_parameter_set.format(show_name=self.lightshow.name)
 
-            client.subscribe(brightness_path)
-            self.logger.debug("show subscribed to {}".format(brightness_path))
+            client.subscribe(set_brightness_path)
+            self.logger.debug("show subscribed to {}".format(set_brightness_path))
             client.subscribe(parameter_path)
             self.logger.debug("show subscribed to {}".format(parameter_path))
 
@@ -290,49 +318,59 @@ class Lightshow(metaclass=ABCMeta):
                 This is a necessary argument but is not handled in any way in the function.
             :param msg: The object representing the incoming MQTT message
             """
-            command = helpers.mqtt.get_from_topic(helpers.mqtt.TopicAspect.command, str(msg.topic))
-            if type(msg.payload) is bytes:  # might be a byte encoded string that must be stripped
-                payload = msg.payload.decode()
-            else:
-                payload = str(msg.payload)
 
-            if command == "brightness":
-                self.set_brightness(payload)
-            else:
+            if msg.topic == self.global_conf.MQTT.Path.global_brightness_set:
+                try:
+                    new_brightness = float(msg.payload)  # parse string to float
+                except ValueError:
+                    self.logger.error("Could not parse set brightness as a number!")
+                    return
+
+                try:  # verify that the number is in the defined range
+                    verify.numeric(new_brightness, "brightness", minimum=0.0, maximum=1.0)
+                    self.lightshow.strip.set_global_brightness(new_brightness)
+                except helpers.exceptions.InvalidParameters as error_msg:
+                    self.logger.error(error_msg)
+                    return
+
+                self.set_brightness(new_brightness)  # apply to the strip
+
+            else:  # must be a show parameter
+                parameters = json.loads(msg.payload.decode())
+
                 if self.parse_parameter_changes:
-                    self.lightshow.set_parameter(command, payload)
+                    self.lightshow.apply_parameter_set(parameters)
 
-        def set_brightness(self, payload: str) -> None:
+        def set_brightness(self, brightness: float) -> None:
             """\
-            Tries to cast the payload as an integer between 0 and 100,
-            then invokes the strip's :py:func:`drivers.LEDStrip.set_global_brightness`
-            function.
-
-            :param payload: string containing the brightness as integer
+            Limits the brightness value to the maximum brightness that is set in the configuration file,
+            then calls the strip driver's :py:func:`drivers.LEDStrip.set_global_brightness` function
+            
+            :param brightness: float between 0.0 and 1.0
             """
-
-            # check general restrictions
-            try:
-                brightness = int(payload)
-            except ValueError:
-                self.logger.error("Could not parse set brightness as integer!")
-                return
-            try:
-                verify.integer(brightness, "brightness", minimum=0, maximum=100)
-            except helpers.exceptions.InvalidParameters as error_msg:
-                self.logger.error(error_msg)
-                return
-
             # confine brightness to configured value
-            max_brightness = self.global_conf.Strip.max_brightness
+            max_brightness = self.global_conf.Strip.max_brightness_percent / 100.0
             if brightness > max_brightness:
-                self.logger.info("tried to set brightness {set} but maximum brightness is {max}.".format(
+                self.logger.info("tried to set brightness {set} but configured maximum brightness is {max}.".format(
                     set=brightness, max=max_brightness))
                 self.logger.info("setting {max} as brightness instead...".format(max=max_brightness))
                 brightness = max_brightness
 
-            # finally: set brightness
+            # finally: set brightness of the strip
             self.lightshow.strip.set_global_brightness(brightness)
+
+            self.client.publish(topic=self.global_conf.MQTT.Path.global_brightness_current,
+                                payload=str(brightness),
+                                qos=1,
+                                retain=True)
+
+        def send_current_parameter_state(self):
+            path = self.global_conf.MQTT.Path.show_parameter_current.format(show_name=self.lightshow.name)
+            self.client.publish(
+                topic=path,
+                payload=json.dumps(self.lightshow.p.value),
+                qos=1,
+                retain=True)
 
         def start_listening(self) -> None:
             """\

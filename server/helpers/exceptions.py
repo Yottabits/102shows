@@ -5,34 +5,43 @@
 """This module defines some exception classes specific to 102shows:"""
 
 
-class InvalidStrip(Exception):
+class DescriptiveException(Exception):
+    """\
+    This type of exception must contain a value (usually a string)
+    that is used as the string representation of the exception
+    """
+
+    def __init__(self, value):
+        self.value = value
+        pass
+
+    def __str__(self) -> str:
+        return repr(self.value)
+
+
+class InvalidStrip(DescriptiveException):
     """\
     Use if something is wrong with the strip.
 
     **For example:** not enough LEDs to run the selected lightshow
     """
 
-    def __init__(self):
-        pass
+    pass
 
 
-class InvalidConf(Exception):
+class InvalidConf(DescriptiveException):
     """\
     Use if something in the configuration will not work
     for what the user has chosen in the config file.
     """
 
-    def __init__(self):
-        pass
+    pass
 
 
-class InvalidParameters(Exception):
+class InvalidParameters(DescriptiveException):
     """\
     Use when given parameters (for a lightshow) are not valid
     """
-
-    def __init__(self):
-        pass
 
     @staticmethod
     def unknown(param_name: str = None):

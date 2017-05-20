@@ -28,11 +28,11 @@ class ColorCycle(Lightshow):
 
         checks if all necessary parameters are set
         """
-        if self.p['pause_sec'] is None:
+        if self.p.value['pause_sec'] is None:
             raise InvalidParameters("Missing parameter \"pause_sec\"!")
-        if self.p['num_steps_per_cycle'] is None:
+        if self.p.value['num_steps_per_cycle'] is None:
             raise InvalidParameters("Missing parameter \"num_steps_per_cycle\"!")
-        if self.p['num_cycles'] is None:
+        if self.p.value['num_cycles'] is None:
             raise InvalidParameters("Missing parameter \"num_cycles\"!")
 
     @abstractmethod
@@ -41,14 +41,14 @@ class ColorCycle(Lightshow):
         This method is called to initialize a color cycle.
         You should set up the variables You are going to use throughout the show.
 
-        The following parameters are already set in :py:attribute:`p` (but can be changed):
+        The following parameters are already set in :py:attribute:`p.value` (but can be changed):
          - ``pause_sec`` (:py:type:`float`): The time (in seconds) between two frames of the color cycle
             is pre-set to 0.
          - ``num_cycles`` (:py:type:`int`): The number of times the color cycle runs through
             if the lightshow is started.
             After so many complete cycles the lightshow ends.
             Default value is :py:`float('inf`), so basically it runs forever.
-        The following parameter in :py:attribute:`p` must be set **before** the show is started
+        The following parameter in :py:attribute:`p.value` must be set **before** the show is started
         (for example in :py:func:`before_start`):
          - ``num_steps_per_cycle`` (:py:type:`int`: The number of steps in a single cycle
         """
@@ -78,13 +78,13 @@ class ColorCycle(Lightshow):
         self.strip.show()
         current_cycle = 0
         while True:  # Loop forever (for would not work for num_cycles = infinity)
-            for currentStep in range(self.p['num_steps_per_cycle']):
+            for currentStep in range(self.p.value['num_steps_per_cycle']):
                 need_repaint = self.update(currentStep, current_cycle)  # Call the subclasses update method
                 if need_repaint:
                     self.strip.show()  # Display, only if required
-                self.sleep(self.p['pause_sec'])  # Pause until the next step
+                self.sleep(self.p.value['pause_sec'])  # Pause until the next step
             current_cycle += 1
-            if current_cycle >= self.p['num_cycles']:
+            if current_cycle >= self.p.value['num_cycles']:
                 break
         # Finished, cleanup everything
         self.cleanup()

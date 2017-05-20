@@ -12,7 +12,92 @@ On this page, you see the commands it responds to.
 Paths
 =====
 
-The general scheme is ``led/{sys_name}/show/{show_name}/{command}``
+The general scheme is ``{prefix}/{sys_name}/show/{show_name}/{command}``
+
+Switching a show
+================
+
+Starting a show
+---------------
+
+   - **topic**: ``{prefix}/{sys_name}/show/start``
+   - **payload**: JSON Object, for example:
+
+      .. code-block:: json
+
+         {
+            "name": "name_of_my_show",
+            "parameters": {
+               "some_time_sec": 3.5,
+               "arbitrary_color": [255, 64, 8]
+            }
+         }
+
+      The ``parameters`` block is optional.
+
+   - **retained**: no
+
+Stopping a show
+---------------
+
+   - **topic**: ``{prefix}/{sys_name}/show/stop``
+   - **payload**: none needed
+   - **retained**: no
+
+Response of the system
+----------------------
+
+   - **topic**: ``{prefix}/{sys_name}/show/current``
+   - **payload**: show name as string
+   - **retained**: yes
+
+The system is sending this message every time the current show is changed.
+
+Global brightness
+=================
+
+Setting the global brightness
+-----------------------------
+
+   - **topic**: ``{prefix}/{sys_name}/global-brightness/set``
+   - **payload**: string containing a floating-point number between 0.0 and 1.0
+   - **retained**: no
+
+Response of the system
+----------------------
+
+   - **topic**: ``{prefix}/{sys_name}/global-brightness/current``
+   - **payload**: string containing a floating-point number between 0.0 and 1.0
+   - **retained**: yes
+
+The system is sending this message every time the brightness is changed.
+
+Show-specific parameters
+========================
+
+Setting a parameter
+-------------------
+
+   - **topic**: ``{prefix}/{sys_name}/show/{show-name}/parameters/set``
+   - **payload**: JSON
+   - **retained**: no
+
+Response of the system
+----------------------
+
+   - **topic**: ``{prefix}/{sys_name}/show/{show-name}/parameters/current``
+   - **payload**: JSON with all the parameters, for example:
+
+      .. code-block:: json
+
+         {
+            "some_time_sec": 3.5,
+            "arbitrary_color": [255, 64, 8]
+         }
+
+   - **retained**: yes
+
+The system is sending this message every time the parameter is changed.
 
 General commands
 ----------------
@@ -51,6 +136,7 @@ Lightshow-specific commands
 ---------------------------
 
 Each lightshow can implement its own commands, like ``foo-color``, ``velocity`` (of an animation) etc.
+The name of the parameter must not be ``start`` or ``stop``
 
 
 ##########

@@ -5,8 +5,9 @@ Strip:
   driver: APA102
   num_leds: null
   max_clock_speed_hz: 4000000  # [Hz] 4 MHz is the maximum for "large" strips of more than 500 LEDs.
-  initial_brightness: 50  # integer from 0 to 100
-  max_brightness: 75  # maximum brightness
+  initial_brightness_percent: 50  # integer from 0 to 100
+  max_brightness_percent: 75  # maximum brightness
+  refresh_time_sec: 5 # time between to regular strip refreshes
 
 MQTT:
   prefix: led
@@ -19,3 +20,14 @@ MQTT:
     host: localhost
     port: 1883
     keepalive: 60  # [seconds]
+
+  Path:
+    global_brightness_current: "{prefix}/{sys_name}/global-brightness/current"
+    global_brightness_set: "{prefix}/{sys_name}/global-brightness/set"
+
+    show_current: "{prefix}/{sys_name}/show/current"
+    show_start: "{prefix}/{sys_name}/show/start"
+    show_stop: "{prefix}/{sys_name}/show/stop"
+
+    show_parameter_current: "{prefix}/{sys_name}/show/{{show_name}}/parameters/current"
+    show_parameter_set: "{prefix}/{sys_name}/show/{{show_name}}/parameters/set"

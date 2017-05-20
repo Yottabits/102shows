@@ -53,8 +53,8 @@ class APA102(LEDStrip):
     The constructor initializes the strip connection via SPI
     """
 
-    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000):
-        super().__init__(num_leds, max_clock_speed_hz)
+    def __init__(self, num_leds: int, max_clock_speed_hz: int = 4000000, max_global_brightness: float = 1.0):
+        super().__init__(num_leds, max_clock_speed_hz, max_global_brightness)
 
         # check if we do not have too much LEDs in the strip
         if self.num_leds > 1024:
@@ -64,20 +64,23 @@ class APA102(LEDStrip):
         self.spi = spidev.SpiDev()  # Init the SPI device
         self.spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
         self.spi.max_speed_hz = self.max_clock_speed_hz  # should not be higher than 8000000
-        self.leds = [0, 0, 0, 0] * self.num_leds  # 4 bytes per LED
+        self.leds = [self.led_prefix(self._global_brightness), 0, 0, 0] * self.num_leds  # 4 bytes per LED
         self.synced_buffer = SyncedArray('i', self.leds)
 
-        self.max_refresh_time_sec = 25E-6 * self.num_leds
+        # Strip parameters
+        self.max_refresh_time_sec = 25E-6 * self.num_leds  #: the maximum time the whole strip takes to refresh
+        self.__sk9822_compatibility_mode = True  #: be compatible with SK9822 chips? see: https://goo.gl/ePlcaI
 
     def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
         """\
-        .. todo:: explain
+        Changes the message buffer after a pixel was changed in the global color buffer.
+        Also, a grayscale correction is performed.
+        To send the message buffer to the strip and show the changes, you must invoke :func:`show`
 
-        :param led_num:
-        :param red:
-        :param green:
-        :param blue:
-        :return:
+        :param led_num: index of the pixel to be set
+        :param red: red component of the pixel (``0.0 - 255.0``)
+        :param green: green component of the pixel (``0.0 - 255.0``)
+        :param blue: blue component of the pixel (``0.0 - 255.0``)
         """
         # get correct duty cycle for desired lightness
         r_duty = grayscale_correction(red)
@@ -100,20 +103,21 @@ class APA102(LEDStrip):
 
         :param led_num: The index of the LED whose prefix should be regenerated
         """
-        brightness = self.brightness_buffer[led_num]
+
+        brightness = self._global_brightness * self.brightness_buffer[led_num]
         self.leds[4 * led_num] = self.led_prefix(brightness)
 
     @classmethod
-    def led_prefix(cls, brightness: int) -> int:
+    def led_prefix(cls, brightness: float) -> int:
         """
         generates the first byte of a 4-byte SPI message to a single APA102 module
 
-        :param brightness: integer from 0 (off) to 100 (full brightness)
+        :param brightness: float from 0.0 (off) to 1.0 (full brightness)
         :return: the brightness byte
         """
 
-        # map 0 - 100 brightness parameter to 0 - 31 integer as used in the APA102 prefix byte
-        brightness_byte = grayscale_correction(brightness, max_in=100, max_out=31)
+        # map 0 - 1 brightness parameter to 0 - 31 integer as used in the APA102 prefix byte
+        brightness_byte = grayscale_correction(brightness, max_in=1, max_out=31)
 
         # structure of the prefix byte: (1 1 1 b4 b3 b2 b1 b0)
         #    - the first three ones are fixed
@@ -139,11 +143,13 @@ class APA102(LEDStrip):
         """sends the buffered color and brightness values to the strip"""
         self.spi.xfer2(self.spi_start_frame())
         self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
+        if self.__sk9822_compatibility_mode:
+            self.spi.xfer2(self.spi_start_frame())
         self.spi.xfer2(self.spi_end_frame(self.num_leds))
 
     @staticmethod
     def spi_end_frame(num_leds) -> list:
-        """
+        """\
         As explained above, dummy data must be sent after the last real color information so that all of the data
         can reach its destination down the line.
         The delay is not as bad as with the human example above. It is only 1/2 bit per LED. This is because the
