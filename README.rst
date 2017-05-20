@@ -15,9 +15,9 @@ Its responsive layout makes it ideal for smart phones, tablets and computers.
 Supported LED chipsets
 ----------------------
 
-   -  `APA102 <https://www.aliexpress.com/item//32322326979.html>`__ (a.k.a
-      `DotStar <https://www.adafruit.com/products/2240>`__)
-   -  `SK9822 <https://cpldcpu.com/2016/12/13/sk9822-a-clone-of-the-apa102/>`__
+- `APA102 <https://www.aliexpress.com/item//32322326979.html>`__ (a.k.a
+  `DotStar <https://www.adafruit.com/products/2240>`__)
+- `SK9822 <https://cpldcpu.com/2016/12/13/sk9822-a-clone-of-the-apa102/>`__
 
 Features
 --------
