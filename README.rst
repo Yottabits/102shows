@@ -24,7 +24,7 @@ Features
 
 -  `non-linear brightness perception
    correction <https://ledshield.wordpress.com/2012/11/13/led-brightness-to-your-eye-gamma-correction-no/>`__
-   (currently mistaken for *gamma correction*)
+   (commonly mistaken as *gamma correction*)
 -  High framerates even with long strips (over 140 refreshes per seconds
    at a strip length of 500 LEDs)
 -  sleek looking UI (based on `Node-RED <https://nodered.org>`__)
