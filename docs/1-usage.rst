@@ -32,11 +32,12 @@ of your MQTT broker for later.
 Server
 ======
 
+For the latest **stable** release:
 In the folder you want to install 102shows in, run:
 
    .. code-block:: bash
 
-      wget -q -O 102s-setup.sh https://git.io/v1x1q; chmod +x 102s-setup.sh; ./102s-setup.sh; rm 102s-setup.sh
+      wget -q -O 102s-setup.sh https://git.io/vHydu; chmod u+x 102s-setup.sh; ./102s-setup.sh stable; rm 102s-setup.sh
 
 This will launch an assistant that will lead you through the
 installation process.

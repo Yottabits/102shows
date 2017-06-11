@@ -18,6 +18,17 @@ function check_tty() {
     fi
 }
 
+function parse_branch() {
+    local number_of_arguments=${#BASH_ARGV[@]}
+
+    if [[ number_of_arguments -eq 0 ]]; then
+        status_update "No branch supplied as argument. Using ${BRANCH}"
+    else
+        BRANCH=${BASH_ARGV[0]}
+        status_update "Using repository branch ${BRANCH}."
+    fi
+}
+
 function status_update() {
     echo -e "\n${LIGHTBLUE}$@${NOCOLOR}"
 }
@@ -44,7 +55,7 @@ function install()
 {
     install_dependencies
     
-    status_update " => Getting the latest stable release from GitHub"
+    status_update " => Getting the latest ${BRANCH} release from GitHub"
     git clone -b ${BRANCH} https://github.com/Yottabits/102shows.git
     rc=$?; if [[ ${rc} == 0 ]]; then   # check for success
         msg_success " => Download finished!"
@@ -103,9 +114,9 @@ function install()
 
     msg_success "
  => We successfully installed the 102shows server :-)
-      - Note that you need to an MQTT broker in order for the server to work
-      - If you wan t to use the included UI, you should install it now
-        You can find the instructions at https://git.io/v1x5Os
+      - Note that you need an MQTT broker in order for the server to work
+      - If you want to use the included UI, you should install it now
+        You can find the instructions at https://goo.gl/lvGYzV
       - To run the server, start the MQTT broker and then execute $PWD/server/run.sh"
 }
 
@@ -116,6 +127,7 @@ function main()
     read answer < /dev/tty
     if [ "$answer" == "y" ] || [ "$answer" == "Y" ]
     then
+        parse_branch
         install
     fi
 
