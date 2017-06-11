@@ -34,8 +34,16 @@ function question() {
     echo -en "${LIGHTCYAN}$@${NOCOLOR}"
 }
 
+function install_dependencies()
+{
+    status_update " => Installing required software"
+    sudo apt-get install python3 python3-venv python3-pip
+}
+
 function install()
 {
+    install_dependencies
+    
     status_update " => Getting the latest stable release from GitHub"
     git clone -b ${BRANCH} https://github.com/Yottabits/102shows.git
     rc=$?; if [[ ${rc} == 0 ]]; then   # check for success
@@ -63,12 +71,12 @@ function install()
     source venv/bin/activate  # set the new interpreter as the default for python3, pip, setuptools,...
 
 
-    status_update " => Installing requirements..."
+    status_update " => Installing required Python libraries..."
     pip3 install -r ./requirements.txt
     rc=$?; if [[ ${rc} == 0 ]]; then   # check for success
         msg_success " => Requirements are ready!"
     else
-        msg_error " => Requirements installation failed! (return code: $rc)"
+        msg_error " => Installation of required Python libraries failed! (return code: $rc)"
         msg_error "    Maybe You do not have sufficient rights - try running this script with sudo..."
         msg_error "    For now I am going to quit the installation."
         exit ${rc}
