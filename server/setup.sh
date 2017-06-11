@@ -22,10 +22,10 @@ function parse_branch() {
     local number_of_arguments=${#BASH_ARGV[@]}
 
     if [[ number_of_arguments -eq 0 ]]; then
-        status_update "No branch supplied as argument. Using ${BRANCH}"
+        msg_success "=> No branch supplied as argument. Using ${BRANCH}"
     else
         BRANCH=${BASH_ARGV[0]}
-        status_update "Using repository branch ${BRANCH}."
+        msg_success "=> Using repository branch ${BRANCH}."
     fi
 }
 
@@ -68,9 +68,9 @@ function install()
 
     cd 102shows
     rm ./server/setup.sh  # remove this installer
-    chmod +x ./server/run.sh  # make runner executable
+    chmod u+x ./server/run.sh  # make runner executable
 
-    status_update " => Setting up a Python3 virtual environment..."
+    status_update " => Setting up a Python3 virtual environment"
     eval ${GLOBAL_PYTHON3} -m venv venv
     rc=$?; if [[ ${rc} == 0 ]]; then   # check for success
         msg_success " => venv successfully created!"
@@ -82,7 +82,7 @@ function install()
     source venv/bin/activate  # set the new interpreter as the default for python3, pip, setuptools,...
 
 
-    status_update " => Installing required Python libraries..."
+    status_update " => Installing required Python libraries"
     pip3 install -r ./requirements.txt
     rc=$?; if [[ ${rc} == 0 ]]; then   # check for success
         msg_success " => Requirements are ready!"
@@ -93,6 +93,26 @@ function install()
         exit ${rc}
     fi
 
+    status_update " => Installing an executable under /bin/102shows-server"
+    sudo rm /bin/102shows-server
+    echo "#!/bin/bash
+
+$PWD/server/run.sh""" | sudo tee -a /bin/102shows-server > /dev/null
+
+    sudo chmod +x /bin/102shows-server
+
+    status_update " => Installing a systemd service"
+    sudo rm /etc/systemd/system/102shows-server.service
+    sudo mv ./server/102shows-server.service /etc/systemd/system/102shows-server.service
+    
+    question " => Would you like to enable the service now? [Y/n]  "
+    read answer < /dev/tty
+    if [ "$answer" != "n" ] && [ "$answer" != "N" ]; then
+        sudo systemctl enable 102shows-server
+        msg_success " => To start the service now, execute: \"sudo service 102shows-server start\""
+    else
+        status_update " => If you want enable it later, execute: \"sudo systemctl enable 102shows-server\""
+    fi
 
     echo -e  "$(cat logo)  version: $(cat version)"
     echo -e "\n\n"
@@ -103,7 +123,7 @@ function install()
     if [ "$answer" != "n" ] && [ "$answer" != "N" ]; then
         status_update " => copying config.example.yml to config.yml"
         cp ./server/config.example.yml ./server/config.yml
-        status_update " => starting editor..."
+        status_update " => starting editor"
         editor ./server/config.yml < /dev/tty
         status_update " => editor stopped"
     else

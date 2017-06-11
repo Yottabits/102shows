@@ -1,0 +1,10 @@
+[Unit]
+Description=102shows server
+After=mosquitto.service
+
+[Service]
+Type=simple
+ExecStart=/bin/102shows-server
+
+[Install]
+WantedBy=multi-user.target
