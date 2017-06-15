@@ -54,7 +54,7 @@ add-on.
 
 -  Install Node-RED: (this is **not necessary** on Raspbian)
 
-   -  Install node.js (including npm): :command:`sudo apt-get install nodejs`
+   -  Install node.js (including npm): :command:`sudo apt-get install nodejs npm`
       (not necessary on Raspbian)
    -  Update npm: :command:`sudo npm install npm@latest -g`
    -  Install Node-RED: :command:`sudo npm install -g node-red`
