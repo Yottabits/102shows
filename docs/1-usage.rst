@@ -42,6 +42,19 @@ In the folder you want to install 102shows in, run:
 This will launch an assistant that will lead you through the
 installation process.
 
+.. topic:: Installing a development version
+
+   The setup script ``102s-setup.sh`` takes the GitHub branch to clone as an argument.
+   So, if you want to install the latest development version (which resides on the ``master`` branch),
+   you should run:
+
+   .. code-block:: bash
+
+      wget -q -O 102s-setup.sh https://git.io/vHydu; chmod u+x 102s-setup.sh; ./102s-setup.sh master; rm 102s-setup.sh
+
+
+
+
 Web UI
 ======
 
@@ -52,12 +65,17 @@ The web UI depends on `Node-RED <https://nodered.org/>`__ with the
 `dashboard <https://flows.nodered.org/node/node-red-dashboard>`__
 add-on.
 
--  Install Node-RED: (this is **not necessary** on Raspbian)
+-  Install Node-RED:
+   Follow the `Installation Instructions <https://nodered.org/docs/getting-started/installation>`__
 
-   -  Install node.js (including npm): :command:`sudo apt-get install nodejs npm`
-      (not necessary on Raspbian)
-   -  Update npm: :command:`sudo npm install npm@latest -g`
-   -  Install Node-RED: :command:`sudo npm install -g node-red`
+.. topic:: Raspbian Tip
+
+   There is a special `simple installation way <https://nodered.org/docs/hardware/raspberrypi>`__
+   for the Raspberry Pi:
+
+   .. code-block:: bash
+
+      bash <(curl -sL https://raw.githubusercontent.com/node-red/raspbian-deb-package/master/resources/update-nodejs-and-nodered)
 
 .. warning::
 
@@ -65,7 +83,10 @@ add-on.
   you have to uninstall it **before** installing :program:`node-red-dashboard`.
 
 -  Install the Node-RED dashboard add-on:
-   :command:`npm install node-red-dashboard`
+  .. code-block:: bash
+
+     cd ~/.node-red
+     npm install node-red-dashboard
 
 2. Start Node-RED
 -----------------
@@ -76,7 +97,10 @@ should now be available on |nodered-admin|
 .. topic:: Raspbian Tip
 
    If you want Node-RED to automatically start on boot, execute:
-   :command:`sudo systemctl enable nodered.service`
+
+   .. code-block:: bash
+
+      sudo systemctl enable nodered.service
 
 3. Paste the 102shows UI in Node-RED
 ------------------------------------
@@ -88,7 +112,12 @@ menu (upper right corner) choose :guilabel:`Import` >> :guilabel:`Clipboard`
 and paste the code you copied earlier into the window that is opening.
 Confirm with :guilabel:`Import`
 
-You should now see the flow **LED control**
+You should now see the flow **LED control**.
+
+.. topic:: Installing a development version
+
+   The link to `ui/nodered.json <https://raw.githubusercontent.com/Yottabits/102shows/stable/ui/nodered.json>`__
+   above points to the latest ``stable`` version.
 
 4. Configure the 102shows UI
 ----------------------------
