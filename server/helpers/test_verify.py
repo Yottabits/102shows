@@ -1,3 +1,11 @@
+# Tests for helpers.verify
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
+
+"""\
+.. todo:: write docstring for this module
+"""
+
 import unittest
 
 from helpers import verify

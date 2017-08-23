@@ -1,15 +1,13 @@
-"""
-RGBTest
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# RGBTest
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 from helpers.color import blend_whole_strip_to_color
 from lightshows.templates.base import *
 
 
 class RGBTest(Lightshow):
-    """
+    """\
     turns on all red, then all green, then all blue leds and then all together
 
     No parameters necessary

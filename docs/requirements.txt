@@ -1,3 +1,7 @@
+sphinx-autodoc-typehints>=1.2.0
+sphinx-autodoc-annotation
+sphinx_rtd_theme
+
 coloredlogs>=5.2
 orderedattrdict>=1.4.3
 paho-mqtt>=1.2

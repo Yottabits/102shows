@@ -1,22 +1,10 @@
-"""
-Verify Parameters
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
+# Verify Parameters
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
-functions that validate input parameters and exceptions with error messages
-if the input does not fit the requirements. These are at the moment:
-
- - numeric
- - not_negative_numeric
- - positive_numeric
-
- - integer
- - not_negative_integer
- - positive_integer
-
- - boolean
-
- - rgb_color_tuple
+"""\
+Functions that validate input parameters and exceptions, raising
+InvalidParameters exceptions if the input does not fit the requirements. #fixme: link to exception
 """
 
 from helpers.exceptions import InvalidParameters

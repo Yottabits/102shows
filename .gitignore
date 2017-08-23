@@ -13,3 +13,7 @@ server/dist
 
 # temporary stuff
 playground/
+
+# built documentation
+docs/_build
+

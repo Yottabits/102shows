@@ -1,14 +1,12 @@
-"""
-Strand Test
-(c) 2015 Martin Erzberger, 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Strand Test
+# (c) 2015 Martin Erzberger, 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 from lightshows.templates.colorcycle import *
 
 
 class StrandTest(ColorCycle):
-    """
+    """\
     Displays a classical LED test
 
     No parameters necessary
@@ -27,7 +25,7 @@ class StrandTest(ColorCycle):
         if self.color == 0:
             self.color = 0xFF0000  # If black, reset to red
 
-        head = (current_step + 9) % self.p['num_steps_per_cycle']  # The head pixel that will be turned on in this cycle
+        head = (current_step + 9) % self.p.value['num_steps_per_cycle']  # The head pixel that will be turned on in this cycle
         tail = current_step  # The tail pixel that will be turned off
         self.strip.set_pixel_bytes(head, self.color)  # Paint head
         self.strip.set_pixel_bytes(tail, 0)  # Clear tail

@@ -1,10 +1,8 @@
-"""
-Christmas Show
-(c) 2016 Simon Leiner, Jenny Schinkel
-licensed under the GNU Public License, version 2
+# Christmas Show
+# (c) 2016-2017 Simon Leiner, Jenny Schinkel
+# licensed under the GNU Public License, version 2
 
-at this point more or less a quick hack
-"""
+"""at this point more or less a quick hack"""
 
 from lightshows.templates.base import *
 from helpers.color import SmoothBlend, blend_whole_strip_to_color

@@ -1,8 +1,7 @@
-"""
-102shows Configuration File Parser
-(c) 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# 102shows Configuration File Parser
+# (c) 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
+
 
 from copy import deepcopy
 import logging
@@ -20,11 +19,12 @@ logger = logging.getLogger('102shows.server.helpers.configparser')
 
 def update_settings_tree(base: ConfigTree, update: ConfigTree) -> ConfigTree:
     """
-    For all attributes in "update" override the defaults set in "base"
-    or add them to the tree, if they did not exist in "base".
+    For all attributes in ``update`` override the defaults set in ``base``
+    or add them to the tree, if they did not exist in ``base``.
 
     :param base: default config tree
     :param update: "patch" for the default config tree
+
     :return: the updated tree
     """
     updated = deepcopy(base)
@@ -43,8 +43,9 @@ def get_configuration(default_filename: str = 'defaults.yml', user_filename: str
     """
     gets the current configuration, as specified by YAML files
 
-    :param default_filename: name of the default settings file (relative to configparser.py)
-    :param user_filename: name of the user settings file (relative to configparser.py)
+    :param default_filename: name of the default settings file (relative to :file:`configparser.py`)
+    :param user_filename: name of the user settings file (relative to :file:`configparser.py`)
+
     :return: settings tree
     """
 
@@ -59,5 +60,11 @@ def get_configuration(default_filename: str = 'defaults.yml', user_filename: str
 
     # apply user config over Defaults
     configuration = update_settings_tree(base=defaults, update=user_config)
+
+    # parse MQTT path templates
+    for path_name in configuration.MQTT.Path:
+        path_template = configuration.MQTT.Path[path_name]
+        path = path_template.format(prefix=configuration.MQTT.prefix, sys_name=configuration.sys_name)
+        configuration.MQTT.Path[path_name] = path
 
     return configuration

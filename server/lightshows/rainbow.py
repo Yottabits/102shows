@@ -1,15 +1,13 @@
-"""
-Rainbow
-(c) 2015 Martin Erzberger, 2016 Simon Leiner
-licensed under the GNU Public License, version 2
-"""
+# Rainbow
+# (c) 2015 Martin Erzberger, 2016-2017 Simon Leiner
+# licensed under the GNU Public License, version 2
 
 from helpers.color import wheel
 from lightshows.templates.colorcycle import *
 
 
 class Rainbow(ColorCycle):
-    """
+    """\
     Rotates a rainbow color wheel around the strip.
 
     No parameters necessary
@@ -29,7 +27,7 @@ class Rainbow(ColorCycle):
         # -> The other LEDs go up to 254, then wrap around to zero and go up again until the last one is just
         #     below LED 0. This way, the strip always shows one full rainbow, regardless of the number of LEDs
         scale_factor = 255 / self.strip.num_leds  # Value for the index change between two neighboring LEDs
-        start_index = 255 / self.p['num_steps_per_cycle'] * current_step  # Value of LED 0
+        start_index = 255 / self.p.value['num_steps_per_cycle'] * current_step  # Value of LED 0
         for i in range(self.strip.num_leds):
             led_index = start_index + i * scale_factor  # Index of LED i, not rounded and not wrapped at 255
             pixel_color = wheel(led_index % 255)  # Get the actual color out of wheel
