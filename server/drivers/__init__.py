@@ -7,6 +7,7 @@
 import logging
 from abc import ABCMeta, abstractmethod
 from multiprocessing import Array as SyncedArray
+from multiprocessing import Value as SyncedValue
 
 __all__ = ['apa102', 'dummy', 'LEDStrip']
 
@@ -42,13 +43,14 @@ class LEDStrip(metaclass=ABCMeta):
 
         # buffers
         self.color_buffer = [(0.0, 0.0, 0.0)] * self.num_leds
-        self.brightness_buffer = [1] * self.num_leds
+        self.brightness_buffer = [1.0] * self.num_leds
         #: the individual dim factors for each LED (0-1), EXCLUDING the global dim factor
 
         self.synced_red_buffer = SyncedArray('f', [0.0] * self.num_leds)
         self.synced_green_buffer = SyncedArray('f', [0.0] * self.num_leds)
         self.synced_blue_buffer = SyncedArray('f', [0.0] * self.num_leds)
-        self.synced_brightness_buffer = SyncedArray('i', self.brightness_buffer)
+        self.synced_brightness_buffer = SyncedArray('f', self.brightness_buffer)
+        self.synced_global_brightness = SyncedValue('f', self._global_brightness)
 
     def __del__(self):
         """Invokes :py:func': `close` and deletes all the buffers."""
@@ -256,14 +258,6 @@ class LEDStrip(metaclass=ABCMeta):
         for led_num in range(self.num_leds):
             self.on_brightness_change(led_num)
 
-    def set_global_brightness_percent(self, brightness: float) -> None:
-        """\
-        Just like :func:`set_global_brightness`, but with a 0-100 percent value.
-        
-        :param brightness: the global brightness (``0.0 - 100.0``) multiplicator to be set
-        """
-        self.set_global_brightness(100 * brightness)
-
     def clear_buffer(self) -> None:
         """Resets all pixels in the color buffer to ``(0,0,0)``."""
         for led_num in range(self.num_leds):
@@ -279,7 +273,10 @@ class LEDStrip(metaclass=ABCMeta):
         Copies the local color and brightness buffers to the shared buffer
         so other processes can see the current strip state.
         """
-        logger.info("sync-up")
+        logger.info("sync_up()")
+
+        self.synced_global_brightness.value = self._global_brightness
+
         for led_num, (red, green, blue) in enumerate(self.color_buffer):
             # colors
             self.synced_red_buffer[led_num] = red
@@ -291,7 +288,10 @@ class LEDStrip(metaclass=ABCMeta):
 
     def sync_down(self) -> None:
         """Reads the shared color and brightness buffers and copies them to the local buffers"""
-        logger.info("sync-down")
+        logger.info("sync_down()")
+
+        self._global_brightness = self.synced_global_brightness.value
+
         for led_num, _ in enumerate(self.color_buffer):
             # colors
             red = self.synced_red_buffer[led_num]

@@ -178,8 +178,8 @@ class MQTTControl:
         driver = get_driver(self.conf.Strip.driver)
         self.strip = driver(num_leds=self.conf.Strip.num_leds,
                             max_clock_speed_hz=self.conf.Strip.max_clock_speed_hz,
-                            max_global_brightness=self.conf.Strip.max_brightness_percent)
-        self.strip.set_global_brightness_percent(self.conf.Strip.initial_brightness_percent)
+                            max_global_brightness=self.conf.Strip.max_brightness_percent / 100.0)
+        self.strip.set_global_brightness(self.conf.Strip.initial_brightness_percent / 100.0)
         self.strip.sync_up()
 
         logger.info("Connecting to the MQTT Broker")
