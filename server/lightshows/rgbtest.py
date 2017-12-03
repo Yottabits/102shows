@@ -21,15 +21,15 @@ class RGBTest(Lightshow):
     def run(self):
         while True:
             # single leds
-            blend_whole_strip_to_color(self.strip, (255, 0, 0), fadetime_sec=0)
+            blend_whole_strip_to_color(self.strip, (255, 0, 0), fadetime_sec=5)
             self.sleep(10)
-            blend_whole_strip_to_color(self.strip, (0, 255, 0), fadetime_sec=0)
+            blend_whole_strip_to_color(self.strip, (0, 255, 0), fadetime_sec=5)
             self.sleep(10)
-            blend_whole_strip_to_color(self.strip, (0, 0, 255), fadetime_sec=0)
+            blend_whole_strip_to_color(self.strip, (0, 0, 255), fadetime_sec=5)
             self.sleep(10)
 
             # all leds together
-            blend_whole_strip_to_color(self.strip, (255, 255, 255), fadetime_sec=0)
+            blend_whole_strip_to_color(self.strip, (255, 255, 255), fadetime_sec=5)
             self.sleep(10)
 
             # clear strip
