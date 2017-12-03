@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import apa102
 import random
 import time
 import math
