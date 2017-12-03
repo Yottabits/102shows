@@ -4,6 +4,7 @@
 
 
 from lightshows import *
+from lightshows import starlight
 
 shows = {'christmas': christmas.Christmas,  # A list of available shows
          'clear': clear.Clear,
@@ -13,4 +14,5 @@ shows = {'christmas': christmas.Christmas,  # A list of available shows
          'solidcolor': solidcolor.SolidColor,
          'theaterchase': theaterchase.TheaterChase,
          'twocolorblend': twocolorblend.TwoColorBlend,
+         'starlight': starlight.Starlight,
          }
