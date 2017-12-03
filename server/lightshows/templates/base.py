@@ -193,6 +193,7 @@ class Lightshow(metaclass=ABCMeta):
                 self.set_parameter(param_name, value=parameters[param_name], send_mqtt_update=False)
             self.mqtt.send_current_parameter_state()
         else:
+            print("parameters", type(parameters))
             raise InvalidParameters("Parameters payload must be given as JSON like this: " +
                                     "{\"param_name\": 42, \"param2_name\": [255,125,0]}  " +
                                     "(instead received: " + str(parameters) + " ).")
