@@ -38,9 +38,13 @@ class Starlight(ColorCycle):
 
         for pos, end in self.state.items():
             brightness = 1.0 / self.length * (end - t)
-            self.strip.set_pixel(pos, *self.color)
-            self.strip.set_brightness(pos, brightness)
+            if brightness > 0.0:
+                self.strip.set_pixel(pos, *self.color)
+                self.strip.set_brightness(pos, brightness)
+            else:
+                self.strip.set_pixel(pos, 0, 0, 0)
+                self.strip.set_brightness(pos, 1.0)
 
-        self.state = { pos: end for pos, end in self.state.items() if end > t }
+        self.state = {pos: end for pos, end in self.state.items() if end > t}
 
         return True  # All pixels are set in the buffer, so repaint the strip now
