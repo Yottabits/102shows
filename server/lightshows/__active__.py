@@ -4,7 +4,7 @@
 
 
 from lightshows import *
-from lightshows import starlight
+from lightshows import starlight, jump
 
 shows = {'christmas': christmas.Christmas,  # A list of available shows
          'clear': clear.Clear,
@@ -15,4 +15,5 @@ shows = {'christmas': christmas.Christmas,  # A list of available shows
          'theaterchase': theaterchase.TheaterChase,
          'twocolorblend': twocolorblend.TwoColorBlend,
          'starlight': starlight.Starlight,
+         'jump': jump.Jump,
          }

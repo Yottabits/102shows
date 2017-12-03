@@ -13,13 +13,17 @@ class Starlight(ColorCycle):
 
     No parameters necessary
     """
+
+    def __init__(self, strip: LEDStrip, parameters: dict):
+        super().__init__(strip, parameters)
+        self.state = {}
+        self.length = 10
+        self.color = (255, 180, 50)
+
     def init_parameters(self):
         super().init_parameters()
         self.set_parameter('num_steps_per_cycle', 255)
         self.set_parameter('pause_sec', 0.02)
-        self.state = {}
-        self.length = 10
-        self.color = (255, 180, 50)
 
     def before_start(self):
         pass
@@ -30,8 +34,7 @@ class Starlight(ColorCycle):
         if random.randint(0, 100) > 90:
             self.state[random.randint(0, self.strip.num_leds - 1)] = t + self.length
 
-        for pos in range(self.strip.num_leds):
-            self.strip.set_pixel(pos, 0, 0, 0)
+        self.strip.clear_buffer()
 
         for pos, end in self.state.items():
             brightness = 1.0 / self.length * (end - t)
