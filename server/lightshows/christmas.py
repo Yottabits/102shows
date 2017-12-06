@@ -30,7 +30,7 @@ class Christmas(Lightshow):
             verify.integer(value, "velocity", minimum=1, maximum=10)
             self.velocity = value
         else:
-            raise InvalidParameters.unknown(param_name)
+            super(Christmas, self).set_parameter(param_name, value, **kwargs)
 
     def check_runnable(self):
         pass
