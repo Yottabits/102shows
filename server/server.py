@@ -39,6 +39,14 @@ For details, see https://www.gnu.org/licenses/gpl-2.0.html
 # configuration
 user_config = get_configuration()
 
+# logging
+root_logger = logging.getLogger()
+fh = logging.FileHandler('102shows.log')
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+root_logger.addHandler(fh)
+
 # logger
 logger = logging.getLogger('102shows.server')
 coloredlogs.install(level=user_config.log_level)

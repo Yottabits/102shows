@@ -6,7 +6,7 @@ from helpers.color import SmoothBlend, linear_dim, add_tuples
 from helpers.preprocessors import list_to_tuple
 from lightshows.templates.base import *
 
-
+logger = logging.getLogger(__name__)
 class TwoColorBlend(Lightshow):
     """\
     linear transition between two colors across the strip
@@ -39,4 +39,5 @@ class TwoColorBlend(Lightshow):
             component2 = linear_dim(self.p.value['color2'], normal_distance)
             led_color = add_tuples(component1, component2)
             transition.set_pixel(led, *led_color)
+            logger.info('set pixel %s, color %s', str(led), str(led_color))
         transition.blend()
