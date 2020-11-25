@@ -42,7 +42,7 @@ user_config = get_configuration()
 # logging
 root_logger = logging.getLogger()
 fh = logging.FileHandler('102shows.log')
-fh.setLevel(logging.DEBUG)
+fh.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
 root_logger.addHandler(fh)

@@ -125,7 +125,6 @@ class LEDStrip(metaclass=ABCMeta):
         :param blue: blue component of the pixel (``0.0 - 255.0``)
         """
 
-        logger.debug('set pixel(%d, %f, %f, %f) frozen=%b', led_num, red, green, blue, self.__frozen)
         if led_num < 0:
             return  # Pixel is invisible, so ignore
         if led_num >= self.num_leds:
