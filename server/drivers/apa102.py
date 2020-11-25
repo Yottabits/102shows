@@ -2,12 +2,11 @@
 # (c) 2015 Martin Erzberger, 2016-2017 Simon Leiner
 # licensed under the GNU Public License, version 2
 
-import spidev
 from multiprocessing import Array as SyncedArray
+from typing import Callable, Tuple
 
 from drivers import LEDStrip
 from helpers.color import grayscale_correction
-
 
 class APA102(LEDStrip):
     """\
@@ -61,15 +60,26 @@ class APA102(LEDStrip):
             raise Exception("The APA102 LED driver does not support strips of more than 1024 LEDs")
 
         # SPI connection
-        self.spi = spidev.SpiDev()  # Init the SPI device
-        self.spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
-        self.spi.max_speed_hz = self.max_clock_speed_hz  # should not be higher than 8000000
+        self.spi_transmit, self.spi_close = self.init_spi()
+
         self.leds = [self.led_prefix(self._global_brightness), 0, 0, 0] * self.num_leds  # 4 bytes per LED
         self.synced_buffer = SyncedArray('i', self.leds)
 
         # Strip parameters
         self.max_refresh_time_sec = 25E-6 * self.num_leds  #: the maximum time the whole strip takes to refresh
         self.__sk9822_compatibility_mode = True  #: be compatible with SK9822 chips? see: https://goo.gl/ePlcaI
+
+    def init_spi(self) -> Tuple[Callable, Callable]:
+        try:
+            import Adafruit_GPIO.SPI as SPI
+            spi = SPI.SpiDev(0, 0, self.max_clock_speed_hz)
+            return spi.write, spi.close
+        except ImportError:
+            import spidev
+            spi = spidev.SpiDev()  # Init the SPI device
+            spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
+            spi.max_speed_hz = self.max_clock_speed_hz  # should not be higher than 8000000
+            return spi.xfer2, spi.close
 
     def on_color_change(self, led_num, red: float, green: float, blue: float) -> None:
         """\
@@ -128,7 +138,7 @@ class APA102(LEDStrip):
 
     def close(self) -> None:
         """Closes the SPI connection to the strip."""
-        self.spi.close()
+        self.spi_close()
 
     @staticmethod
     def spi_start_frame() -> list:
@@ -141,11 +151,11 @@ class APA102(LEDStrip):
 
     def show(self) -> None:
         """sends the buffered color and brightness values to the strip"""
-        self.spi.xfer2(self.spi_start_frame())
-        self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
+        self.spi_transmit(self.spi_start_frame())
+        self.spi_transmit(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
         if self.__sk9822_compatibility_mode:
-            self.spi.xfer2(self.spi_start_frame())
-        self.spi.xfer2(self.spi_end_frame(self.num_leds))
+            self.spi_transmit(self.spi_start_frame())
+        self.spi_transmit(self.spi_end_frame(self.num_leds))
 
     @staticmethod
     def spi_end_frame(num_leds) -> list:
