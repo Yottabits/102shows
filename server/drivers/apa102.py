@@ -9,8 +9,6 @@ from typing import Callable, Tuple
 from drivers import LEDStrip
 from helpers.color import grayscale_correction
 
-logger = logging.getLogger('102shows.drivers.apa102')
-
 
 class APA102(LEDStrip):
     """\
@@ -110,7 +108,6 @@ class APA102(LEDStrip):
         self.leds[start_index + 3] = r_duty
         self.leds[start_index + 2] = g_duty
         self.leds[start_index + 1] = b_duty
-        logger.debug('on_color_change #%d, (%d, %d, %d)', led_num, r_duty, g_duty, b_duty)
 
     def on_brightness_change(self, led_num: int) -> None:
         """
