@@ -287,6 +287,12 @@
                 "base-font": {
                     "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
                 }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey"
             }
         },
         "site": {
@@ -309,7 +315,7 @@
     {
         "id": "b944567b.d15278",
         "type": "mqtt-broker",
-        "z": "",
+        "name": "",
         "broker": "localhost",
         "port": "1883",
         "clientid": "",
@@ -317,106 +323,18 @@
         "compatmode": true,
         "keepalive": "60",
         "cleansession": true,
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": "",
         "birthTopic": "",
         "birthQos": "0",
-        "birthPayload": ""
-    },
-    {
-        "id": "29e67bf9.e34be4",
-        "type": "ui_base",
-        "theme": {
-            "name": "theme-dark",
-            "lightTheme": {
-                "default": "#0094CE",
-                "baseColor": "#0094CE",
-                "baseFont": "Helvetica Neue",
-                "edited": true,
-                "reset": false
-            },
-            "darkTheme": {
-                "default": "#097479",
-                "baseColor": "#097479",
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
-                "edited": true,
-                "reset": false
-            },
-            "customTheme": {
-                "name": "Untitled Theme 1",
-                "default": "#4B7930",
-                "baseColor": "#4B7930",
-                "baseFont": "Helvetica Neue"
-            },
-            "themeState": {
-                "base-color": {
-                    "default": "#097479",
-                    "value": "#097479",
-                    "edited": false
-                },
-                "page-titlebar-backgroundColor": {
-                    "value": "#097479",
-                    "edited": false
-                },
-                "page-backgroundColor": {
-                    "value": "#111111",
-                    "edited": false
-                },
-                "page-sidebar-backgroundColor": {
-                    "value": "#000000",
-                    "edited": false
-                },
-                "group-textColor": {
-                    "value": "#0eb8c0",
-                    "edited": false
-                },
-                "group-borderColor": {
-                    "value": "#555555",
-                    "edited": false
-                },
-                "group-backgroundColor": {
-                    "value": "#333333",
-                    "edited": false
-                },
-                "widget-textColor": {
-                    "value": "#eeeeee",
-                    "edited": false
-                },
-                "widget-backgroundColor": {
-                    "value": "#097479",
-                    "edited": false
-                },
-                "widget-borderColor": {
-                    "value": "#333333",
-                    "edited": false
-                },
-                "base-font": {
-                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
-                }
-            }
-        },
-        "site": {
-            "name": "Node-RED Dashboard",
-            "hideToolbar": "false",
-            "allowSwipe": "false",
-            "dateFormat": "DD. MM. YYYY",
-            "sizes": {
-                "sx": 48,
-                "sy": 48,
-                "gx": 6,
-                "gy": 6,
-                "cx": 6,
-                "cy": 6,
-                "px": 0,
-                "py": 0
-            }
-        }
+        "birthPayload": "",
+        "closeTopic": "",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
     },
     {
         "id": "4dc2b995.13d0f8",
         "type": "mqtt-broker",
-        "z": "",
         "broker": "localhost",
         "port": "1883",
         "clientid": "",
@@ -424,17 +342,16 @@
         "compatmode": true,
         "keepalive": "60",
         "cleansession": true,
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": "",
         "birthTopic": "",
         "birthQos": "0",
-        "birthPayload": ""
+        "birthPayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
     },
     {
         "id": "222a3f19.b90e9",
         "type": "ui_group",
-        "z": "",
         "name": "Spin the Bottle",
         "tab": "c7886a8d.764f4",
         "order": 3,
@@ -444,21 +361,13 @@
     {
         "id": "c7886a8d.764f4",
         "type": "ui_tab",
-        "z": "",
         "name": "MyLED",
         "icon": "lightbulb_outline",
         "order": 2
     },
     {
-        "id": "fb68d861.2f3c5",
-        "type": "ui_base",
-        "name": "LED Control",
-        "theme": "theme-light"
-    },
-    {
         "id": "da52ac1d.f09478",
         "type": "ui_group",
-        "z": "",
         "name": "etc",
         "tab": "c7886a8d.764f4",
         "order": 5,
@@ -468,7 +377,6 @@
     {
         "id": "abc9273f.36d778",
         "type": "ui_group",
-        "z": "",
         "name": "Color",
         "tab": "c7886a8d.764f4",
         "order": 1,
@@ -478,7 +386,6 @@
     {
         "id": "e2aca116.33ad2",
         "type": "ui_group",
-        "z": "",
         "name": "Color Blend",
         "tab": "c7886a8d.764f4",
         "order": 2,
@@ -488,7 +395,6 @@
     {
         "id": "57eea257.4cfba4",
         "type": "ui_group",
-        "z": "",
         "name": "Animations",
         "tab": "c7886a8d.764f4",
         "order": 4,
@@ -498,7 +404,6 @@
     {
         "id": "f7b943a7.14f418",
         "type": "ui_group",
-        "z": "",
         "name": "Christmas Show",
         "tab": "c7886a8d.764f4",
         "order": 6,
@@ -513,6 +418,8 @@
         "func": "var split_str = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(msg.payload);\n\nr = parseInt(split_str[1], 16);\ng = parseInt(split_str[2], 16);\nb = parseInt(split_str[3], 16)\n\nvar rgb = [r,g,b];\nmsg.payload = rgb;\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
         "x": 379.90000915527344,
         "y": 96.39999389648438,
         "wires": [
@@ -600,12 +507,12 @@
         "type": "inject",
         "z": "2fc32e47.9732e2",
         "name": "INIT",
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
         "repeat": "",
         "crontab": "",
         "once": true,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
         "x": 345.14288330078125,
         "y": 71.42855834960938,
         "wires": [
@@ -686,6 +593,8 @@
         "func": "var command = msg.topic;\n\nif (msg.topic == \"start\") {\n    msg.topic = flow.get(\"mqtt_prefix\") + \"/\" + flow.get(\"mqtt_sys_name\") +\n        \"/show/start\";\n    \n    var parameters = msg.payload;\n    \n    msg.payload = {\n        \"name\": msg.show,\n        \"parameters\": parameters\n    }\n}\n\nelse {\n    var parameter_name = msg.topic;\n    var parameter_value = msg.payload;\n    \n    msg.topic = flow.get(\"mqtt_prefix\") + \"/\" + flow.get(\"mqtt_sys_name\") +\n        \"/show/\" + msg.show + \"/parameters/set\";\n    \n    msg.payload = {parameter_name: parameter_value};\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
         "x": 4255.327392578125,
         "y": 704.0831298828125,
         "wires": [
@@ -759,12 +668,12 @@
         "type": "inject",
         "z": "2fc32e47.9732e2",
         "name": "trigger reset to presets",
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
         "repeat": "",
         "crontab": "",
         "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
         "x": 834.390625,
         "y": 115.05706787109375,
         "wires": [
@@ -1238,7 +1147,7 @@
         "links": [
             "57127376.359c3c"
         ],
-        "x": 2951.0665283203125,
+        "x": 2952.0665283203125,
         "y": 1326.7999267578125,
         "wires": []
     },
@@ -1261,11 +1170,12 @@
         "z": "2fc32e47.9732e2",
         "name": "color1",
         "label": "",
+        "tooltip": "",
         "group": "e2aca116.33ad2",
         "order": 1,
         "width": "3",
         "height": "1",
-        "passthru": false,
+        "passthru": true,
         "mode": "color",
         "delay": 300,
         "topic": "color1",
@@ -1282,11 +1192,13 @@
         "type": "subflow:93f4131.fbfd2f",
         "z": "2fc32e47.9732e2",
         "name": "",
+        "env": [],
         "x": 3490.809295654297,
         "y": 1349.678451538086,
         "wires": [
             [
-                "4a0170a0.88db3"
+                "4a0170a0.88db3",
+                "6ba84738.2ddc78"
             ]
         ]
     },
@@ -1333,7 +1245,8 @@
         "y": 1398.9283905029297,
         "wires": [
             [
-                "4a0170a0.88db3"
+                "4a0170a0.88db3",
+                "b40f3ef0.18ed38"
             ]
         ]
     },
@@ -1360,8 +1273,12 @@
         "y": 1322.2853393554688,
         "wires": [
             [
-                "3ec3076f.74f948"
+                "3ec3076f.74f948",
+                "521dae4f.7a96b8"
             ]
+        ],
+        "inputLabels": [
+            "asdf"
         ]
     },
     {
@@ -1415,8 +1332,11 @@
         "order": 0,
         "width": "0",
         "height": "0",
+        "passthru": false,
         "label": "Show me! ✨",
+        "tooltip": "",
         "color": "",
+        "bgcolor": "",
         "icon": "",
         "payload": "twocolorblend",
         "payloadType": "str",
@@ -1437,11 +1357,14 @@
         "func": "msg.payload = flow.get(\"parameters_twocolorblend\");\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
         "x": 3409.39990234375,
         "y": 1233.8951416015625,
         "wires": [
             [
-                "4a0170a0.88db3"
+                "4a0170a0.88db3",
+                "521e6b06.2ce48c"
             ]
         ]
     },
@@ -1697,6 +1620,7 @@
         "z": "2fc32e47.9732e2",
         "position": "top right",
         "displayTime": "5",
+        "outputs": 0,
         "name": "",
         "x": 888.63623046875,
         "y": 357.8908386230469,
@@ -3032,19 +2956,109 @@
         "width": 0,
         "height": 0,
         "passthru": false,
-        "label": "Preset warm white",
+        "label": "Warm white",
+        "tooltip": "",
         "color": "",
         "bgcolor": "",
         "icon": "",
-        "payload": "[255,200,140]",
+        "payload": "[241,178,60]",
         "payloadType": "json",
         "topic": "start",
-        "x": 3584.999999999999,
+        "x": 3564.999999999999,
         "y": 1051.9999999999998,
         "wires": [
             [
                 "5d817da7.2113cc"
             ]
         ]
+    },
+    {
+        "id": "b492d144.1b9b08",
+        "type": "ui_button",
+        "z": "2fc32e47.9732e2",
+        "name": "",
+        "group": "abc9273f.36d778",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "White",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "[255,255,255]",
+        "payloadType": "json",
+        "topic": "",
+        "x": 3544.5,
+        "y": 1088,
+        "wires": [
+            [
+                "5d817da7.2113cc"
+            ]
+        ]
+    },
+    {
+        "id": "b40f3ef0.18ed38",
+        "type": "ui_text",
+        "z": "2fc32e47.9732e2",
+        "group": "e2aca116.33ad2",
+        "order": 11,
+        "width": 0,
+        "height": 0,
+        "name": "Color 2 Value",
+        "label": "color 2:",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "x": 3750,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "521e6b06.2ce48c",
+        "type": "ui_text",
+        "z": "2fc32e47.9732e2",
+        "group": "e2aca116.33ad2",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "Parameters",
+        "label": "Twocolor: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "x": 3750,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "6ba84738.2ddc78",
+        "type": "ui_text",
+        "z": "2fc32e47.9732e2",
+        "group": "e2aca116.33ad2",
+        "order": 11,
+        "width": 0,
+        "height": 0,
+        "name": "Color 1 Value",
+        "label": "color 1:",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "x": 3750,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "521dae4f.7a96b8",
+        "type": "ui_text",
+        "z": "2fc32e47.9732e2",
+        "group": "e2aca116.33ad2",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "Result",
+        "label": "text",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "x": 4160,
+        "y": 1240,
+        "wires": []
     }
 ]
