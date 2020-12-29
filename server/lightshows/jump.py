@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
+import logging
 import math
 
 from drivers import LEDStrip
 from lightshows.templates.colorcycle import ColorCycle
+
+log = logging.getLogger(__name__)
 
 
 class Ball(object):
@@ -14,9 +17,24 @@ class Ball(object):
         self.width = 2 * math.sqrt(self.height)
         self.center = self.width / 2.0
         self.color = color
+        self.period = 0
+        self.next = False
 
     def get_pos(self, t):
+        current_period = int(math.floor(t / self.width))
+
+        if self.period != current_period:
+            self.period = current_period
+            self.next = True
+
         return int(self.height - (t % self.width - self.center) ** 2)
+
+    def is_next(self):
+        if self.next:
+            log.info("next %d", self.height)
+            self.next = False
+            return True
+        return False
 
 
 class Jump(ColorCycle):
@@ -33,7 +51,7 @@ class Jump(ColorCycle):
         self.block = 99
         self.mirror = True
         self.balls = ()
-        self.colors = ()
+        self.spare_colors = [(0, 255, 255)]
 
     def init_parameters(self):
         super().init_parameters()
@@ -61,5 +79,9 @@ class Jump(ColorCycle):
                 self.strip.set_pixel(index, *ball.color)
                 if self.mirror:
                     self.strip.set_pixel(self.strip.num_leds - index, *ball.color)
+
+                if ball.is_next():
+                    self.spare_colors.insert(0, ball.color)
+                    ball.color = self.spare_colors.pop()
 
         return True
