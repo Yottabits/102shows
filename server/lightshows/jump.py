@@ -1,22 +1,23 @@
 #!/usr/bin/env python3
 
-import random
-import time
 import math
 
 from drivers import LEDStrip
 from lightshows.templates.colorcycle import ColorCycle
 
+
 class Ball(object):
 
-    def __init__(self, height, stripe):
+    def __init__(self, height, stripe, color):
         self.height = height - stripe
         self.stripe = stripe
         self.width = 2 * math.sqrt(self.height)
         self.center = self.width / 2.0
+        self.color = color
 
     def get_pos(self, t):
         return int(self.height - (t % self.width - self.center) ** 2)
+
 
 class Jump(ColorCycle):
     """\
@@ -41,33 +42,24 @@ class Jump(ColorCycle):
 
     def before_start(self):
         self.balls = (
-            Ball(self.block, self.stripe),
-            Ball(self.block * 0.5, self.stripe),
-            Ball(self.block * 0.75, self.stripe),
-            Ball(self.block * 0.88, self.stripe),
-            Ball(self.block * 0.66, self.stripe)
+            Ball(self.block, self.stripe, (255, 0, 0)),
+            Ball(self.block * 0.5, self.stripe, (0, 255, 0)),
+            Ball(self.block * 0.75, self.stripe, (255, 255, 0)),
+            Ball(self.block * 0.88, self.stripe, (255, 0, 255)),
+            Ball(self.block * 0.66, self.stripe, (0, 0, 255))
         )
-        self.colors = (
-            (255, 0, 0),
-            (0, 255, 0),
-            (255, 255, 0),
-            (255, 0, 255),
-            (0, 0, 255)
-        )
-
-    pass
 
     def update(self, current_step: int, current_cycle: int) -> bool:
         t = (current_step + current_cycle * 256) * 0.1
-        positions = (ball.get_pos(t) for ball in self.balls)
 
         self.strip.clear_buffer()
 
         for offset in range(0, self.stripe):
-            for pos, color in zip(positions, self.colors):
+            for ball in self.balls:
+                pos = ball.get_pos(t)
                 index = pos + offset
-                self.strip.set_pixel(index, *color)
+                self.strip.set_pixel(index, *ball.color)
                 if self.mirror:
-                    self.strip.set_pixel(self.strip.num_leds - index, *color)
+                    self.strip.set_pixel(self.strip.num_leds - index, *ball.color)
 
         return True
