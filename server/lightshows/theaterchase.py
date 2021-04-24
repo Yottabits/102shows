@@ -19,7 +19,7 @@ class TheaterChase(ColorCycle):
     def before_start(self):
         pass
 
-    def update(self, current_step: int, current_cycle) -> bool:
+    def update(self, current_step: int, current_cycle: int) -> bool:
         # One cycle = One trip through the color wheel, 0..254
         # Few cycles = quick transition, lots of cycles = slow transition
         # Note: For a smooth transition between cycles, numStepsPerCycle must be a multiple of 7
