@@ -11,8 +11,8 @@ from orderedattrdict import AttrDict as ConfigTree
 import yaml
 
 # Load YAML always as AttrDict (aka ConfigTree)
-yaml.add_constructor(u'tag:yaml.org,2002:map', from_yaml)
-yaml.add_constructor(u'tag:yaml.org,2002:omap', from_yaml)
+yaml.add_constructor(u'tag:yaml.org,2002:map', from_yaml, yaml.SafeLoader)
+yaml.add_constructor(u'tag:yaml.org,2002:omap', from_yaml, yaml.SafeLoader)
 
 logger = logging.getLogger('102shows.server.helpers.configparser')
 
@@ -51,11 +51,11 @@ def get_configuration(default_filename: str = 'defaults.yml', user_filename: str
 
     # read defaults
     with open(default_filename, 'r') as file:
-        defaults = yaml.load(file)
+        defaults = yaml.safe_load(file)
         logger.info("Successfully parsed {} as default configuration".format(default_filename))
 
     with open(user_filename, 'r') as file:
-        user_config = yaml.load(file)
+        user_config = yaml.safe_load(file)
         logger.info("Successfully parsed {} as user configuration".format(user_filename))
 
     # apply user config over Defaults
