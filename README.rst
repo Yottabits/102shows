@@ -6,6 +6,13 @@
 
 |Code Climate|  |Documentation Status|
 
+----
+
+**THERE IS CURRENTLY NO ACTIVE MAINTAINER FOR THIS PROJECT.**
+If you want to take over the maintenance for this project, go ahead and open an issue ticket.
+
+----
+
 102shows is an LED strip driver for the Raspberry Pi and also a collection of lightshows.
 These lightshows can be controlled over your home network via MQTT.
 And for those who do not prefer sending raw MQTT messages from the console, there is a
