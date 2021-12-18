@@ -162,7 +162,7 @@ def rgb_color_tuple(candidate, param_name: str = None):
     if type(candidate) is not tuple:
         raise InvalidParameters(debug_str)
 
-    if len(candidate) is not 3:  # an rgb tuple has three components
+    if len(candidate) != 3:  # an rgb tuple has three components
         raise InvalidParameters(debug_str)
 
     for component in candidate:
