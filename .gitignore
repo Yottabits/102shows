@@ -11,6 +11,11 @@ config.yml
 server/dist
 *.egg-info
 
+# Python "binaries"
+__pycache__/
+*.py[cod]
+*$py.class
+
 # temporary stuff
 playground/
 
