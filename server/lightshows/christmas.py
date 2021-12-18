@@ -17,7 +17,7 @@ class Christmas(Lightshow):
                            "chunk_blendover": 5,
                            "whole_blendover": 5}
 
-    def set_parameter(self, param_name: str, value):
+    def set_parameter(self, param_name: str, value, **kwargs):
         if param_name == "merry_go_round":
             verify.not_negative_integer(value, "merry_go_round")
             self.num_cycles["merry_go_round"] = value
@@ -30,7 +30,7 @@ class Christmas(Lightshow):
             verify.integer(value, "velocity", minimum=1, maximum=10)
             self.velocity = value
         else:
-            raise InvalidParameters.unknown(param_name)
+            super(Christmas, self).set_parameter(param_name, value, **kwargs)
 
     def check_runnable(self):
         pass
