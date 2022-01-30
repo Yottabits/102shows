@@ -31,7 +31,7 @@ class Ball(object):
 
     def is_next(self):
         if self.next:
-            log.info("next %d", self.height)
+            log.debug("next %d", self.height)
             self.next = False
             return True
         return False
@@ -76,8 +76,6 @@ class Jump(ColorCycle):
             for ball in self.balls:
                 pos = ball.get_pos(t)
                 index = pos + offset
-                if index == 10:
-                    print(index, *ball.color)
                 self.strip.set_pixel(index, *ball.color)
                 if self.mirror:
                     self.strip.set_pixel(self.strip.num_leds - index, *ball.color)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # 8 bar Audio equaliser using MCP2307
-
+import logging
 from struct import unpack
 
 import alsaaudio as aa
@@ -10,19 +10,7 @@ import numpy as np
 from drivers import LEDStrip
 from lightshows.templates.colorcycle import ColorCycle
 
-
-def TurnOffLEDS():
-    # bus.write_byte_data(ADDR, BANKA, 0xFF)  #set all columns high
-    # bus.write_byte_data(ADDR, BANKB, 0x00)  #set all rows low
-    pass
-
-
-def Set_Column(row, col):
-    print("set column", row, col)
-
-
-# Initialise matrix
-TurnOffLEDS()
+log = logging.getLogger(__name__)
 
 
 def calculate_levels(data, chunk, sample_rate):
@@ -45,7 +33,8 @@ def combine_color(red, green, blue, brightness: int):
     brightness_factor = brightness / 100
     """Make one 3*8 byte color value."""
 
-    return (np.clip(red * brightness_factor, 0, 255), np.clip(green * brightness_factor, 0, 255), np.clip(blue * brightness_factor, 0, 255))
+    return (np.clip(red * brightness_factor, 0, 255), np.clip(green * brightness_factor, 0, 255),
+            np.clip(blue * brightness_factor, 0, 255))
 
 
 def wheel(value, threshold):
@@ -84,6 +73,7 @@ class AudioSpectrum(ColorCycle):
         self.data_in = None
         self.chunk = 0
         self.sample_rate = 0
+        self.first_run = None
 
     def init_parameters(self):
         super().init_parameters()
@@ -91,7 +81,7 @@ class AudioSpectrum(ColorCycle):
         self.set_parameter('pause_sec', 0.001)
 
     def before_start(self) -> None:
-        print("set up audio")
+        log.info("set up audio")
         # Set up audio
         self.sample_rate = 44100
         no_channels = 2
@@ -102,23 +92,26 @@ class AudioSpectrum(ColorCycle):
         self.data_in.setformat(aa.PCM_FORMAT_S16_LE)
         self.data_in.setperiodsize(self.chunk)
 
+        self.strip.clear_strip()
+        self.first_run = True
+
     def shutdown(self) -> None:
         pass
 
     def update(self, current_step: int, current_cycle: int) -> bool:
-       # print(f"step: {current_step}, cycle: {current_cycle}")
-        #self.data_in.pause(0)  # Resume capture
+        if not self.first_run:
+            self.data_in.pause(0)  # Resume capture
+        else:
+            self.first_run = False
 
-        # Read data from device
-        l, data = self.data_in.read()
+        l, data = self.data_in.read()  # Read data from device
 
-        #self.data_in.pause(1)  # Pause capture whilst RPi processes data
+        self.data_in.pause(1)  # Pause capture whilst RPi processes data
+
         if l > 0:
-            # catch frame error
             try:
                 matrix = calculate_levels(data, self.chunk, self.sample_rate)
                 line = [int((1 << matrix[i]) - 1) for i in range(100)]
-                # print(" ".join([str(value) for value in line]))
                 for index, value in enumerate(line):
                     rgb = wheel(value, threshold)
                     # brightness = int(max(1, math.log(value - threshold + 1))) if value >= threshold else 0
@@ -128,6 +121,9 @@ class AudioSpectrum(ColorCycle):
             except Exception as e:
                 if not hasattr(e, "message") or e.message != "not a whole number of frames":
                     raise e
+                log.info("frame error")
+                return False
             return True
         else:
             print(f"skipping l: {l}, data: {data}")
+            return False

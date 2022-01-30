@@ -1,32 +1,27 @@
 [
     {
-        "id": "2fc32e47.9732e2",
-        "type": "tab",
-        "label": "LED Control"
-    },
-    {
-        "id": "93f4131.fbfd2f",
+        "id": "d15c800.af31a",
         "type": "subflow",
-        "name": "HEX to RGB",
-        "info": "convert a color HEX value (like #ff0080) to a rgb color tuple (like [255, 0, 128])",
+        "name": "RGB Joiner",
+        "info": "",
         "in": [
             {
-                "x": 207,
-                "y": 96,
+                "x": 80,
+                "y": 100,
                 "wires": [
                     {
-                        "id": "5c79cf54.3c5ed"
+                        "id": "eb5767ba.336868"
                     }
                 ]
             }
         ],
         "out": [
             {
-                "x": 534,
-                "y": 96,
+                "x": 440,
+                "y": 100,
                 "wires": [
                     {
-                        "id": "5c79cf54.3c5ed",
+                        "id": "2507f05e.330b78",
                         "port": 0
                     }
                 ]
@@ -34,110 +29,33 @@
         ]
     },
     {
-        "id": "49e83dbb.1a9224",
-        "type": "subflow",
-        "name": "RGB to HEX",
-        "info": "convert an rgb color tuple (like [255, 0, 128]) to a color HEX value (like #ff0080)",
-        "in": [
-            {
-                "x": 209.00001525878906,
-                "y": 136,
-                "wires": [
-                    {
-                        "id": "bd378a2d.22a2d"
-                    }
-                ]
-            }
-        ],
-        "out": [
-            {
-                "x": 455,
-                "y": 137,
-                "wires": [
-                    {
-                        "id": "bd378a2d.22a2d",
-                        "port": 0
-                    }
-                ]
-            }
+        "id": "2507f05e.330b78",
+        "type": "function",
+        "z": "d15c800.af31a",
+        "name": "joiner",
+        "func": "var R = flow.get('R');\nvar G = flow.get('G');\nvar B = flow.get('B');\n\nmsg.topic = \"colour\";\nmsg.payload = [R, G, B];\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 330,
+        "y": 100,
+        "wires": [
+            []
         ]
     },
     {
-        "id": "793be9a5.d2c558",
-        "type": "subflow",
-        "name": "RGB to HSV",
-        "info": "convert an RGB color tuple (like [128, 0, 128]) to H (hue), S (saturation) and V (brightness) values (like, 300, 1, 0.5).",
-        "in": [
-            {
-                "x": 144,
-                "y": 103,
-                "wires": [
-                    {
-                        "id": "8f7a013f.29663"
-                    }
-                ]
-            }
-        ],
-        "out": [
-            {
-                "x": 474,
-                "y": 49,
-                "wires": [
-                    {
-                        "id": "8f7a013f.29663",
-                        "port": 0
-                    }
-                ]
-            },
-            {
-                "x": 472.9999694824219,
-                "y": 102,
-                "wires": [
-                    {
-                        "id": "8f7a013f.29663",
-                        "port": 1
-                    }
-                ]
-            },
-            {
-                "x": 473.9999694824219,
-                "y": 156,
-                "wires": [
-                    {
-                        "id": "8f7a013f.29663",
-                        "port": 2
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "a79c1741.5ef28",
-        "type": "subflow",
-        "name": "HSV to RGB",
-        "info": "cache all messages with topics H, S and V.\non any H, S or V message, the according RGB tuple is recalculated and sent out.",
-        "in": [
-            {
-                "x": 95.33334350585938,
-                "y": 74.5,
-                "wires": [
-                    {
-                        "id": "ff772c2b.e14458"
-                    }
-                ]
-            }
-        ],
-        "out": [
-            {
-                "x": 448.33331298828125,
-                "y": 74.66667175292969,
-                "wires": [
-                    {
-                        "id": "b3d72a18.150118",
-                        "port": 0
-                    }
-                ]
-            }
+        "id": "eb5767ba.336868",
+        "type": "function",
+        "z": "d15c800.af31a",
+        "name": "buffer",
+        "func": "var valid = ['R', 'G', 'B'];\n\nif (valid.indexOf(msg.topic) !== -1) {\n    flow.set(msg.topic, msg.payload);\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 198.99996948242188,
+        "y": 100,
+        "wires": [
+            [
+                "2507f05e.330b78"
+            ]
         ]
     },
     {
@@ -190,270 +108,90 @@
         ]
     },
     {
-        "id": "d15c800.af31a",
+        "id": "11416ce1.833b7b",
+        "type": "switch",
+        "z": "1919d466.09f77c",
+        "name": "",
+        "property": "parts.index",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "outputs": 3,
+        "x": 590,
+        "y": 140,
+        "wires": [
+            [],
+            [],
+            []
+        ],
+        "outputLabels": [
+            "r",
+            "",
+            "b"
+        ]
+    },
+    {
+        "id": "99b2c1b8.b666d8",
+        "type": "split",
+        "z": "1919d466.09f77c",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 450,
+        "y": 140,
+        "wires": [
+            [
+                "11416ce1.833b7b"
+            ]
+        ]
+    },
+    {
+        "id": "a79c1741.5ef28",
         "type": "subflow",
-        "name": "RGB Joiner",
-        "info": "",
+        "name": "HSV to RGB",
+        "info": "cache all messages with topics H, S and V.\non any H, S or V message, the according RGB tuple is recalculated and sent out.",
         "in": [
             {
-                "x": 80,
-                "y": 100,
+                "x": 95.33334350585938,
+                "y": 74.5,
                 "wires": [
                     {
-                        "id": "eb5767ba.336868"
+                        "id": "ff772c2b.e14458"
                     }
                 ]
             }
         ],
         "out": [
             {
-                "x": 440,
-                "y": 100,
+                "x": 448.33331298828125,
+                "y": 74.66667175292969,
                 "wires": [
                     {
-                        "id": "2507f05e.330b78",
+                        "id": "b3d72a18.150118",
                         "port": 0
                     }
                 ]
             }
-        ]
-    },
-    {
-        "id": "311dcc49.0aed54",
-        "type": "ui_base",
-        "theme": {
-            "name": "theme-light",
-            "lightTheme": {
-                "default": "#0094CE",
-                "baseColor": "#0094CE",
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
-                "edited": true,
-                "reset": false
-            },
-            "darkTheme": {
-                "default": "#097479",
-                "baseColor": "#097479",
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
-                "edited": false
-            },
-            "customTheme": {
-                "name": "Untitled Theme 1",
-                "default": "#4B7930",
-                "baseColor": "#4B7930",
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
-            },
-            "themeState": {
-                "base-color": {
-                    "default": "#0094CE",
-                    "value": "#0094CE",
-                    "edited": false
-                },
-                "page-titlebar-backgroundColor": {
-                    "value": "#0094CE",
-                    "edited": false
-                },
-                "page-backgroundColor": {
-                    "value": "#fafafa",
-                    "edited": false
-                },
-                "page-sidebar-backgroundColor": {
-                    "value": "#ffffff",
-                    "edited": false
-                },
-                "group-textColor": {
-                    "value": "#1bbfff",
-                    "edited": false
-                },
-                "group-borderColor": {
-                    "value": "#ffffff",
-                    "edited": false
-                },
-                "group-backgroundColor": {
-                    "value": "#ffffff",
-                    "edited": false
-                },
-                "widget-textColor": {
-                    "value": "#111111",
-                    "edited": false
-                },
-                "widget-backgroundColor": {
-                    "value": "#0094ce",
-                    "edited": false
-                },
-                "widget-borderColor": {
-                    "value": "#ffffff",
-                    "edited": false
-                },
-                "base-font": {
-                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
-                }
-            },
-            "angularTheme": {
-                "primary": "indigo",
-                "accents": "blue",
-                "warn": "red",
-                "background": "grey"
-            }
-        },
-        "site": {
-            "name": "Node-RED Dashboard",
-            "hideToolbar": "false",
-            "allowSwipe": "false",
-            "dateFormat": "DD/MM/YYYY",
-            "sizes": {
-                "sx": 48,
-                "sy": 48,
-                "gx": 6,
-                "gy": 6,
-                "cx": 6,
-                "cy": 6,
-                "px": 0,
-                "py": 0
-            }
-        }
-    },
-    {
-        "id": "b944567b.d15278",
-        "type": "mqtt-broker",
-        "name": "",
-        "broker": "localhost",
-        "port": "1883",
-        "clientid": "",
-        "usetls": false,
-        "compatmode": true,
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
-    },
-    {
-        "id": "4dc2b995.13d0f8",
-        "type": "mqtt-broker",
-        "broker": "localhost",
-        "port": "1883",
-        "clientid": "",
-        "usetls": false,
-        "compatmode": true,
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
-    },
-    {
-        "id": "222a3f19.b90e9",
-        "type": "ui_group",
-        "name": "Spin the Bottle",
-        "tab": "c7886a8d.764f4",
-        "order": 3,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "c7886a8d.764f4",
-        "type": "ui_tab",
-        "name": "MyLED",
-        "icon": "lightbulb_outline",
-        "order": 2
-    },
-    {
-        "id": "da52ac1d.f09478",
-        "type": "ui_group",
-        "name": "etc",
-        "tab": "c7886a8d.764f4",
-        "order": 5,
-        "disp": false,
-        "width": "6"
-    },
-    {
-        "id": "abc9273f.36d778",
-        "type": "ui_group",
-        "name": "Color",
-        "tab": "c7886a8d.764f4",
-        "order": 1,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "e2aca116.33ad2",
-        "type": "ui_group",
-        "name": "Color Blend",
-        "tab": "c7886a8d.764f4",
-        "order": 2,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "57eea257.4cfba4",
-        "type": "ui_group",
-        "name": "Animations",
-        "tab": "c7886a8d.764f4",
-        "order": 4,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "f7b943a7.14f418",
-        "type": "ui_group",
-        "name": "Christmas Show",
-        "tab": "c7886a8d.764f4",
-        "order": 6,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "5c79cf54.3c5ed",
-        "type": "function",
-        "z": "93f4131.fbfd2f",
-        "name": "HEX to RGB",
-        "func": "var split_str = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(msg.payload);\n\nr = parseInt(split_str[1], 16);\ng = parseInt(split_str[2], 16);\nb = parseInt(split_str[3], 16)\n\nvar rgb = [r,g,b];\nmsg.payload = rgb;\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "x": 379.90000915527344,
-        "y": 96.39999389648438,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "bd378a2d.22a2d",
-        "type": "function",
-        "z": "49e83dbb.1a9224",
-        "name": "RGB to HEX",
-        "func": "r = msg.payload[0];\ng = msg.payload[1];\nb = msg.payload[2];\n\nvar rgb = b | (g << 8) | (r << 16);\nmsg.payload = '#' + (0x1000000 + rgb).toString(16).slice(1);\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 326.20001220703125,
-        "y": 142.1999969482422,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "8f7a013f.29663",
-        "type": "function",
-        "z": "793be9a5.d2c558",
-        "name": "converter",
-        "func": "var r = msg.payload[0];\nvar g = msg.payload[1];\nvar b = msg.payload[2];\n\n// algorithm: http://www.rapidtables.com/convert/color/rgb-to-hsv.htm\n\n// helper variables\nvar R_ = r / 255;\nvar G_ = g / 255;\nvar B_ = b / 255;\n\nvar C_max = Math.max(R_, G_, B_);\nvar C_min = Math.min(R_, G_, B_);\nvar Delta = C_max - C_min;\n\n// Hue\nvar H;\nif (Delta === 0) {\n    H = 0;\n} else if (C_max === R_) {\n    H = 60 * ( ( (G_ - B_) / Delta ) % 6 );\n    if (H < 0) {\n        H = H + 360;\n    }\n} else if (C_max === G_) {\n    H = 60 * ( ( (B_ - R_) / Delta) + 2 );\n} else if (C_max === B_) {\n    H = 60 * ( ( (R_ - G_) / Delta) + 4 );\n}\n\n// Saturation\nvar S;\nif (C_max === 0) {\n    S = 0;\n} else{\n    S = Delta / C_max;\n}\n\n// Value\nvar V = C_max;\n\n// output messages\nvar msg_h = {\"topic\": \"H\", \"payload\": H};\nvar msg_s = {\"topic\": \"S\", \"payload\": S};\nvar msg_v = {\"topic\": \"V\", \"payload\": V};\n\nreturn [msg_h, msg_s, msg_v];",
-        "outputs": "3",
-        "noerr": 0,
-        "x": 273.73333740234375,
-        "y": 103.7166748046875,
-        "wires": [
-            [],
-            [],
-            []
         ]
     },
     {
@@ -487,6 +225,165 @@
         ]
     },
     {
+        "id": "793be9a5.d2c558",
+        "type": "subflow",
+        "name": "RGB to HSV",
+        "info": "convert an RGB color tuple (like [128, 0, 128]) to H (hue), S (saturation) and V (brightness) values (like, 300, 1, 0.5).",
+        "in": [
+            {
+                "x": 144,
+                "y": 103,
+                "wires": [
+                    {
+                        "id": "8f7a013f.29663"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 474,
+                "y": 49,
+                "wires": [
+                    {
+                        "id": "8f7a013f.29663",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 472.9999694824219,
+                "y": 102,
+                "wires": [
+                    {
+                        "id": "8f7a013f.29663",
+                        "port": 1
+                    }
+                ]
+            },
+            {
+                "x": 473.9999694824219,
+                "y": 156,
+                "wires": [
+                    {
+                        "id": "8f7a013f.29663",
+                        "port": 2
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "8f7a013f.29663",
+        "type": "function",
+        "z": "793be9a5.d2c558",
+        "name": "converter",
+        "func": "var r = msg.payload[0];\nvar g = msg.payload[1];\nvar b = msg.payload[2];\n\n// algorithm: http://www.rapidtables.com/convert/color/rgb-to-hsv.htm\n\n// helper variables\nvar R_ = r / 255;\nvar G_ = g / 255;\nvar B_ = b / 255;\n\nvar C_max = Math.max(R_, G_, B_);\nvar C_min = Math.min(R_, G_, B_);\nvar Delta = C_max - C_min;\n\n// Hue\nvar H;\nif (Delta === 0) {\n    H = 0;\n} else if (C_max === R_) {\n    H = 60 * ( ( (G_ - B_) / Delta ) % 6 );\n    if (H < 0) {\n        H = H + 360;\n    }\n} else if (C_max === G_) {\n    H = 60 * ( ( (B_ - R_) / Delta) + 2 );\n} else if (C_max === B_) {\n    H = 60 * ( ( (R_ - G_) / Delta) + 4 );\n}\n\n// Saturation\nvar S;\nif (C_max === 0) {\n    S = 0;\n} else{\n    S = Delta / C_max;\n}\n\n// Value\nvar V = C_max;\n\n// output messages\nvar msg_h = {\"topic\": \"H\", \"payload\": H};\nvar msg_s = {\"topic\": \"S\", \"payload\": S};\nvar msg_v = {\"topic\": \"V\", \"payload\": V};\n\nreturn [msg_h, msg_s, msg_v];",
+        "outputs": "3",
+        "noerr": 0,
+        "x": 273.73333740234375,
+        "y": 103.7166748046875,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "93f4131.fbfd2f",
+        "type": "subflow",
+        "name": "HEX to RGB",
+        "info": "convert a color HEX value (like #ff0080) to a rgb color tuple (like [255, 0, 128])",
+        "in": [
+            {
+                "x": 207,
+                "y": 96,
+                "wires": [
+                    {
+                        "id": "5c79cf54.3c5ed"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 534,
+                "y": 96,
+                "wires": [
+                    {
+                        "id": "5c79cf54.3c5ed",
+                        "port": 0
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "5c79cf54.3c5ed",
+        "type": "function",
+        "z": "93f4131.fbfd2f",
+        "name": "HEX to RGB",
+        "func": "var split_str = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(msg.payload);\n\nr = parseInt(split_str[1], 16);\ng = parseInt(split_str[2], 16);\nb = parseInt(split_str[3], 16)\n\nvar rgb = [r,g,b];\nmsg.payload = rgb;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 379.90000915527344,
+        "y": 96.39999389648438,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "49e83dbb.1a9224",
+        "type": "subflow",
+        "name": "RGB to HEX",
+        "info": "convert an rgb color tuple (like [255, 0, 128]) to a color HEX value (like #ff0080)",
+        "in": [
+            {
+                "x": 209.00001525878906,
+                "y": 136,
+                "wires": [
+                    {
+                        "id": "bd378a2d.22a2d"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 455,
+                "y": 137,
+                "wires": [
+                    {
+                        "id": "bd378a2d.22a2d",
+                        "port": 0
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "bd378a2d.22a2d",
+        "type": "function",
+        "z": "49e83dbb.1a9224",
+        "name": "RGB to HEX",
+        "func": "r = msg.payload[0];\ng = msg.payload[1];\nb = msg.payload[2];\n\nvar rgb = b | (g << 8) | (r << 16);\nmsg.payload = '#' + (0x1000000 + rgb).toString(16).slice(1);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 326.20001220703125,
+        "y": 142.1999969482422,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2fc32e47.9732e2",
+        "type": "tab",
+        "label": "LED Control"
+    },
+    {
         "id": "83a0d3d7.f8db4",
         "type": "mqtt in",
         "z": "2fc32e47.9732e2",
@@ -494,6 +391,7 @@
         "topic": "+/+/show/+/parameters/current",
         "qos": "2",
         "broker": "4dc2b995.13d0f8",
+        "inputs": 0,
         "x": 1329.64306640625,
         "y": 384.7143249511719,
         "wires": [
@@ -595,6 +493,7 @@
         "noerr": 0,
         "initialize": "",
         "finalize": "",
+        "libs": [],
         "x": 4255.327392578125,
         "y": 704.0831298828125,
         "wires": [
@@ -785,6 +684,9 @@
         "func": "// input:\n//   msg.topic: parameter name => \"color\"\n//   msg.payload: color tuple => [255, 0, 128]\nvar parameters = {};\nparameters[msg.topic] = msg.payload;\n\n// assemble start command\nmsg.topic = \"start\";\nmsg.payload = parameters;\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
         "x": 3620,
         "y": 720,
         "wires": [
@@ -875,11 +777,13 @@
         "links": [
             "3232186.264b6e8",
             "9432c02d.2fc698",
-            "2499e0f9.91c298",
-            "e49e1dd7.1016f8"
+            "e49e1dd7.1016f8",
+            "0555ed834494cbab",
+            "1ee7c9a6620d3859",
+            "2499e0f9.91c298"
         ],
-        "x": 4109.750244140625,
-        "y": 394.5001220703125,
+        "x": 4115,
+        "y": 380,
         "wires": [
             [
                 "621db8de.2c88f8"
@@ -891,11 +795,14 @@
         "type": "function",
         "z": "2fc32e47.9732e2",
         "name": "cache in flow context",
-        "func": "var paramstore_name = \"parameters_\" + msg.show;\n\nvar show_parameters = flow.get(paramstore_name);\nshow_parameters[msg.topic] = msg.payload;\nflow.set(paramstore_name, show_parameters);\n\nreturn msg;",
+        "func": "var paramstore_name = \"parameters_\" + msg.show;\n\nvar show_parameters = flow.get(paramstore_name);\nshow_parameters[msg.topic] = msg.payload;\nnode.debug(\"update cache\"+paramstore_name+show_parameters)\nflow.set(paramstore_name, show_parameters);\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 4287.999755859375,
-        "y": 392.16680908203125,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 4280,
+        "y": 380,
         "wires": [
             []
         ]
@@ -957,6 +864,7 @@
             }
         ],
         "checkall": "false",
+        "repair": false,
         "outputs": 4,
         "x": 2845.666748046875,
         "y": 359.9999084472656,
@@ -1049,8 +957,8 @@
         "payload": "spinthebottle",
         "payloadType": "str",
         "topic": "start",
-        "x": 3103.4857177734375,
-        "y": 228.37155151367188,
+        "x": 3120,
+        "y": 220,
         "wires": [
             [
                 "c11a8382.00e4d8"
@@ -1125,17 +1033,18 @@
             }
         ],
         "checkall": "false",
+        "repair": false,
         "outputs": 2,
         "x": 2809.66650390625,
         "y": 1376.4998779296875,
         "wires": [
             [
-                "2499e0f9.91c298",
-                "845b563.6862ca8"
+                "845b563.6862ca8",
+                "2499e0f9.91c298"
             ],
             [
-                "2499e0f9.91c298",
-                "6116c978.6b3cc"
+                "6116c978.6b3cc",
+                "2499e0f9.91c298"
             ]
         ]
     },
@@ -1144,11 +1053,12 @@
         "type": "link out",
         "z": "2fc32e47.9732e2",
         "name": "cache_twocolorblend",
+        "mode": "link",
         "links": [
             "57127376.359c3c"
         ],
-        "x": 2952.0665283203125,
-        "y": 1326.7999267578125,
+        "x": 2955,
+        "y": 1300,
         "wires": []
     },
     {
@@ -1156,8 +1066,8 @@
         "type": "subflow:49e83dbb.1a9224",
         "z": "2fc32e47.9732e2",
         "name": "",
-        "x": 3101.809326171875,
-        "y": 1349.428466796875,
+        "x": 3150,
+        "y": 1340,
         "wires": [
             [
                 "6a6eeb89.65f4c4"
@@ -1179,8 +1089,8 @@
         "mode": "color",
         "delay": 300,
         "topic": "color1",
-        "x": 3275.9759216308594,
-        "y": 1349.428482055664,
+        "x": 3290,
+        "y": 1340,
         "wires": [
             [
                 "90a89be1.2aa74"
@@ -1193,12 +1103,11 @@
         "z": "2fc32e47.9732e2",
         "name": "",
         "env": [],
-        "x": 3490.809295654297,
-        "y": 1349.678451538086,
+        "x": 3430,
+        "y": 1340,
         "wires": [
             [
-                "4a0170a0.88db3",
-                "6ba84738.2ddc78"
+                "68c7a793eaa9294d"
             ]
         ]
     },
@@ -1206,8 +1115,8 @@
         "id": "6116c978.6b3cc",
         "type": "subflow:49e83dbb.1a9224",
         "z": "2fc32e47.9732e2",
-        "x": 3103.226043701172,
-        "y": 1398.428466796875,
+        "x": 3150,
+        "y": 1380,
         "wires": [
             [
                 "a3507107.89ba6"
@@ -1220,6 +1129,7 @@
         "z": "2fc32e47.9732e2",
         "name": "color2",
         "label": "",
+        "tooltip": "",
         "group": "e2aca116.33ad2",
         "order": 2,
         "width": "3",
@@ -1228,8 +1138,8 @@
         "mode": "color",
         "delay": 300,
         "topic": "color2",
-        "x": 3274.9524536132812,
-        "y": 1398.9285278320312,
+        "x": 3290,
+        "y": 1380,
         "wires": [
             [
                 "7caed831.88ab9"
@@ -1241,12 +1151,11 @@
         "type": "subflow:93f4131.fbfd2f",
         "z": "2fc32e47.9732e2",
         "name": "",
-        "x": 3491.976043701172,
-        "y": 1398.9283905029297,
+        "x": 3430,
+        "y": 1380,
         "wires": [
             [
-                "4a0170a0.88db3",
-                "b40f3ef0.18ed38"
+                "5c2e39584ad8b2f5"
             ]
         ]
     },
@@ -1269,12 +1178,11 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 3805.8094482421875,
-        "y": 1322.2853393554688,
+        "x": 3640,
+        "y": 1220,
         "wires": [
             [
-                "3ec3076f.74f948",
-                "521dae4f.7a96b8"
+                "3ec3076f.74f948"
             ]
         ],
         "inputLabels": [
@@ -1341,8 +1249,8 @@
         "payload": "twocolorblend",
         "payloadType": "str",
         "topic": "start",
-        "x": 3081.238037109375,
-        "y": 1233.9998779296875,
+        "x": 3020,
+        "y": 1220,
         "wires": [
             [
                 "305c823d.2e4e76"
@@ -1359,12 +1267,12 @@
         "noerr": 0,
         "initialize": "",
         "finalize": "",
-        "x": 3409.39990234375,
-        "y": 1233.8951416015625,
+        "libs": [],
+        "x": 3350,
+        "y": 1220,
         "wires": [
             [
-                "4a0170a0.88db3",
-                "521e6b06.2ce48c"
+                "4a0170a0.88db3"
             ]
         ]
     },
@@ -1590,6 +1498,7 @@
         "topic": "+/+/notification",
         "qos": "2",
         "broker": "4dc2b995.13d0f8",
+        "inputs": 0,
         "x": 277.90020751953125,
         "y": 358.01434326171875,
         "wires": [
@@ -1761,6 +1670,9 @@
         "func": "msg.payload = flow.get(\"parameters_christmas\");\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
         "x": 3433.190185546875,
         "y": 1576.952392578125,
         "wires": [
@@ -1775,11 +1687,13 @@
         "z": "2fc32e47.9732e2",
         "name": "",
         "label": "velocity",
+        "tooltip": "",
         "group": "f7b943a7.14f418",
         "order": 0,
         "width": 0,
         "height": 0,
         "passthru": false,
+        "outs": "all",
         "topic": "velocity",
         "min": "1",
         "max": 10,
@@ -1798,6 +1712,7 @@
         "z": "2fc32e47.9732e2",
         "name": "",
         "label": "Merry Go Round",
+        "tooltip": "",
         "group": "f7b943a7.14f418",
         "order": 0,
         "width": 0,
@@ -1827,6 +1742,7 @@
         "z": "2fc32e47.9732e2",
         "name": "",
         "label": "Chunk Blendover",
+        "tooltip": "",
         "group": "f7b943a7.14f418",
         "order": 0,
         "width": 0,
@@ -1856,6 +1772,7 @@
         "z": "2fc32e47.9732e2",
         "name": "",
         "label": "Whole Blendover",
+        "tooltip": "",
         "group": "f7b943a7.14f418",
         "order": 0,
         "width": 0,
@@ -1894,6 +1811,7 @@
         "randomLast": "5",
         "randomUnits": "seconds",
         "drop": false,
+        "outputs": 1,
         "x": 826.9000244140625,
         "y": 72.39999389648438,
         "wires": [
@@ -2047,7 +1965,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 3210,
+        "x": 3170,
         "y": 720,
         "wires": [
             [
@@ -2120,6 +2038,9 @@
         "type": "json",
         "z": "2fc32e47.9732e2",
         "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
         "x": 1984.199951171875,
         "y": 384.3999938964844,
         "wires": [
@@ -2136,6 +2057,9 @@
         "func": "var properties = msg.payload;\nvar msg_queue = []\n\nfor (var property_name in properties) {\n    var property_msg = {\"show\": msg.show};\n    property_msg.topic = property_name;\n    property_msg.payload = properties[property_name];\n    msg_queue.push(property_msg);\n}\n\nreturn [msg_queue];",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
         "x": 2117.142822265625,
         "y": 384.4285583496094,
         "wires": [
@@ -2204,6 +2128,9 @@
         "func": "// get to work\nvar topic_path = msg.topic.split(\"/\");\n\nvar mqtt_prefix = topic_path[0];\nvar mqtt_sys_name = topic_path[1];\n\n// filters\nif (mqtt_prefix !== flow.get(\"mqtt_prefix\")) {\n    return;\n}\nif (mqtt_sys_name !== flow.get(\"mqtt_sys_name\")) {\n    return;\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
         "x": 1618.8887939453125,
         "y": 383.4444580078125,
         "wires": [
@@ -2236,6 +2163,7 @@
         "topic": "+/+/global-brightness/current",
         "qos": "2",
         "broker": "4dc2b995.13d0f8",
+        "inputs": 0,
         "x": 2621.333251953125,
         "y": 99.77774810791016,
         "wires": [
@@ -2335,6 +2263,7 @@
         "topic": "+/+/show/current",
         "qos": "2",
         "broker": "4dc2b995.13d0f8",
+        "inputs": 0,
         "x": 2464.25,
         "y": 2179.5000610351562,
         "wires": [
@@ -2537,11 +2466,13 @@
         "z": "2fc32e47.9732e2",
         "name": "",
         "label": "B",
+        "tooltip": "",
         "group": "abc9273f.36d778",
         "order": 9,
         "width": "0",
         "height": "0",
         "passthru": false,
+        "outs": "all",
         "topic": "B",
         "min": 0,
         "max": "255",
@@ -2589,94 +2520,6 @@
         ]
     },
     {
-        "id": "11416ce1.833b7b",
-        "type": "switch",
-        "z": "1919d466.09f77c",
-        "name": "",
-        "property": "parts.index",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "0",
-                "vt": "num"
-            },
-            {
-                "t": "eq",
-                "v": "1",
-                "vt": "num"
-            },
-            {
-                "t": "eq",
-                "v": "2",
-                "vt": "str"
-            }
-        ],
-        "checkall": "false",
-        "outputs": 3,
-        "x": 590,
-        "y": 140,
-        "wires": [
-            [],
-            [],
-            []
-        ],
-        "outputLabels": [
-            "r",
-            "",
-            "b"
-        ]
-    },
-    {
-        "id": "99b2c1b8.b666d8",
-        "type": "split",
-        "z": "1919d466.09f77c",
-        "name": "",
-        "splt": "\\n",
-        "spltType": "str",
-        "arraySplt": 1,
-        "arraySpltType": "len",
-        "stream": false,
-        "addname": "",
-        "x": 450,
-        "y": 140,
-        "wires": [
-            [
-                "11416ce1.833b7b"
-            ]
-        ]
-    },
-    {
-        "id": "2507f05e.330b78",
-        "type": "function",
-        "z": "d15c800.af31a",
-        "name": "joiner",
-        "func": "var R = flow.get('R');\nvar G = flow.get('G');\nvar B = flow.get('B');\n\nmsg.topic = \"colour\";\nmsg.payload = [R, G, B];\n\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 330,
-        "y": 100,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "eb5767ba.336868",
-        "type": "function",
-        "z": "d15c800.af31a",
-        "name": "buffer",
-        "func": "var valid = ['R', 'G', 'B'];\n\nif (valid.indexOf(msg.topic) !== -1) {\n    flow.set(msg.topic, msg.payload);\n}\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 198.99996948242188,
-        "y": 100,
-        "wires": [
-            [
-                "2507f05e.330b78"
-            ]
-        ]
-    },
-    {
         "id": "d9c76ab3.29ae8",
         "type": "subflow:d15c800.af31a",
         "z": "2fc32e47.9732e2",
@@ -2703,6 +2546,7 @@
         "randomLast": "5",
         "randomUnits": "seconds",
         "drop": true,
+        "outputs": 1,
         "x": 3390,
         "y": 720,
         "wires": [
@@ -2732,7 +2576,7 @@
         "links": [
             "5d817da7.2113cc"
         ],
-        "x": 3075,
+        "x": 3035,
         "y": 720,
         "wires": [
             [
@@ -2785,6 +2629,7 @@
         "height": 0,
         "passthru": false,
         "label": "RGBTest",
+        "tooltip": "",
         "color": "",
         "bgcolor": "",
         "icon": "",
@@ -2853,6 +2698,7 @@
         "height": 0,
         "passthru": false,
         "label": "Starlight",
+        "tooltip": "",
         "color": "",
         "bgcolor": "",
         "icon": "",
@@ -2932,14 +2778,15 @@
         "height": 0,
         "passthru": false,
         "label": "Jump!",
+        "tooltip": "",
         "color": "",
         "bgcolor": "",
         "icon": "",
         "payload": "{}",
         "payloadType": "json",
         "topic": "start",
-        "x": 3498.999999999999,
-        "y": 2249.9999999999995,
+        "x": 3510,
+        "y": 2260,
         "wires": [
             [
                 "ddf6bc75.ad0428"
@@ -2998,67 +2845,248 @@
         ]
     },
     {
-        "id": "b40f3ef0.18ed38",
-        "type": "ui_text",
+        "id": "94200d9a63f133ed",
+        "type": "link in",
         "z": "2fc32e47.9732e2",
-        "group": "e2aca116.33ad2",
-        "order": 11,
-        "width": 0,
-        "height": 0,
-        "name": "Color 2 Value",
-        "label": "color 2:",
-        "format": "{{msg.payload}}",
-        "layout": "row-left",
-        "x": 3750,
-        "y": 1480,
+        "name": "twocolorblend_color1_input",
+        "links": [
+            "0555ed834494cbab"
+        ],
+        "x": 3035,
+        "y": 1300,
+        "wires": [
+            [
+                "845b563.6862ca8"
+            ]
+        ]
+    },
+    {
+        "id": "0555ed834494cbab",
+        "type": "link out",
+        "z": "2fc32e47.9732e2",
+        "name": "twocolorblend_color1_output",
+        "mode": "link",
+        "links": [
+            "57127376.359c3c",
+            "94200d9a63f133ed"
+        ],
+        "x": 3795,
+        "y": 1340,
         "wires": []
     },
     {
-        "id": "521e6b06.2ce48c",
-        "type": "ui_text",
+        "id": "b2529fb843960528",
+        "type": "link in",
         "z": "2fc32e47.9732e2",
-        "group": "e2aca116.33ad2",
-        "order": 4,
-        "width": 0,
-        "height": 0,
-        "name": "Parameters",
-        "label": "Twocolor: ",
-        "format": "{{msg.payload}}",
-        "layout": "row-left",
-        "x": 3750,
-        "y": 1240,
-        "wires": []
-    },
-    {
-        "id": "6ba84738.2ddc78",
-        "type": "ui_text",
-        "z": "2fc32e47.9732e2",
-        "group": "e2aca116.33ad2",
-        "order": 11,
-        "width": 0,
-        "height": 0,
-        "name": "Color 1 Value",
-        "label": "color 1:",
-        "format": "{{msg.payload}}",
-        "layout": "row-left",
-        "x": 3750,
+        "name": "twocolorblend_color2_input",
+        "links": [
+            "1ee7c9a6620d3859"
+        ],
+        "x": 3035,
         "y": 1420,
+        "wires": [
+            [
+                "6116c978.6b3cc"
+            ]
+        ]
+    },
+    {
+        "id": "1ee7c9a6620d3859",
+        "type": "link out",
+        "z": "2fc32e47.9732e2",
+        "name": "twocolorblend_color2_output",
+        "mode": "link",
+        "links": [
+            "57127376.359c3c",
+            "b2529fb843960528"
+        ],
+        "x": 3795,
+        "y": 1380,
         "wires": []
     },
     {
-        "id": "521dae4f.7a96b8",
-        "type": "ui_text",
+        "id": "5c2e39584ad8b2f5",
+        "type": "change",
         "z": "2fc32e47.9732e2",
-        "group": "e2aca116.33ad2",
-        "order": 6,
+        "name": "msg.show => twocolorblend",
+        "rules": [
+            {
+                "t": "set",
+                "p": "show",
+                "pt": "msg",
+                "to": "twocolorblend",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3640,
+        "y": 1380,
+        "wires": [
+            [
+                "1ee7c9a6620d3859"
+            ]
+        ]
+    },
+    {
+        "id": "68c7a793eaa9294d",
+        "type": "change",
+        "z": "2fc32e47.9732e2",
+        "name": "msg.show => twocolorblend",
+        "rules": [
+            {
+                "t": "set",
+                "p": "show",
+                "pt": "msg",
+                "to": "twocolorblend",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3640,
+        "y": 1340,
+        "wires": [
+            [
+                "0555ed834494cbab"
+            ]
+        ]
+    },
+    {
+        "id": "36653f0a33615a9a",
+        "type": "ui_button",
+        "z": "2fc32e47.9732e2",
+        "name": "",
+        "group": "57eea257.4cfba4",
+        "order": 11,
         "width": 0,
         "height": 0,
-        "name": "Result",
-        "label": "text",
-        "format": "{{msg.payload}}",
-        "layout": "row-left",
-        "x": 4160,
-        "y": 1240,
-        "wires": []
+        "passthru": false,
+        "label": "Audio spectrum",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "topic": "start",
+        "x": 3530,
+        "y": 2340,
+        "wires": [
+            [
+                "663dd5d378ba6465"
+            ]
+        ]
+    },
+    {
+        "id": "663dd5d378ba6465",
+        "type": "change",
+        "z": "2fc32e47.9732e2",
+        "name": "msg.show => audio_spectrum",
+        "rules": [
+            {
+                "t": "set",
+                "p": "show",
+                "pt": "msg",
+                "to": "audio_spectrum",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3860,
+        "y": 2340,
+        "wires": [
+            [
+                "3ec3076f.74f948"
+            ]
+        ]
+    },
+    {
+        "id": "4dc2b995.13d0f8",
+        "type": "mqtt-broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "222a3f19.b90e9",
+        "type": "ui_group",
+        "name": "Spin the Bottle",
+        "tab": "c7886a8d.764f4",
+        "order": 3,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "e2aca116.33ad2",
+        "type": "ui_group",
+        "name": "Color Blend",
+        "tab": "c7886a8d.764f4",
+        "order": 2,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "57eea257.4cfba4",
+        "type": "ui_group",
+        "name": "Animations",
+        "tab": "c7886a8d.764f4",
+        "order": 4,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "da52ac1d.f09478",
+        "type": "ui_group",
+        "name": "etc",
+        "tab": "c7886a8d.764f4",
+        "order": 5,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "f7b943a7.14f418",
+        "type": "ui_group",
+        "name": "Christmas Show",
+        "tab": "c7886a8d.764f4",
+        "order": 6,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "abc9273f.36d778",
+        "type": "ui_group",
+        "name": "Color",
+        "tab": "c7886a8d.764f4",
+        "order": 1,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "c7886a8d.764f4",
+        "type": "ui_tab",
+        "name": "MyLED",
+        "icon": "lightbulb_outline",
+        "order": 2
     }
 ]
