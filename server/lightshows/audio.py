@@ -2,12 +2,12 @@
 
 # 8 bar Audio equaliser using MCP2307
 
-import time
+from struct import unpack
 
 import alsaaudio as aa
 import numpy as np
-from struct import unpack
 
+from drivers import LEDStrip
 from lightshows.templates.colorcycle import ColorCycle
 
 
@@ -23,7 +23,6 @@ def Set_Column(row, col):
 
 # Initialise matrix
 TurnOffLEDS()
-
 
 
 def calculate_levels(data, chunk, sample_rate):
@@ -42,25 +41,29 @@ def calculate_levels(data, chunk, sample_rate):
     return matrix
 
 
-def combine_color(red, green, blue):
+def combine_color(red, green, blue, brightness: int):
+    brightness_factor = brightness / 100
     """Make one 3*8 byte color value."""
 
-    return (red,  green, blue)
+    return (np.clip(red * brightness_factor, 0, 255), np.clip(green * brightness_factor, 0, 255), np.clip(blue * brightness_factor, 0, 255))
 
 
-def wheel(wheel_pos):
+def wheel(value, threshold):
     """Get a color from a color wheel; Green -> Red -> Blue -> Green"""
+
+    wheel_pos = value - threshold
+    brightness = value if value > threshold else 0
 
     if wheel_pos > 255:
         wheel_pos = 255  # Safeguard
     if wheel_pos < 85:  # Red -> Green
-        return combine_color(255 - wheel_pos * 3, wheel_pos * 3, 0)
+        return combine_color(255 - wheel_pos * 3, wheel_pos * 3, 0, brightness)
     if wheel_pos < 170:  # Green -> Blue
         wheel_pos -= 85
-        return combine_color(0, 255 - wheel_pos * 3, wheel_pos * 3)
+        return combine_color(0, 255 - wheel_pos * 3, wheel_pos * 3, brightness)
     # Blue -> Magenta
     wheel_pos -= 170
-    return combine_color(0, wheel_pos * 3, 255)
+    return combine_color(0, wheel_pos * 3, 255, brightness)
 
 
 def brightness(value):
@@ -73,51 +76,58 @@ def brightness(value):
 
 threshold = 15
 
+
 class AudioSpectrum(ColorCycle):
 
+    def __init__(self, strip: LEDStrip, parameters: dict):
+        super().__init__(strip, parameters)
+        self.data_in = None
+        self.chunk = 0
+        self.sample_rate = 0
+
+    def init_parameters(self):
+        super().init_parameters()
+        self.set_parameter('num_steps_per_cycle', 255)
+        self.set_parameter('pause_sec', 0.001)
+
     def before_start(self) -> None:
-        pass
+        print("set up audio")
+        # Set up audio
+        self.sample_rate = 44100
+        no_channels = 2
+        self.chunk = 2048  # Use a multiple of 8
+        self.data_in = aa.PCM(aa.PCM_CAPTURE, aa.PCM_NORMAL, cardindex=0)
+        self.data_in.setchannels(no_channels)
+        self.data_in.setrate(self.sample_rate)
+        self.data_in.setformat(aa.PCM_FORMAT_S16_LE)
+        self.data_in.setperiodsize(self.chunk)
 
     def shutdown(self) -> None:
         pass
 
-    def run(self) -> None:
-        # Set up audio
-        sample_rate = 44100
-        no_channels = 2
-        chunk = 2048  # Use a multiple of 8
-        data_in = aa.PCM(aa.PCM_CAPTURE, aa.PCM_NORMAL, cardindex=0)
-        data_in.setchannels(no_channels)
-        data_in.setrate(sample_rate)
-        data_in.setformat(aa.PCM_FORMAT_S16_LE)
-        data_in.setperiodsize(chunk)
+    def update(self, current_step: int, current_cycle: int) -> bool:
+       # print(f"step: {current_step}, cycle: {current_cycle}")
+        #self.data_in.pause(0)  # Resume capture
 
-        while True:
-            self.strip.clear_strip()
+        # Read data from device
+        l, data = self.data_in.read()
 
-            # Read data from device
-            l, data = data_in.read()
-
-            data_in.pause(1)  # Pause capture whilst RPi processes data
-            if l:
-                # catch frame error
-                try:
-                    matrix = calculate_levels(data, chunk, sample_rate)
-                    line = [int((1 << matrix[i]) - 1) for i in range(100)]
-                    # print(" ".join([str(value) for value in line]))
-                    for index, value in enumerate(line):
-                        rgb = wheel(value - threshold)
-                        # brightness = int(max(1, math.log(value - threshold + 1))) if value >= threshold else 0
-                        # brightness = value - threshold + 1 if value >= threshold else 0
-                        bright = brightness(value)
-                        self.strip.set_pixel(index, *rgb)
-                        self.strip.set_pixel(self.strip.num_leds - index, *rgb)
-                    self.strip.show()
-                except Exception as e:
-                    if e.message != "not a whole number of frames":
-                        raise e
-            time.sleep(0.001)
-            data_in.pause(0)  # Resume capture
-
-
-
+        #self.data_in.pause(1)  # Pause capture whilst RPi processes data
+        if l > 0:
+            # catch frame error
+            try:
+                matrix = calculate_levels(data, self.chunk, self.sample_rate)
+                line = [int((1 << matrix[i]) - 1) for i in range(100)]
+                # print(" ".join([str(value) for value in line]))
+                for index, value in enumerate(line):
+                    rgb = wheel(value, threshold)
+                    # brightness = int(max(1, math.log(value - threshold + 1))) if value >= threshold else 0
+                    # brightness = value - threshold + 1 if value >= threshold else 0
+                    self.strip.set_pixel(index, *rgb)
+                    self.strip.set_pixel(self.strip.num_leds - index, *rgb)
+            except Exception as e:
+                if not hasattr(e, "message") or e.message != "not a whole number of frames":
+                    raise e
+            return True
+        else:
+            print(f"skipping l: {l}, data: {data}")

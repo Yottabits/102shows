@@ -8,12 +8,17 @@
 and displays animations on an LED strip.
 """
 
-__all__ = ['christmas',
-           'clear',
-           'rainbow',
-           'rgbtest',
-           'solidcolor',
-           'spinthebottle',
-           'strandtest',
-           'theaterchase',
-           'twocolorblend']
+__all__ = [
+    'audio',
+    'christmas',
+    'clear',
+    'jump',
+    'rainbow',
+    'rgbtest',
+    'solidcolor',
+    'spinthebottle',
+    'starlight',
+    'strandtest',
+    'theaterchase',
+    'twocolorblend'
+]
