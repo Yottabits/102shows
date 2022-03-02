@@ -4,6 +4,7 @@ import logging
 import math
 
 from drivers import LEDStrip
+from helpers.layout import Layout
 from lightshows.templates.colorcycle import ColorCycle
 
 log = logging.getLogger(__name__)
@@ -48,8 +49,6 @@ class Jump(ColorCycle):
         super().__init__(strip, parameters)
         self.state = {}
         self.stripe = 1
-        self.block = 99
-        self.mirror = True
         self.balls = ()
         self.spare_colors = [(0, 255, 255)]
 
@@ -60,11 +59,11 @@ class Jump(ColorCycle):
 
     def before_start(self):
         self.balls = (
-            Ball(self.block, self.stripe, (255, 0, 0)),
-            Ball(self.block * 0.5, self.stripe, (0, 255, 0)),
-            Ball(self.block * 0.75, self.stripe, (255, 255, 0)),
-            Ball(self.block * 0.88, self.stripe, (255, 0, 255)),
-            Ball(self.block * 0.66, self.stripe, (0, 0, 255))
+            Ball(self.layout.block, self.stripe, (255, 0, 0)),
+            Ball(self.layout.block * 0.5, self.stripe, (0, 255, 0)),
+            Ball(self.layout.block * 0.75, self.stripe, (255, 255, 0)),
+            Ball(self.layout.block * 0.88, self.stripe, (255, 0, 255)),
+            Ball(self.layout.block * 0.66, self.stripe, (0, 0, 255))
         )
 
     def update(self, current_step: int, current_cycle: int) -> bool:
@@ -76,9 +75,7 @@ class Jump(ColorCycle):
             for ball in self.balls:
                 pos = ball.get_pos(t)
                 index = pos + offset
-                self.strip.set_pixel(index, *ball.color)
-                if self.mirror:
-                    self.strip.set_pixel(self.strip.num_leds - index, *ball.color)
+                self.layout.set_pixel(index, *ball.color)
 
                 if ball.is_next():
                     self.spare_colors.insert(0, ball.color)

@@ -113,11 +113,7 @@ class AudioSpectrum(ColorCycle):
                 matrix = calculate_levels(data, self.chunk, self.sample_rate)
                 line = [int((1 << matrix[i]) - 1) for i in range(100)]
                 for index, value in enumerate(line):
-                    rgb = wheel(value, threshold)
-                    # brightness = int(max(1, math.log(value - threshold + 1))) if value >= threshold else 0
-                    # brightness = value - threshold + 1 if value >= threshold else 0
-                    self.strip.set_pixel(index, *rgb)
-                    self.strip.set_pixel(self.strip.num_leds - index, *rgb)
+                    self.layout.set_pixel(index, *(wheel(value, threshold)))
             except Exception as e:
                 if not hasattr(e, "message") or e.message != "not a whole number of frames":
                     raise e

@@ -20,5 +20,6 @@ __all__ = [
     'starlight',
     'strandtest',
     'theaterchase',
-    'twocolorblend'
+    'twocolorblend',
+    'ukraine',
 ]

@@ -16,6 +16,7 @@ import helpers.verify as verify
 from drivers import LEDStrip
 from helpers.configparser import get_configuration
 from helpers.exceptions import *
+from helpers.layout import Layout
 
 
 class LightshowParameters:
@@ -64,6 +65,7 @@ class Lightshow(metaclass=ABCMeta):
         # Parameters
         self.p = LightshowParameters()
         self.strip = strip
+        self.layout = Layout(strip)
         self.init_parameters()  # let the child class set its own default parameters
 
         # override with any directly given parameters

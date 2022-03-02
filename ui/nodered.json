@@ -1,27 +1,32 @@
 [
     {
-        "id": "d15c800.af31a",
+        "id": "2fc32e47.9732e2",
+        "type": "tab",
+        "label": "LED Control"
+    },
+    {
+        "id": "93f4131.fbfd2f",
         "type": "subflow",
-        "name": "RGB Joiner",
-        "info": "",
+        "name": "HEX to RGB",
+        "info": "convert a color HEX value (like #ff0080) to a rgb color tuple (like [255, 0, 128])",
         "in": [
             {
-                "x": 80,
-                "y": 100,
+                "x": 207,
+                "y": 96,
                 "wires": [
                     {
-                        "id": "eb5767ba.336868"
+                        "id": "5c79cf54.3c5ed"
                     }
                 ]
             }
         ],
         "out": [
             {
-                "x": 440,
-                "y": 100,
+                "x": 534,
+                "y": 96,
                 "wires": [
                     {
-                        "id": "2507f05e.330b78",
+                        "id": "5c79cf54.3c5ed",
                         "port": 0
                     }
                 ]
@@ -29,33 +34,110 @@
         ]
     },
     {
-        "id": "2507f05e.330b78",
-        "type": "function",
-        "z": "d15c800.af31a",
-        "name": "joiner",
-        "func": "var R = flow.get('R');\nvar G = flow.get('G');\nvar B = flow.get('B');\n\nmsg.topic = \"colour\";\nmsg.payload = [R, G, B];\n\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 330,
-        "y": 100,
-        "wires": [
-            []
+        "id": "49e83dbb.1a9224",
+        "type": "subflow",
+        "name": "RGB to HEX",
+        "info": "convert an rgb color tuple (like [255, 0, 128]) to a color HEX value (like #ff0080)",
+        "in": [
+            {
+                "x": 209.00001525878906,
+                "y": 136,
+                "wires": [
+                    {
+                        "id": "bd378a2d.22a2d"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 455,
+                "y": 137,
+                "wires": [
+                    {
+                        "id": "bd378a2d.22a2d",
+                        "port": 0
+                    }
+                ]
+            }
         ]
     },
     {
-        "id": "eb5767ba.336868",
-        "type": "function",
-        "z": "d15c800.af31a",
-        "name": "buffer",
-        "func": "var valid = ['R', 'G', 'B'];\n\nif (valid.indexOf(msg.topic) !== -1) {\n    flow.set(msg.topic, msg.payload);\n}\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 198.99996948242188,
-        "y": 100,
-        "wires": [
-            [
-                "2507f05e.330b78"
-            ]
+        "id": "793be9a5.d2c558",
+        "type": "subflow",
+        "name": "RGB to HSV",
+        "info": "convert an RGB color tuple (like [128, 0, 128]) to H (hue), S (saturation) and V (brightness) values (like, 300, 1, 0.5).",
+        "in": [
+            {
+                "x": 144,
+                "y": 103,
+                "wires": [
+                    {
+                        "id": "8f7a013f.29663"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 474,
+                "y": 49,
+                "wires": [
+                    {
+                        "id": "8f7a013f.29663",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 472.9999694824219,
+                "y": 102,
+                "wires": [
+                    {
+                        "id": "8f7a013f.29663",
+                        "port": 1
+                    }
+                ]
+            },
+            {
+                "x": 473.9999694824219,
+                "y": 156,
+                "wires": [
+                    {
+                        "id": "8f7a013f.29663",
+                        "port": 2
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "a79c1741.5ef28",
+        "type": "subflow",
+        "name": "HSV to RGB",
+        "info": "cache all messages with topics H, S and V.\non any H, S or V message, the according RGB tuple is recalculated and sent out.",
+        "in": [
+            {
+                "x": 95.33334350585938,
+                "y": 74.5,
+                "wires": [
+                    {
+                        "id": "ff772c2b.e14458"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 448.33331298828125,
+                "y": 74.66667175292969,
+                "wires": [
+                    {
+                        "id": "b3d72a18.150118",
+                        "port": 0
+                    }
+                ]
+            }
         ]
     },
     {
@@ -105,6 +187,304 @@
                     }
                 ]
             }
+        ]
+    },
+    {
+        "id": "d15c800.af31a",
+        "type": "subflow",
+        "name": "RGB Joiner",
+        "info": "",
+        "in": [
+            {
+                "x": 80,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "eb5767ba.336868"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 440,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "2507f05e.330b78",
+                        "port": 0
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "311dcc49.0aed54",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "b944567b.d15278",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "4dc2b995.13d0f8",
+        "type": "mqtt-broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "222a3f19.b90e9",
+        "type": "ui_group",
+        "name": "Spin the Bottle",
+        "tab": "c7886a8d.764f4",
+        "order": 3,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "c7886a8d.764f4",
+        "type": "ui_tab",
+        "name": "MyLED",
+        "icon": "lightbulb_outline",
+        "order": 2
+    },
+    {
+        "id": "da52ac1d.f09478",
+        "type": "ui_group",
+        "name": "etc",
+        "tab": "c7886a8d.764f4",
+        "order": 5,
+        "disp": false,
+        "width": "6"
+    },
+    {
+        "id": "abc9273f.36d778",
+        "type": "ui_group",
+        "name": "Color",
+        "tab": "c7886a8d.764f4",
+        "order": 1,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "e2aca116.33ad2",
+        "type": "ui_group",
+        "name": "Color Blend",
+        "tab": "c7886a8d.764f4",
+        "order": 2,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "57eea257.4cfba4",
+        "type": "ui_group",
+        "name": "Animations",
+        "tab": "c7886a8d.764f4",
+        "order": 4,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "f7b943a7.14f418",
+        "type": "ui_group",
+        "name": "Christmas Show",
+        "tab": "c7886a8d.764f4",
+        "order": 6,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "5c79cf54.3c5ed",
+        "type": "function",
+        "z": "93f4131.fbfd2f",
+        "name": "HEX to RGB",
+        "func": "var split_str = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(msg.payload);\n\nr = parseInt(split_str[1], 16);\ng = parseInt(split_str[2], 16);\nb = parseInt(split_str[3], 16)\n\nvar rgb = [r,g,b];\nmsg.payload = rgb;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 379.90000915527344,
+        "y": 96.39999389648438,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bd378a2d.22a2d",
+        "type": "function",
+        "z": "49e83dbb.1a9224",
+        "name": "RGB to HEX",
+        "func": "r = msg.payload[0];\ng = msg.payload[1];\nb = msg.payload[2];\n\nvar rgb = b | (g << 8) | (r << 16);\nmsg.payload = '#' + (0x1000000 + rgb).toString(16).slice(1);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 326.20001220703125,
+        "y": 142.1999969482422,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8f7a013f.29663",
+        "type": "function",
+        "z": "793be9a5.d2c558",
+        "name": "converter",
+        "func": "var r = msg.payload[0];\nvar g = msg.payload[1];\nvar b = msg.payload[2];\n\n// algorithm: http://www.rapidtables.com/convert/color/rgb-to-hsv.htm\n\n// helper variables\nvar R_ = r / 255;\nvar G_ = g / 255;\nvar B_ = b / 255;\n\nvar C_max = Math.max(R_, G_, B_);\nvar C_min = Math.min(R_, G_, B_);\nvar Delta = C_max - C_min;\n\n// Hue\nvar H;\nif (Delta === 0) {\n    H = 0;\n} else if (C_max === R_) {\n    H = 60 * ( ( (G_ - B_) / Delta ) % 6 );\n    if (H < 0) {\n        H = H + 360;\n    }\n} else if (C_max === G_) {\n    H = 60 * ( ( (B_ - R_) / Delta) + 2 );\n} else if (C_max === B_) {\n    H = 60 * ( ( (R_ - G_) / Delta) + 4 );\n}\n\n// Saturation\nvar S;\nif (C_max === 0) {\n    S = 0;\n} else{\n    S = Delta / C_max;\n}\n\n// Value\nvar V = C_max;\n\n// output messages\nvar msg_h = {\"topic\": \"H\", \"payload\": H};\nvar msg_s = {\"topic\": \"S\", \"payload\": S};\nvar msg_v = {\"topic\": \"V\", \"payload\": V};\n\nreturn [msg_h, msg_s, msg_v];",
+        "outputs": "3",
+        "noerr": 0,
+        "x": 273.73333740234375,
+        "y": 103.7166748046875,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b3d72a18.150118",
+        "type": "function",
+        "z": "a79c1741.5ef28",
+        "name": "converter",
+        "func": "var H = flow.get('H');\nvar S = flow.get('S');\nvar V = flow.get('V');\n\n// conversion\n// algorithm: http://www.rapidtables.com/convert/color/hsv-to-rgb.htm\n\nvar C = V * S;\nvar X = C * (1 - Math.abs(((H / 60) % 2) - 1));\nvar m = V - C;\n\nvar R_, G_, B_;\nif (H < 0) {\n    return;\n} else if (H < 60) {\n    [R_, G_, B_] = [C, X, 0];\n} else if (H < 120) {\n    [R_, G_, B_] = [X, C, 0];\n} else if (H < 180) {\n    [R_, G_, B_] = [0, C, X];\n} else if (H < 240) {\n    [R_, G_, B_] = [0, X, C];\n} else if (H < 300) {\n    [R_, G_, B_] = [X, 0, C];\n} else if (H < 360) {\n    [R_, G_, B_] = [C, 0, X];\n} else {\n    return;\n}\n\nvar R, G, B;\n[R, G, B] = [(R_ + m) * 255, (G_ + m) * 255, (B_ + m) * 255];\n[R, G, B] = [Math.round(R), Math.round(G), Math.round(B)];\n\nmsg.topic = \"colour\";\nmsg.payload = [R, G, B];\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 341.06671142578125,
+        "y": 74.38334655761719,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ff772c2b.e14458",
+        "type": "function",
+        "z": "a79c1741.5ef28",
+        "name": "buffer",
+        "func": "var valid = ['H', 'S', 'V'];\n\nif (valid.indexOf(msg.topic) !== -1) {\n    flow.set(msg.topic, msg.payload);\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 200.06668090820312,
+        "y": 74.38334655761719,
+        "wires": [
+            [
+                "b3d72a18.150118"
+            ]
         ]
     },
     {
@@ -166,222 +546,34 @@
         ]
     },
     {
-        "id": "a79c1741.5ef28",
-        "type": "subflow",
-        "name": "HSV to RGB",
-        "info": "cache all messages with topics H, S and V.\non any H, S or V message, the according RGB tuple is recalculated and sent out.",
-        "in": [
-            {
-                "x": 95.33334350585938,
-                "y": 74.5,
-                "wires": [
-                    {
-                        "id": "ff772c2b.e14458"
-                    }
-                ]
-            }
-        ],
-        "out": [
-            {
-                "x": 448.33331298828125,
-                "y": 74.66667175292969,
-                "wires": [
-                    {
-                        "id": "b3d72a18.150118",
-                        "port": 0
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "b3d72a18.150118",
+        "id": "2507f05e.330b78",
         "type": "function",
-        "z": "a79c1741.5ef28",
-        "name": "converter",
-        "func": "var H = flow.get('H');\nvar S = flow.get('S');\nvar V = flow.get('V');\n\n// conversion\n// algorithm: http://www.rapidtables.com/convert/color/hsv-to-rgb.htm\n\nvar C = V * S;\nvar X = C * (1 - Math.abs(((H / 60) % 2) - 1));\nvar m = V - C;\n\nvar R_, G_, B_;\nif (H < 0) {\n    return;\n} else if (H < 60) {\n    [R_, G_, B_] = [C, X, 0];\n} else if (H < 120) {\n    [R_, G_, B_] = [X, C, 0];\n} else if (H < 180) {\n    [R_, G_, B_] = [0, C, X];\n} else if (H < 240) {\n    [R_, G_, B_] = [0, X, C];\n} else if (H < 300) {\n    [R_, G_, B_] = [X, 0, C];\n} else if (H < 360) {\n    [R_, G_, B_] = [C, 0, X];\n} else {\n    return;\n}\n\nvar R, G, B;\n[R, G, B] = [(R_ + m) * 255, (G_ + m) * 255, (B_ + m) * 255];\n[R, G, B] = [Math.round(R), Math.round(G), Math.round(B)];\n\nmsg.topic = \"colour\";\nmsg.payload = [R, G, B];\n\n\nreturn msg;",
+        "z": "d15c800.af31a",
+        "name": "joiner",
+        "func": "var R = flow.get('R');\nvar G = flow.get('G');\nvar B = flow.get('B');\n\nmsg.topic = \"colour\";\nmsg.payload = [R, G, B];\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 341.06671142578125,
-        "y": 74.38334655761719,
+        "x": 330,
+        "y": 100,
         "wires": [
             []
         ]
     },
     {
-        "id": "ff772c2b.e14458",
+        "id": "eb5767ba.336868",
         "type": "function",
-        "z": "a79c1741.5ef28",
+        "z": "d15c800.af31a",
         "name": "buffer",
-        "func": "var valid = ['H', 'S', 'V'];\n\nif (valid.indexOf(msg.topic) !== -1) {\n    flow.set(msg.topic, msg.payload);\n}\n\nreturn msg;",
+        "func": "var valid = ['R', 'G', 'B'];\n\nif (valid.indexOf(msg.topic) !== -1) {\n    flow.set(msg.topic, msg.payload);\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 200.06668090820312,
-        "y": 74.38334655761719,
+        "x": 198.99996948242188,
+        "y": 100,
         "wires": [
             [
-                "b3d72a18.150118"
+                "2507f05e.330b78"
             ]
         ]
-    },
-    {
-        "id": "793be9a5.d2c558",
-        "type": "subflow",
-        "name": "RGB to HSV",
-        "info": "convert an RGB color tuple (like [128, 0, 128]) to H (hue), S (saturation) and V (brightness) values (like, 300, 1, 0.5).",
-        "in": [
-            {
-                "x": 144,
-                "y": 103,
-                "wires": [
-                    {
-                        "id": "8f7a013f.29663"
-                    }
-                ]
-            }
-        ],
-        "out": [
-            {
-                "x": 474,
-                "y": 49,
-                "wires": [
-                    {
-                        "id": "8f7a013f.29663",
-                        "port": 0
-                    }
-                ]
-            },
-            {
-                "x": 472.9999694824219,
-                "y": 102,
-                "wires": [
-                    {
-                        "id": "8f7a013f.29663",
-                        "port": 1
-                    }
-                ]
-            },
-            {
-                "x": 473.9999694824219,
-                "y": 156,
-                "wires": [
-                    {
-                        "id": "8f7a013f.29663",
-                        "port": 2
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "8f7a013f.29663",
-        "type": "function",
-        "z": "793be9a5.d2c558",
-        "name": "converter",
-        "func": "var r = msg.payload[0];\nvar g = msg.payload[1];\nvar b = msg.payload[2];\n\n// algorithm: http://www.rapidtables.com/convert/color/rgb-to-hsv.htm\n\n// helper variables\nvar R_ = r / 255;\nvar G_ = g / 255;\nvar B_ = b / 255;\n\nvar C_max = Math.max(R_, G_, B_);\nvar C_min = Math.min(R_, G_, B_);\nvar Delta = C_max - C_min;\n\n// Hue\nvar H;\nif (Delta === 0) {\n    H = 0;\n} else if (C_max === R_) {\n    H = 60 * ( ( (G_ - B_) / Delta ) % 6 );\n    if (H < 0) {\n        H = H + 360;\n    }\n} else if (C_max === G_) {\n    H = 60 * ( ( (B_ - R_) / Delta) + 2 );\n} else if (C_max === B_) {\n    H = 60 * ( ( (R_ - G_) / Delta) + 4 );\n}\n\n// Saturation\nvar S;\nif (C_max === 0) {\n    S = 0;\n} else{\n    S = Delta / C_max;\n}\n\n// Value\nvar V = C_max;\n\n// output messages\nvar msg_h = {\"topic\": \"H\", \"payload\": H};\nvar msg_s = {\"topic\": \"S\", \"payload\": S};\nvar msg_v = {\"topic\": \"V\", \"payload\": V};\n\nreturn [msg_h, msg_s, msg_v];",
-        "outputs": "3",
-        "noerr": 0,
-        "x": 273.73333740234375,
-        "y": 103.7166748046875,
-        "wires": [
-            [],
-            [],
-            []
-        ]
-    },
-    {
-        "id": "93f4131.fbfd2f",
-        "type": "subflow",
-        "name": "HEX to RGB",
-        "info": "convert a color HEX value (like #ff0080) to a rgb color tuple (like [255, 0, 128])",
-        "in": [
-            {
-                "x": 207,
-                "y": 96,
-                "wires": [
-                    {
-                        "id": "5c79cf54.3c5ed"
-                    }
-                ]
-            }
-        ],
-        "out": [
-            {
-                "x": 534,
-                "y": 96,
-                "wires": [
-                    {
-                        "id": "5c79cf54.3c5ed",
-                        "port": 0
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "5c79cf54.3c5ed",
-        "type": "function",
-        "z": "93f4131.fbfd2f",
-        "name": "HEX to RGB",
-        "func": "var split_str = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(msg.payload);\n\nr = parseInt(split_str[1], 16);\ng = parseInt(split_str[2], 16);\nb = parseInt(split_str[3], 16)\n\nvar rgb = [r,g,b];\nmsg.payload = rgb;\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 379.90000915527344,
-        "y": 96.39999389648438,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "49e83dbb.1a9224",
-        "type": "subflow",
-        "name": "RGB to HEX",
-        "info": "convert an rgb color tuple (like [255, 0, 128]) to a color HEX value (like #ff0080)",
-        "in": [
-            {
-                "x": 209.00001525878906,
-                "y": 136,
-                "wires": [
-                    {
-                        "id": "bd378a2d.22a2d"
-                    }
-                ]
-            }
-        ],
-        "out": [
-            {
-                "x": 455,
-                "y": 137,
-                "wires": [
-                    {
-                        "id": "bd378a2d.22a2d",
-                        "port": 0
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "bd378a2d.22a2d",
-        "type": "function",
-        "z": "49e83dbb.1a9224",
-        "name": "RGB to HEX",
-        "func": "r = msg.payload[0];\ng = msg.payload[1];\nb = msg.payload[2];\n\nvar rgb = b | (g << 8) | (r << 16);\nmsg.payload = '#' + (0x1000000 + rgb).toString(16).slice(1);\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 326.20001220703125,
-        "y": 142.1999969482422,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "2fc32e47.9732e2",
-        "type": "tab",
-        "label": "LED Control"
     },
     {
         "id": "83a0d3d7.f8db4",
@@ -3003,7 +3195,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 3860,
+        "x": 3830,
         "y": 2340,
         "wires": [
             [
@@ -3012,81 +3204,56 @@
         ]
     },
     {
-        "id": "4dc2b995.13d0f8",
-        "type": "mqtt-broker",
-        "broker": "localhost",
-        "port": "1883",
-        "clientid": "",
-        "usetls": false,
-        "compatmode": true,
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
+        "id": "676f680930b90f84",
+        "type": "ui_button",
+        "z": "2fc32e47.9732e2",
+        "name": "",
+        "group": "abc9273f.36d778",
+        "order": 11,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Ukraine",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "topic": "start",
+        "x": 3530,
+        "y": 2420,
+        "wires": [
+            [
+                "9e6bf7b4155daf0f"
+            ]
+        ]
     },
     {
-        "id": "222a3f19.b90e9",
-        "type": "ui_group",
-        "name": "Spin the Bottle",
-        "tab": "c7886a8d.764f4",
-        "order": 3,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "e2aca116.33ad2",
-        "type": "ui_group",
-        "name": "Color Blend",
-        "tab": "c7886a8d.764f4",
-        "order": 2,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "57eea257.4cfba4",
-        "type": "ui_group",
-        "name": "Animations",
-        "tab": "c7886a8d.764f4",
-        "order": 4,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "da52ac1d.f09478",
-        "type": "ui_group",
-        "name": "etc",
-        "tab": "c7886a8d.764f4",
-        "order": 5,
-        "disp": false,
-        "width": "6"
-    },
-    {
-        "id": "f7b943a7.14f418",
-        "type": "ui_group",
-        "name": "Christmas Show",
-        "tab": "c7886a8d.764f4",
-        "order": 6,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "abc9273f.36d778",
-        "type": "ui_group",
-        "name": "Color",
-        "tab": "c7886a8d.764f4",
-        "order": 1,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "c7886a8d.764f4",
-        "type": "ui_tab",
-        "name": "MyLED",
-        "icon": "lightbulb_outline",
-        "order": 2
+        "id": "9e6bf7b4155daf0f",
+        "type": "change",
+        "z": "2fc32e47.9732e2",
+        "name": "msg.show => ukraine",
+        "rules": [
+            {
+                "t": "set",
+                "p": "show",
+                "pt": "msg",
+                "to": "ukraine",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3800,
+        "y": 2420,
+        "wires": [
+            [
+                "3ec3076f.74f948"
+            ]
+        ]
     }
 ]

@@ -17,4 +17,5 @@ shows = {
     'starlight': starlight.Starlight,
     'jump': jump.Jump,
     'audio_spectrum': audio.AudioSpectrum,
+    'ukraine': ukraine.Ukraine,
 }
