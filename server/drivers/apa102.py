@@ -142,7 +142,7 @@ class APA102(LEDStrip):
     def show(self) -> None:
         """sends the buffered color and brightness values to the strip"""
         self.spi.xfer2(self.spi_start_frame())
-        self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
+        self.spi.xfer2(self.leds.copy())  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
         if self.__sk9822_compatibility_mode:
             self.spi.xfer2(self.spi_start_frame())
         self.spi.xfer2(self.spi_end_frame(self.num_leds))
