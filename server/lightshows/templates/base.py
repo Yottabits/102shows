@@ -16,6 +16,7 @@ import helpers.verify as verify
 from drivers import LEDStrip
 from helpers.configparser import get_configuration
 from helpers.exceptions import *
+from helpers.layout import Layout
 
 
 class LightshowParameters:
@@ -64,6 +65,7 @@ class Lightshow(metaclass=ABCMeta):
         # Parameters
         self.p = LightshowParameters()
         self.strip = strip
+        self.layout = Layout(strip)
         self.init_parameters()  # let the child class set its own default parameters
 
         # override with any directly given parameters
@@ -193,6 +195,7 @@ class Lightshow(metaclass=ABCMeta):
                 self.set_parameter(param_name, value=parameters[param_name], send_mqtt_update=False)
             self.mqtt.send_current_parameter_state()
         else:
+            print("parameters", type(parameters))
             raise InvalidParameters("Parameters payload must be given as JSON like this: " +
                                     "{\"param_name\": 42, \"param2_name\": [255,125,0]}  " +
                                     "(instead received: " + str(parameters) + " ).")

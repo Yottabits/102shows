@@ -1,9 +1,8 @@
 # Driver for APA102 LED strips (aka "DotStar")
 # (c) 2015 Martin Erzberger, 2016-2017 Simon Leiner
 # licensed under the GNU Public License, version 2
-
-import spidev
 from multiprocessing import Array as SyncedArray
+import spidev
 
 from drivers import LEDStrip
 from helpers.color import grayscale_correction
@@ -64,6 +63,7 @@ class APA102(LEDStrip):
         self.spi = spidev.SpiDev()  # Init the SPI device
         self.spi.open(0, 1)  # Open SPI port 0, slave device (CS)  1
         self.spi.max_speed_hz = self.max_clock_speed_hz  # should not be higher than 8000000
+
         self.leds = [self.led_prefix(self._global_brightness), 0, 0, 0] * self.num_leds  # 4 bytes per LED
         self.synced_buffer = SyncedArray('i', self.leds)
 
@@ -142,10 +142,10 @@ class APA102(LEDStrip):
     def show(self) -> None:
         """sends the buffered color and brightness values to the strip"""
         self.spi.xfer2(self.spi_start_frame())
-        self.spi.xfer2(self.leds)  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
+        self.spi.xfer2(self.leds.copy())  # SPI takes up to 4096 Integers. So we are fine for up to 1024 LEDs.
         if self.__sk9822_compatibility_mode:
             self.spi.xfer2(self.spi_start_frame())
-        self.spi.xfer2(self.spi_end_frame(self.num_leds))
+        self.spi.xfer(self.spi_end_frame(self.num_leds))
 
     @staticmethod
     def spi_end_frame(num_leds) -> list:
